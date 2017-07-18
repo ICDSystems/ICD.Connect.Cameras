@@ -1,24 +1,14 @@
 ﻿using ICD.Connect.Conferencing.Cameras;
-using ICD.Connect.Devices;
 using ICD.Connect.Protocol.Ports;
-using ICD.Connect.Protocol.Extensions;
-using ICD.Common.EventArguments;
-using ICD.Connect.Settings.Core;
-using ICD.Common.Services.Logging;
 
-namespace ICD.Connect.Cameras
+namespace ICD.Connect.Cameras.Visca
 {
-    public abstract class AbstractCameraDevice<TSettings> : AbstractDevice<TSettings>, ICameraDevice
-        where TSettings : ICameraDeviceSettings, new()
+    public sealed class ViscaCameraDevice : AbstractCameraDevice<ViscaCameraDeviceSettings>
     {
-        private ISerialPort m_Port;
-
-        #region Methods
-
-        public abstract void Move(eCameraAction action);
-
-        public abstract void Stop();
-
+        public void Move(eCameraAction action)
+        {
+            
+        }
         /// <summary>
         /// Sets the wrapped port for communication with the hardware.
         /// </summary>
@@ -127,6 +117,5 @@ namespace ICD.Connect.Cameras
         }
 
         #endregion
-    
     }
 }
