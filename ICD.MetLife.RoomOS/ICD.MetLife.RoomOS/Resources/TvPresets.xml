@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Provider Name="MetLife GTO" >
+	<Stations>
+		<Station Image="CBS" Name="CBS" Channel="1" />
+		<Station Image="ABC" Name="ABC" Channel="2" />
+		<Station Image="TWC" Name="News14" Channel="3" />
+		<Station Image="NBC" Name="NBC" Channel="4" />
+		<Station Image="CNN" Name="CNN" Channel="5" />
+		<Station Image="HLN" Name="HLN" Channel="6" />
+		<Station Image="FoxNews" Name="Fox News" Channel="7" />
+		<Station Image="MSNBC" Name="MSNBC" Channel="8" />
+		<Station Image="CNBC" Name="CNBC" Channel="9" />
+		<Station Image="ESPN" Name="ESPN" Channel="10" />
+		<Station Image="BloombergTelevision" Name="Bloomberg Television" Channel="11" />
+		<Station Image="TheWeatherChannel" Name="The Weather Channel" Channel="12" />
+	</Stations>
+</Provider>

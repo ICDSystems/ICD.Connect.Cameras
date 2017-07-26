@@ -1,0 +1,678 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{A160656E-A329-4F2D-B576-F9A9E192C1C3}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ICD.MetLife.RoomOS</RootNamespace>
+    <AssemblyName>ICD.MetLife.RoomOS_SimplSharp</AssemblyName>
+    <ProjectTypeGuids>{0B4745B0-194B-4BB6-8E21-E9057CA92300};{4D628B5B-2FBC-4AA6-8C16-197242AEB884};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <PlatformFamilyName>WindowsCE</PlatformFamilyName>
+    <PlatformID>E2BECB1F-8C8C-41ba-B736-9BE7D946A398</PlatformID>
+    <OSVersion>5.0</OSVersion>
+    <DeployDirSuffix>SmartDeviceProject1</DeployDirSuffix>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <NativePlatformName>Windows CE</NativePlatformName>
+    <FormFactorID>
+    </FormFactorID>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <AllowedReferenceRelatedFileExtensions>.allowedReferenceRelatedFileExtensions</AllowedReferenceRelatedFileExtensions>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;SIMPLSHARP</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <FileAlignment>512</FileAlignment>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <GenerateSerializationAssemblies>off</GenerateSerializationAssemblies>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <AllowedReferenceRelatedFileExtensions>.allowedReferenceRelatedFileExtensions</AllowedReferenceRelatedFileExtensions>
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <FileAlignment>512</FileAlignment>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <GenerateSerializationAssemblies>off</GenerateSerializationAssemblies>
+    <DefineConstants>SIMPLSHARP</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="mscorlib" />
+    <Reference Include="SimplSharpCustomAttributesInterface, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1099c178b3b54c3b, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\ProgramData\Crestron\SDK\SimplSharpCustomAttributesInterface.dll</HintPath>
+    </Reference>
+    <Reference Include="SimplSharpHelperInterface, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1099c178b3b54c3b, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\ProgramData\Crestron\SDK\SimplSharpHelperInterface.dll</HintPath>
+    </Reference>
+    <Reference Include="SimplSharpNewtonsoft, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1099c178b3b54c3b, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\ProgramData\Crestron\SDK\SimplSharpNewtonsoft.dll</HintPath>
+    </Reference>
+    <Reference Include="SimplSharpPro, Version=1.5.3.17, Culture=neutral, PublicKeyToken=1099c178b3b54c3b, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\ProgramData\Crestron\SDK\SimplSharpPro.exe</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="SimplSharpReflectionInterface, Version=1.0.5583.25238, Culture=neutral, PublicKeyToken=1099c178b3b54c3b, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\ProgramData\Crestron\SDK\SimplSharpReflectionInterface.dll</HintPath>
+    </Reference>
+    <Reference Include="SimplSharpSQLHelperInterface, Version=1.0.92.0, Culture=neutral, PublicKeyToken=1099c178b3b54c3b, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\ProgramData\Crestron\SDK\SimplSharpSQLHelperInterface.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="system.data" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ObfuscationSettings.cs" />
+    <Compile Include="Endpoints\Destinations\MetlifeDestination.cs" />
+    <Compile Include="Endpoints\Destinations\MetlifeDestinationSettings.cs" />
+    <Compile Include="Endpoints\Sources\MetlifeSource.cs" />
+    <Compile Include="Endpoints\Sources\MetlifeSourceSettings.cs" />
+    <Compile Include="Endpoints\Sources\SourceFlags.cs" />
+    <Compile Include="Endpoints\Sources\SourceType.cs" />
+    <Compile Include="KrangPlugin.cs" />
+    <Compile Include="MetlifeUserInterfaceFactory.cs" />
+    <Compile Include="MetlifeUserInterfaceFactorySettings.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rooms\DialingPlanEndpointInfo.cs" />
+    <Compile Include="Rooms\DialingPlanInfo.cs" />
+    <Compile Include="Rooms\MetlifeRoom.cs" />
+    <Compile Include="Rooms\MetlifeRoomOwner.cs" />
+    <Compile Include="Rooms\MetlifeRoomSettings.cs" />
+    <Compile Include="Rooms\MetlifeRouting.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\IPresenters\ICodecFusionPresenter.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\IPresenters\IDisplaysFusionPresenter.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\IPresenters\IDspFusionPresenter.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\IPresenters\IFusionPresenter.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\IPresenters\IFusionPresenterFactory.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\IPresenters\ILightingFusionPresenter.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\IPresenters\ILoggingFusionPresenter.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\IPresenters\IPanelFusionPresenter.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\IPresenters\IProgramFusionPresenter.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\IPresenters\IRackFusionPresenter.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\IPresenters\IRoomFusionPresenter.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\IPresenters\IRoutingFusionPresenter.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\IPresenters\ISettingsFusionPresenter.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\IViews\ICodecFusionView.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\IViews\IDisplaysFusionView.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\IViews\IDspFusionView.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\IViews\IFusionView.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\IViews\IFusionViewFactory.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\IViews\ILightingFusionView.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\IViews\ILoggingFusionView.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\IViews\IPanelFusionView.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\IViews\IProgramFusionView.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\IViews\IRackFusionView.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\IViews\IRoomFusionView.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\IViews\IRoutingFusionView.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\IViews\ISettingsFusionView.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\MetlifeFusionInterface.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Presenters\AbstractFusionPresenter.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Presenters\CodecFusionPresenter.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Presenters\DisplaysFusionPresenter.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Presenters\DspFusionPresenter.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Presenters\LightingFusionPresenter.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Presenters\LoggingFusionPresenter.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Presenters\MetlifeFusionPresenterFactory.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Presenters\PanelFusionPresenter.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Presenters\ProgramFusionPresenter.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Presenters\RackFusionPresenter.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Presenters\RoomFusionPresenter.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Presenters\RoutingFusionPresenter.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Presenters\SettingsFusionPresenter.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Views\AbstractFusionView.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Views\CodecFusionView.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Views\CodecFusionView.generated.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Views\DisplaysFusionView.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Views\DisplaysFusionView.generated.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Views\DspFusionView.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Views\DspFusionView.generated.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Views\LightingFusionView.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Views\LightingFusionView.generated.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Views\LoggingFusionView.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Views\LoggingFusionView.generated.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Views\MetlifeFusionViewFactory.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Views\PanelFusionView.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Views\PanelFusionView.generated.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Views\ProgramFusionView.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Views\ProgramFusionView.generated.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Views\RackFusionView.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Views\RackFusionView.generated.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Views\RoomFusionView.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Views\RoomFusionView.generated.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Views\RoutingFusionView.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Views\RoutingFusionView.generated.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Views\SettingsFusionView.cs" />
+    <Compile Include="UserInterfaces\FusionInterface\Views\SettingsFusionView.generated.cs" />
+    <Compile Include="UserInterfaces\MicrophoneInterfaces\AbstractMicrophoneInterface.cs" />
+    <Compile Include="UserInterfaces\MicrophoneInterfaces\MetlifeClockAudioInterface.cs" />
+    <Compile Include="UserInterfaces\MicrophoneInterfaces\MetlifeShureInterface.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Camera\ICameraPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Common\IPageMainPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Common\IShutdownConfirmPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Common\IStatusBarPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Dial\DialNav\Components\IDialNavComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Dial\DialNav\Components\IDialNavContactsComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Dial\DialNav\Components\IDialNavDialpadComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Dial\DialNav\Components\IDialNavFavoritesComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Dial\DialNav\Components\IDialNavKeyboardComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Dial\DialNav\Components\IDialNavRecentCallsComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Dial\DialNav\IDialNavHomeButtonPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Dial\DialNav\IDialNavPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Dial\IDialpadPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Dial\IDirectoryComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Dial\IDirectoryContactComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Dial\IDirectoryFolderComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Dial\IDirectoryPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Dial\IFavoritesAndDirectoryComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Dial\IFavoritesComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Dial\IFavoritesPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Dial\IKeyboardAlphaPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Dial\IKeyboardCommonPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Dial\IKeyboardSpecialPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Dial\IRecentCallPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Dial\IRecentsPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Home\ICallStatusPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Home\IHomeMeetingsPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Home\IInACallPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Home\IRoomNumbersPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\IHardButtonsPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\INavigationController.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\IPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\ISoundsPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Layout\ILayoutPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\MainNav\Components\IMainNavAddCallComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\MainNav\Components\IMainNavCameraComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\MainNav\Components\IMainNavComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\MainNav\Components\IMainNavContactsComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\MainNav\Components\IMainNavDialComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\MainNav\Components\IMainNavEndCallComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\MainNav\Components\IMainNavHoldCallComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\MainNav\Components\IMainNavLayoutComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\MainNav\Components\IMainNavMeetingsComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\MainNav\Components\IMainNavMuteComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\MainNav\Components\IMainNavPlayGameComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\MainNav\Components\IMainNavShareComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\MainNav\Components\IMainNavSourceComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\MainNav\Components\IMainNavTouchtonesComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\MainNav\IMainNavPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Meetings\IMeetingsPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Popups\Blocking\Alert.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Popups\Blocking\AlertOption.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Popups\Blocking\DialogBoxButton.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Popups\Blocking\IAlertBoxPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Popups\Blocking\IDialogBoxPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Popups\Blocking\IIncomingCallPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Popups\Blocking\IPopupListPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Popups\Blocking\Keyboard\IPopupKeyboardAlphaPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Popups\Blocking\Keyboard\IPopupKeyboardCommonPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Popups\Blocking\Keyboard\IPopupKeyboardSpecialPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Popups\Inline\IPopupBasePresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Popups\Inline\ISettingsStandardPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Popups\Inline\Lights\ILightComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Popups\Inline\Lights\ILightsPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Popups\Inline\Lights\IShadeComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Popups\Inline\Meetings\IReserveNowPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Popups\Inline\Share\IDisplaySelectPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Popups\Inline\Volume\IVolumeComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Popups\Inline\Volume\IVolumePresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Popups\Inline\Volume\IVolumeSidePresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Settings\ISettingsBasePresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Settings\ISettingsDeviceListComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Settings\ISettingsDeviceListPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Settings\ISettingsDevicePropertiesPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Settings\ISettingsDeviceStatusPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Settings\ISettingsEventLogComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Settings\ISettingsEventLogPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Settings\ISettingsFileOperationsPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Settings\ISettingsRoomInfoPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Settings\ISettingsSystemConfigurationPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Settings\SettingsDevicePropertiesComponents\ISettingsDevicePropertiesComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Settings\SettingsDevicePropertiesComponents\ISettingsDevicePropertiesDeviceComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Settings\SettingsDevicePropertiesComponents\ISettingsDevicePropertiesEnumComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Settings\SettingsDevicePropertiesComponents\ISettingsDevicePropertiesIpidComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Settings\SettingsDevicePropertiesComponents\ISettingsDevicePropertiesPortComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Settings\SettingsDevicePropertiesComponents\ISettingsDevicePropertiesStringComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\Settings\SettingsDevicePropertiesComponents\PropertySettingsPair.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\ShareMenu\IShareComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\ShareMenu\IShareMenuPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\TouchTones\ITouchTonesPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\TvTuner\IChannelPresetPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\TvTuner\ITvTunerPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\TvTuner\NavSource\IGenericNavSourcePresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\TvTuner\NavSource\INavSourcePresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\VisibilityTree\AbstractVisibilityNode.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\VisibilityTree\DefaultVisibilityNode.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\VisibilityTree\IVisibilityNode.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IPresenters\VisibilityTree\SingleVisibilityNode.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Camera\ICameraView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Colors.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Common\IPageMainView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Common\IShutdownConfirmView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Common\IStatusBarView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Dial\DialNav\IDialNavComponentView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Dial\DialNav\IDialNavHomeButtonView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Dial\DialNav\IDialNavView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Dial\IDialpadView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Dial\IDirectoryView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Dial\IFavoritesAndDirectoryComponentView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Dial\IFavoritesView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Dial\IKeyboardAlphaView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Dial\IKeyboardCommonView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Dial\IKeyboardSpecialView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Dial\IRecentCallView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Dial\IRecentsView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Home\ICallStatusView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Home\IHomeMeetingsView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Home\IInACallView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Home\IRoomNumbersView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\IHardButtonsView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\IIcon.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\ISoundsView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\IView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\IViewFactory.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\KeyboardKey.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Layout\ILayoutView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\MainNav\IMainNavComponentView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\MainNav\IMainNavView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Meetings\IMeetingsView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Meetings\MeetingInfo.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Popups\Blocking\IAlertBoxView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Popups\Blocking\IDialogBoxView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Popups\Blocking\IIncomingCallView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Popups\Blocking\IPopupListView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Popups\Blocking\Keyboard\IPopupKeyboardAlphaView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Popups\Blocking\Keyboard\IPopupKeyboardCommonView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Popups\Blocking\Keyboard\IPopupKeyboardSpecialView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Popups\Inline\IPopupBaseView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Popups\Inline\ISettingsStandardView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Popups\Inline\Lights\ILightComponentView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Popups\Inline\Lights\ILightsView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Popups\Inline\Lights\IShadeComponentView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Popups\Inline\Meetings\IReserveNowView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Popups\Inline\Share\IDisplaySelectView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Popups\Inline\Volume\IVolumeComponentView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Popups\Inline\Volume\IVolumeSideView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Popups\Inline\Volume\IVolumeView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Settings\ISettingsBaseView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Settings\ISettingsDeviceListComponentView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Settings\ISettingsDeviceListView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Settings\ISettingsDevicePropertiesComponentView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Settings\ISettingsDevicePropertiesView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Settings\ISettingsDeviceStatusView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Settings\ISettingsEventLogComponentView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Settings\ISettingsEventLogView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Settings\ISettingsFileOperationsView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Settings\ISettingsRoomInfoView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\Settings\ISettingsSystemConfigurationView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\ShareMenu\IShareComponentView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\ShareMenu\IShareMenuView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\TouchTones\ITouchTonesView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\TvTuner\IChannelPresetView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\TvTuner\ITvTunerView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\TvTuner\NavSource\IGenericNavSourceView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\IViews\TvTuner\NavSource\INavSourceView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\MetlifeUserInterface.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\AbstractComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\AbstractListItemFactory.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\AbstractMainPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\AbstractPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Camera\CameraPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Common\PageMainPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Common\ShutdownConfirmPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Common\StatusBarPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Dial\AbstractDialPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Dial\AbstractDirectoryComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Dial\AbstractFavoritesAndDirectoryComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Dial\DialNav\Components\AbstractDialNavComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Dial\DialNav\Components\DialNavContactsComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Dial\DialNav\Components\DialNavDialpadComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Dial\DialNav\Components\DialNavFavoritesComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Dial\DialNav\Components\DialNavKeyboardComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Dial\DialNav\Components\DialNavRecentCallsComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Dial\DialNav\DialNavHomeButtonPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Dial\DialNav\DialNavPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Dial\DialpadPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Dial\DirectoryContactComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Dial\DirectoryFolderComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Dial\DirectoryPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Dial\FavoritesComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Dial\FavoritesComponentPresenterFactory.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Dial\FavoritesPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Dial\KeyboardAlphaPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Dial\KeyboardCommonPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Dial\KeyboardSpecialPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Dial\RecentCallPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Dial\RecentsComponentPresenterFactory.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Dial\RecentsPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\HardButtonsPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Home\CallStatusComponentPresenterFactory.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Home\CallStatusPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Home\HomeMeetingsPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Home\InACallPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Home\RoomNumbersPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Layout\LayoutPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\MainNav\Components\AbstractMainNavComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\MainNav\Components\AbstractMainNavMenuComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\MainNav\Components\MainNavAddCallComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\MainNav\Components\MainNavCameraComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\MainNav\Components\MainNavContactsComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\MainNav\Components\MainNavDialComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\MainNav\Components\MainNavEndCallComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\MainNav\Components\MainNavHoldCallComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\MainNav\Components\MainNavLayoutComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\MainNav\Components\MainNavMeetingsComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\MainNav\Components\MainNavMuteComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\MainNav\Components\MainNavPlayGameComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\MainNav\Components\MainNavShareComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\MainNav\Components\MainNavSourceComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\MainNav\Components\MainNavTouchtonesComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\MainNav\MainNavPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Meetings\MeetingsPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\MetlifeNavigationController.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Popups\AbstractPopupPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Popups\Blocking\AlertBoxPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Popups\Blocking\DialogBoxPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Popups\Blocking\IncomingCallPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Popups\Blocking\Keyboard\PopupKeyboardAlphaPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Popups\Blocking\Keyboard\PopupKeyboardCommonPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Popups\Blocking\Keyboard\PopupKeyboardSpecialPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Popups\Blocking\PopupListPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Popups\Inline\Lights\LightComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Popups\Inline\Lights\LightComponentPresenterFactory.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Popups\Inline\Lights\LightsPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Popups\Inline\Lights\ShadeComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Popups\Inline\Lights\ShadeComponentPresenterFactory.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Popups\Inline\Meetings\ReserveNowPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Popups\Inline\PopupBasePresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Popups\Inline\SettingsStandardPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Popups\Inline\Share\DisplaySelectPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Popups\Inline\Volume\VolumeComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Popups\Inline\Volume\VolumeComponentPresenterFactory.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Popups\Inline\Volume\VolumePresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Popups\Inline\Volume\VolumeSidePresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Settings\SettingsBasePresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Settings\SettingsDeviceListComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Settings\SettingsDeviceListComponentPresenterFactory.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Settings\SettingsDeviceListPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Settings\SettingsDevicePropertiesComponentPresenterFactory.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Settings\SettingsDevicePropertiesComponents\AbstractSettingsDevicePropertiesComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Settings\SettingsDevicePropertiesComponents\AbstractSettingsDevicePropertiesKeyboardComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Settings\SettingsDevicePropertiesComponents\AbstractSettingsDevicePropertiesListComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Settings\SettingsDevicePropertiesComponents\SettingsDevicePropertiesDeviceComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Settings\SettingsDevicePropertiesComponents\SettingsDevicePropertiesEnumComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Settings\SettingsDevicePropertiesComponents\SettingsDevicePropertiesIpidComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Settings\SettingsDevicePropertiesComponents\SettingsDevicePropertiesPortComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Settings\SettingsDevicePropertiesComponents\SettingsDevicePropertiesStringComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Settings\SettingsDevicePropertiesPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Settings\SettingsEventLogComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Settings\SettingsEventLogComponentPresenterFactory.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Settings\SettingsEventLogPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Settings\SettingsFileOperationsPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Settings\SettingsRoomInfoButtons.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Settings\SettingsRoomInfoPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\Settings\SettingsSystemConfigurationPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\ShareMenu\ShareComponentPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\ShareMenu\ShareComponentPresenterFactory.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\ShareMenu\ShareMenuPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\SoundsPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\TouchTones\TouchTonesPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\TvTuner\ChannelPresetPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\TvTuner\ChannelPresetPresenterFactory.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\TvTuner\NavSource\AbstractNavSourcePresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\TvTuner\NavSource\GenericNavSourcePresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Presenters\TvTuner\TvTunerPresenter.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\AbstractComponentView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\AbstractView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Camera\CameraView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Camera\CameraView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Common\PageMainView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Common\PageMainView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Common\ShutdownConfirmView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Common\ShutdownConfirmView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Common\StatusBarView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Common\StatusBarView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Dial\DialNav\DialNavComponentView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Dial\DialNav\DialNavComponentView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Dial\DialNav\DialNavHomeButtonView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Dial\DialNav\DialNavHomeButtonView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Dial\DialNav\DialNavView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Dial\DialNav\DialNavView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Dial\DialpadView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Dial\DialpadView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Dial\DirectoryView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Dial\DirectoryView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Dial\FavoritesAndDirectoryComponentView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Dial\FavoritesAndDirectoryComponentView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Dial\FavoritesView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Dial\FavoritesView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Dial\KeyboardAlphaView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Dial\KeyboardAlphaView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Dial\KeyboardCommonView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Dial\KeyboardCommonView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Dial\KeyboardSpecialView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Dial\KeyboardSpecialView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Dial\RecentCallView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Dial\RecentCallView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Dial\RecentsView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Dial\RecentsView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\HardButtonsView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\HardButtonsView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Home\CallStatusView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Home\CallStatusView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Home\HomeMeetingsView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Home\HomeMeetingsView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Home\InACallView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Home\InACallView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Home\RoomNumbersView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Home\RoomNumbersView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Layout\LayoutView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Layout\LayoutView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\MainNav\MainNavComponentView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\MainNav\MainNavComponentView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\MainNav\MainNavView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\MainNav\MainNavView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Meetings\MeetingsView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Meetings\MeetingsView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\MetlifeViewFactory.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Blocking\AlertBoxView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Blocking\AlertBoxView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Blocking\DialogBoxView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Blocking\DialogBoxView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Blocking\IncomingCallView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Blocking\IncomingCallView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Blocking\Keyboard\PopupKeyboardAlphaView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Blocking\Keyboard\PopupKeyboardAlphaView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Blocking\Keyboard\PopupKeyboardCommonView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Blocking\Keyboard\PopupKeyboardCommonView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Blocking\Keyboard\PopupKeyboardSpecialView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Blocking\Keyboard\PopupKeyboardSpecialView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Blocking\PopupListView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Blocking\PopupListView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Inline\Lights\LightComponentView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Inline\Lights\LightComponentView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Inline\Lights\LightsView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Inline\Lights\LightsView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Inline\Lights\ShadeComponentView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Inline\Lights\ShadeComponentView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Inline\Meetings\ReserveNowView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Inline\Meetings\ReserveNowView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Inline\PopupBaseView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Inline\PopupBaseView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Inline\SettingsStandardView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Inline\SettingsStandardView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Inline\Share\DisplaySelectView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Inline\Share\DisplaySelectView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Inline\Volume\VolumeComponentView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Inline\Volume\VolumeComponentView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Inline\Volume\VolumeSideView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Inline\Volume\VolumeSideView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Inline\Volume\VolumeView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Popups\Inline\Volume\VolumeView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Settings\SettingsBaseView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Settings\SettingsBaseView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Settings\SettingsDeviceListComponentView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Settings\SettingsDeviceListComponentView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Settings\SettingsDeviceListView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Settings\SettingsDeviceListView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Settings\SettingsDevicePropertiesComponentView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Settings\SettingsDevicePropertiesComponentView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Settings\SettingsDevicePropertiesView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Settings\SettingsDevicePropertiesView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Settings\SettingsDeviceStatusView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Settings\SettingsDeviceStatusView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Settings\SettingsEventLogComponentView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Settings\SettingsEventLogComponentView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Settings\SettingsEventLogView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Settings\SettingsEventLogView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Settings\SettingsFileOperationsView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Settings\SettingsFileOperationsView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Settings\SettingsRoomInfoView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Settings\SettingsRoomInfoView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Settings\SettingsSystemConfigurationView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\Settings\SettingsSystemConfigurationView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\ShareMenu\ShareComponentView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\ShareMenu\ShareComponentView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\ShareMenu\ShareMenuView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\ShareMenu\ShareMenuView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\SoundsView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\SoundsView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\TouchTones\TouchTonesView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\TouchTones\TouchTonesView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\TvTuner\ChannelPresetView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\TvTuner\ChannelPresetView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\TvTuner\NavSource\AbstractNavSourceView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\TvTuner\NavSource\GenericNavSourceView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\TvTuner\NavSource\GenericNavSourceView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\TvTuner\TvTunerView.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\TvTuner\TvTunerView.generated.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\VtProColors.cs" />
+    <Compile Include="UserInterfaces\UserInterface\Views\VtProIcon.cs" />
+    <Compile Include="VolumePoints\VolumePoint.cs" />
+    <Compile Include="VolumePoints\VolumeType.cs" />
+    <None Include="Properties\ControlSystem.cfg" />
+    <None Include="Resources\Comcast XFinity RSDICD Standard.ir" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\DialingPlan.xml" />
+    <None Include="Resources\RoomConfig-Base.xml" />
+    <None Include="Resources\TvPresets.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\ICD.Common.Utils\ICD.Common.Utils\ICD.Common.Utils_SimplSharp.csproj">
+      <Project>{CB4055C6-D59E-479E-9C56-2C92335A7D9A}</Project>
+      <Name>ICD.Common.Utils_SimplSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ICD.Connect.Analytics\ICD.Connect.Analytics.FusionPro\ICD.Connect.Analytics.FusionPro_SimplSharp.csproj">
+      <Project>{E0BBC879-638E-4D6D-9CFE-DF9F561B69D0}</Project>
+      <Name>ICD.Connect.Analytics.FusionPro_SimplSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ICD.Connect.API\ICD.Connect.API\ICD.Connect.API_SimplSharp.csproj">
+      <Project>{727F5820-5A61-440D-8899-E454FE8238D7}</Project>
+      <Name>ICD.Connect.API_SimplSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ICD.Connect.Audio\ICD.Connect.Audio.ClockAudio\ICD.Connect.Audio.ClockAudio_SimplSharp.csproj">
+      <Project>{DFDEA2A3-B470-4EBC-B959-338437340CAE}</Project>
+      <Name>ICD.Connect.Audio.ClockAudio_SimplSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ICD.Connect.Audio\ICD.Connect.Audio.Shure\ICD.Connect.Audio.Shure_SimplSharp.csproj">
+      <Project>{AFEEC857-710B-4F94-B982-7BD8648904DD}</Project>
+      <Name>ICD.Connect.Audio.Shure_SimplSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ICD.Connect.Conferencing\ICD.Connect.Conferencing.Cisco\ICD.Connect.Conferencing.Cisco_SimplSharp.csproj">
+      <Project>{B2DF3389-5C95-4CAF-BA30-3A4D0AAC9CE3}</Project>
+      <Name>ICD.Connect.Conferencing.Cisco_SimplSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ICD.Connect.Conferencing\ICD.Connect.Conferencing\ICD.Connect.Conferencing_SimplSharp.csproj">
+      <Project>{1CCA89DA-1F1C-4997-A94F-ABCE878BD6DE}</Project>
+      <Name>ICD.Connect.Conferencing_SimplSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ICD.Connect.Devices\ICD.Connect.Devices\ICD.Connect.Devices_SimplSharp.csproj">
+      <Project>{FD46A717-5836-4B73-ADD0-2706639DA8ED}</Project>
+      <Name>ICD.Connect.Devices_SimplSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ICD.Connect.Displays\ICD.Connect.Displays\ICD.Connect.Displays_SimplSharp.csproj">
+      <Project>{FCC7D685-B801-43A5-AEB3-774442027A0D}</Project>
+      <Name>ICD.Connect.Displays_SimplSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ICD.Connect.Krang\ICD.Connect.Krang\ICD.Connect.Krang_SimplSharp.csproj">
+      <Project>{CC672DB0-ED3A-4579-809F-4261B345BA1D}</Project>
+      <Name>ICD.Connect.Krang_SimplSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ICD.Connect.Lighting\ICD.Connect.Lighting\ICD.Connect.Lighting_SimplSharp.csproj">
+      <Project>{A519C705-5801-44BF-97B1-02DEA016380A}</Project>
+      <Name>ICD.Connect.Lighting_SimplSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ICD.Connect.Misc\ICD.Connect.TvPresets\ICD.Connect.TvPresets_SimplSharp.csproj">
+      <Project>{5752751F-FDEB-40A0-9249-6580A62A6D88}</Project>
+      <Name>ICD.Connect.TvPresets_SimplSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ICD.Connect.Panels\ICD.Connect.Panels\ICD.Connect.Panels_SimplSharp.csproj">
+      <Project>{A441FE98-6A8E-4EF3-98F0-D17041D2E118}</Project>
+      <Name>ICD.Connect.Panels_SimplSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ICD.Connect.Protocol\ICD.Connect.Protocol.Network\ICD.Connect.Protocol.Network_SimplSharp.csproj">
+      <Project>{5ED52F05-EA6C-4FC5-8AA0-9B9727F6AECD}</Project>
+      <Name>ICD.Connect.Protocol.Network_SimplSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ICD.Connect.Protocol\ICD.Connect.Protocol\ICD.Connect.Protocol_SimplSharp.csproj">
+      <Project>{2E4E01B8-D4EA-4FB1-9FCE-0A0DC8D83C8A}</Project>
+      <Name>ICD.Connect.Protocol_SimplSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ICD.Connect.Rooms\ICD.Connect.Rooms\ICD.Connect.Rooms_SimplSharp.csproj">
+      <Project>{42FB8CF0-6AE6-4C70-AFDD-DF95F07E077F}</Project>
+      <Name>ICD.Connect.Rooms_SimplSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ICD.Connect.Routing\ICD.Connect.Routing\ICD.Connect.Routing_SimplSharp.csproj">
+      <Project>{B0C0CA1C-FA55-4BEA-8A8B-EDB2141C523E}</Project>
+      <Name>ICD.Connect.Routing_SimplSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ICD.Connect.Scheduling\ICD.Connect.Scheduling.Asure\ICD.Connect.Scheduling.Asure_SimplSharp.csproj">
+      <Project>{DCC7A642-1E5B-4709-BFB9-6A4836EAF77F}</Project>
+      <Name>ICD.Connect.Scheduling.Asure_SimplSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ICD.Connect.Settings\ICD.Connect.Settings\ICD.Connect.Settings_SimplSharp.csproj">
+      <Project>{5B84EB3C-1C3A-4C4D-98C2-69F67CF51D5A}</Project>
+      <Name>ICD.Connect.Settings_SimplSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ICD.Connect.Sources\ICD.Connect.Sources.TvTuner\ICD.Connect.Sources.TvTuner_SimplSharp.csproj">
+      <Project>{EE162C95-A9DB-459D-95B6-9E63D9816DC5}</Project>
+      <Name>ICD.Connect.Sources.TvTuner_SimplSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ICD.Connect.UI\ICD.Connect.UI\ICD.Connect.UI_SimplSharp.csproj">
+      <Project>{89BF27D5-374B-4863-AD92-D217924D6D8F}</Project>
+      <Name>ICD.Connect.UI_SimplSharp</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="References\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CompactFramework.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>if /I "$(ConfigurationName)" == "Release" Eazfuscator.NET.exe "$(TargetPath)" --msbuild-project-path "$(ProjectPath)" --msbuild-project-configuration "$(ConfigurationName)" --msbuild-project-platform "$(PlatformName)" --msbuild-solution-path "$(SolutionPath)" -n --newline-flush -v 5.2 --configuration-file="$(ProjectDir)ObfuscationSettings.cs"
+rem S# Pro preparation will execute after these operations</PostBuildEvent>
+  </PropertyGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+    </VisualStudio>
+  </ProjectExtensions>
+  <Target Name="PlatformVerificationTask">
+  </Target>
+</Project>

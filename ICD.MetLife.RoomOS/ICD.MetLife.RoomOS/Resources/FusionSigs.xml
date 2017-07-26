@@ -1,0 +1,31 @@
+<Sigs>
+  <Sig number="50">
+    <Name>Front Input Online</Name>
+	<Type>Serial</Type>
+	<Mask>InputSigOnly</Mask>
+  </Sig>
+  
+  <Sig number="51">
+    <Name>Left Display Controller Online</Name>
+	<Type>Digital</Type>
+	<Mask>InputSigOnly</Mask>
+  </Sig>
+  
+  <Sig number="52">
+    <Name>Left Display Online</Name>
+	<Type>Digital</Type>
+	<Mask>InputSigOnly</Mask>
+  </Sig>
+  
+  <Sig number="57">
+    <Name>Front Input Sync</Name>
+	<Type>Digital</Type>
+	<Mask>InputSigOnly</Mask>
+  </Sig>
+  
+  <Sig number="69">
+    <Name>Front Input Type</Name>
+	<Type>Serial</Type>
+	<Mask>InputSigOnly</Mask>
+  </Sig>
+</Sigs>

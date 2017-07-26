@@ -1,0 +1,51 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>netstandard1.6</TargetFramework>
+    <AssemblyName>ICD.Common.Utils</AssemblyName>
+    <RootNamespace>$(AssemblyName)</RootNamespace>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Authors>Chris Cameron, Jeff Thompson</Authors>
+    <Company>Integrated Commercial Design</Company>
+    <PackageId>ICD.Common.Utils</PackageId>
+    <Product>ICD.Common.Utils</Product>
+    <Copyright>2017 Integrated Commercial Design</Copyright>
+    <PackageProjectUrl></PackageProjectUrl>
+    <RepositoryUrl>https://cs-gogs.icdpf.net/Common/Utils</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG;STANDARD</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>TRACE;STANDARD</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="SIMPLSharpLogs\**" />
+    <EmbeddedResource Remove="SIMPLSharpLogs\**" />
+    <None Remove="SIMPLSharpLogs\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="ObfuscationSettings.cs" />
+    <Compile Remove="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="ICD.Common.projectinfo" />
+    <None Remove="ICD.Common_SimplSharp.suo" />
+    <None Remove="ICD.SimplSharp.projectinfo" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="1.1.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
+    <PackageReference Include="System.Net.NetworkInformation" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
+  </ItemGroup>
+
+</Project>

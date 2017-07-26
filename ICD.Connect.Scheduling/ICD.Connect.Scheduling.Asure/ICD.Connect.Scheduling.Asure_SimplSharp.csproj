@@ -1,0 +1,151 @@
+﻿<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{DCC7A642-1E5B-4709-BFB9-6A4836EAF77F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ICD.Connect.Scheduling.Asure</RootNamespace>
+    <AssemblyName>ICD.Connect.Scheduling.Asure_SimplSharp</AssemblyName>
+    <ProjectTypeGuids>{0B4745B0-194B-4BB6-8E21-E9057CA92500};{4D628B5B-2FBC-4AA6-8C16-197242AEB884};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <PlatformFamilyName>WindowsCE</PlatformFamilyName>
+    <PlatformID>E2BECB1F-8C8C-41ba-B736-9BE7D946A398</PlatformID>
+    <OSVersion>5.0</OSVersion>
+    <DeployDirSuffix>SmartDeviceProject1</DeployDirSuffix>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <NativePlatformName>Windows CE</NativePlatformName>
+    <FormFactorID>
+    </FormFactorID>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <AllowedReferenceRelatedFileExtensions>.allowedReferenceRelatedFileExtensions</AllowedReferenceRelatedFileExtensions>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <FileAlignment>512</FileAlignment>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <GenerateSerializationAssemblies>off</GenerateSerializationAssemblies>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <AllowedReferenceRelatedFileExtensions>.allowedReferenceRelatedFileExtensions</AllowedReferenceRelatedFileExtensions>
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <FileAlignment>512</FileAlignment>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <GenerateSerializationAssemblies>off</GenerateSerializationAssemblies>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="mscorlib" />
+    <Reference Include="SimplSharpCustomAttributesInterface, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1099c178b3b54c3b, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\ProgramData\Crestron\SDK\SimplSharpCustomAttributesInterface.dll</HintPath>
+    </Reference>
+    <Reference Include="SimplSharpHelperInterface, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1099c178b3b54c3b, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\ProgramData\Crestron\SDK\SimplSharpHelperInterface.dll</HintPath>
+    </Reference>
+    <Reference Include="SimplSharpNewtonsoft, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1099c178b3b54c3b, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\ProgramData\Crestron\SDK\SimplSharpNewtonsoft.dll</HintPath>
+    </Reference>
+    <Reference Include="SimplSharpReflectionInterface, Version=1.0.5583.25238, Culture=neutral, PublicKeyToken=1099c178b3b54c3b, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\ProgramData\Crestron\SDK\SimplSharpReflectionInterface.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AsureDevice.cs" />
+    <Compile Include="AsureDeviceSettings.cs" />
+    <Compile Include="AsureUtils.cs" />
+    <None Include="ObfuscationSettings.cs" />
+    <Compile Include="KrangPlugin.cs" />
+    <Compile Include="ResourceScheduler\Model\AbstractData.cs" />
+    <Compile Include="ResourceScheduler\Model\BrokenRuleData.cs" />
+    <Compile Include="ResourceScheduler\Model\LocationSummaryData.cs" />
+    <Compile Include="ResourceScheduler\Model\RegionSummaryData.cs" />
+    <Compile Include="ResourceScheduler\Model\RegionWithLocationsSummaryData.cs" />
+    <Compile Include="ResourceScheduler\Model\ReservationResourceData.cs" />
+    <Compile Include="ResourceScheduler\Model\ScheduleData.cs" />
+    <Compile Include="ResourceScheduler\Requests\CheckInNowRequest.cs" />
+    <Compile Include="ResourceScheduler\Requests\CheckInRequest.cs" />
+    <Compile Include="ResourceScheduler\Requests\CheckOutRequest.cs" />
+    <Compile Include="ResourceScheduler\Requests\DeleteReservationRequest.cs" />
+    <Compile Include="ResourceScheduler\Requests\GetAllRegionsAndLocationsRequest.cs" />
+    <Compile Include="ResourceScheduler\Requests\GetLocationsRequest.cs" />
+    <Compile Include="ResourceScheduler\Requests\GetRegionsRequest.cs" />
+    <Compile Include="ResourceScheduler\Requests\GetReservationsByLocationRequest.cs" />
+    <Compile Include="ResourceScheduler\Requests\GetReservationsByResourceRequest.cs" />
+    <Compile Include="ResourceScheduler\Requests\SubmitReservationRequest.cs" />
+    <Compile Include="ResourceScheduler\Results\AbstractReservationResult.cs" />
+    <Compile Include="ResourceScheduler\Results\AbstractReservationsResult.cs" />
+    <Compile Include="ResourceScheduler\Results\AbstractResult.cs" />
+    <Compile Include="ResourceScheduler\Results\CheckInNowResult.cs" />
+    <Compile Include="ResourceScheduler\Results\CheckInResult.cs" />
+    <Compile Include="ResourceScheduler\Results\CheckOutResult.cs" />
+    <Compile Include="ResourceScheduler\Results\DeleteReservationResult.cs" />
+    <Compile Include="ResourceScheduler\Results\GetAllRegionsAndLocationsResult.cs" />
+    <Compile Include="ResourceScheduler\Results\GetLocationsResult.cs" />
+    <Compile Include="ResourceScheduler\Results\GetRegionsResult.cs" />
+    <Compile Include="ResourceScheduler\Results\GetReservationsByAttendeeResult.cs" />
+    <Compile Include="ResourceScheduler\Results\GetReservationsByLocationResult.cs" />
+    <Compile Include="ResourceScheduler\Results\GetReservationsByResourceResult.cs" />
+    <Compile Include="ResourceScheduler\Results\GetReservationsResult.cs" />
+    <Compile Include="ResourceScheduler\Model\ReservationData.cs" />
+    <Compile Include="ResourceScheduler\Requests\GetReservationRequest.cs" />
+    <Compile Include="ResourceScheduler\Requests\GetReservationsByAttendeeRequest.cs" />
+    <Compile Include="ResourceScheduler\Requests\GetReservationsRequest.cs" />
+    <Compile Include="ResourceScheduler\ResourceSchedulerService.cs" />
+    <Compile Include="ResourceScheduler\Model\ReservationAttendeeData.cs" />
+    <Compile Include="ResourceScheduler\Results\GetReservationResult.cs" />
+    <Compile Include="ResourceScheduler\Requests\AbstractRequest.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ResourceScheduler\Model\ReservationBaseData.cs" />
+    <Compile Include="ResourceScheduler\Results\SubmitReservationResult.cs" />
+    <None Include="Properties\ControlSystem.cfg" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\ICD.Common.Utils\ICD.Common.Utils\ICD.Common.Utils_SimplSharp.csproj">
+      <Project>{CB4055C6-D59E-479E-9C56-2C92335A7D9A}</Project>
+      <Name>ICD.Common.Utils_SimplSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ICD.Connect.API\ICD.Connect.API\ICD.Connect.API_SimplSharp.csproj">
+      <Project>{727F5820-5A61-440D-8899-E454FE8238D7}</Project>
+      <Name>ICD.Connect.API_SimplSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ICD.Connect.Devices\ICD.Connect.Devices\ICD.Connect.Devices_SimplSharp.csproj">
+      <Project>{FD46A717-5836-4B73-ADD0-2706639DA8ED}</Project>
+      <Name>ICD.Connect.Devices_SimplSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ICD.Connect.Protocol\ICD.Connect.Protocol.Network\ICD.Connect.Protocol.Network_SimplSharp.csproj">
+      <Project>{5ED52F05-EA6C-4FC5-8AA0-9B9727F6AECD}</Project>
+      <Name>ICD.Connect.Protocol.Network_SimplSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ICD.Connect.Protocol\ICD.Connect.Protocol\ICD.Connect.Protocol_SimplSharp.csproj">
+      <Project>{2E4E01B8-D4EA-4FB1-9FCE-0A0DC8D83C8A}</Project>
+      <Name>ICD.Connect.Protocol_SimplSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ICD.Connect.Settings\ICD.Connect.Settings\ICD.Connect.Settings_SimplSharp.csproj">
+      <Project>{5B84EB3C-1C3A-4C4D-98C2-69F67CF51D5A}</Project>
+      <Name>ICD.Connect.Settings_SimplSharp</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CompactFramework.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>if /I "$(ConfigurationName)" == "Release" Eazfuscator.NET.exe "$(TargetPath)" --msbuild-project-path "$(ProjectPath)" --msbuild-project-configuration "$(ConfigurationName)" --msbuild-project-platform "$(PlatformName)" --msbuild-solution-path "$(SolutionPath)" -n --newline-flush -v 5.2 --configuration-file="$(ProjectDir)ObfuscationSettings.cs"
+rem S# Pro preparation will execute after these operations</PostBuildEvent>
+  </PropertyGroup>
+</Project>

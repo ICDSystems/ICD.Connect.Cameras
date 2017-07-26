@@ -1,12 +1,16 @@
 ﻿using System;
 using ICD.Common.Properties;
 using ICD.Connect.Settings.Attributes.Factories;
+using ICD.Common.Attributes.Properties;
+using ICD.Common.Utils.Xml;
+using ICD.Connect.Settings;
 
 namespace ICD.Connect.Cameras.Visca
 {
     public class ViscaCameraDeviceSettings : AbstractCameraDeviceSettings
     {
         private const string FACTORY_NAME = "ViscaCamera";
+        private const string PORT_ELEMENT = "Port";
         /// <summary>
         /// Gets the originator factory name.
         /// </summary>
@@ -24,5 +28,31 @@ namespace ICD.Connect.Cameras.Visca
             ParseXml(output, xml);
             return output;
         }
+
+        //[SettingsProperty(SettingsProperty.ePropertyType.PortId)]
+        //public int? Port { get; set; }
+
+        /// <summary>
+        /// Write settings elements to xml.
+        /// </summary>
+        /// <param name="writer"></param>
+        protected override void WriteElements(IcdXmlTextWriter writer)
+        {
+            base.WriteElements(writer);
+
+            if (Port != null)
+                writer.WriteElementString(PORT_ELEMENT, IcdXmlConvert.ToString((int)Port));
+        }
+
+        /// <summary>
+        /// Parses the xml and applies the properties to the instance.
+        /// </summary>
+        /// <param name="instance"></param>
+        /// <param name="xml"></param>
+        /*protected static void ParseXml(AbstractCameraDeviceSettings instance, string xml)
+        {
+            instance.Port = XmlUtils.TryReadChildElementContentAsInt(xml, PORT_ELEMENT);
+            AbstractCameraDeviceSettings.ParseXml(instance, xml);
+        }*/
     }
 }
