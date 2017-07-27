@@ -134,17 +134,40 @@ namespace ICD.Connect.Cameras.Visca
             return StringUtils.ToString(new byte[] { GetIdsByte(0, Id), 0x01, 0x04, 0x07, 0x00, 0xFF, GetIdsByte(0, Id), 0x01, 0x06, 0x01, 0x01, 0x01, 0x03, 0x03, 0xFF });
         }
 
+        /// <summary>
+        /// Moves camera with default values
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <param name="action"></param>
+        /// <returns></returns>
         public string Move(int Id, eCameraAction action)
         {
             //Move with defaults
             return Move(Id, action, 8, 8, 3);
         }
 
+        /// <summary>
+        /// Overloaded function used to move camera.
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <param name="action"></param>
+        /// <param name="panSpeed"></param>
+        /// <param name="tiltSpeed"></param>
+        /// <returns></returns>
         public string Move(int Id, eCameraAction action, int panSpeed, int tiltSpeed)
         {
             return Move(Id, action, panSpeed, tiltSpeed, 1);
         }
 
+        /// <summary>
+        /// Moves the camera or zooms in, based on eCameraAction.
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <param name="action"></param>
+        /// <param name="panSpeed"></param>
+        /// <param name="tiltSpeed"></param>
+        /// <param name="zoomSpeed"></param>
+        /// <returns></returns>
         public string Move(int Id, eCameraAction action, int panSpeed, int tiltSpeed, int zoomSpeed)
         {
             switch (action)
