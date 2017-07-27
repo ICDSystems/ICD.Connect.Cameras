@@ -1,7 +1,6 @@
 ﻿using System;
 using ICD.Common.Properties;
 using ICD.Connect.Settings.Attributes.Factories;
-using ICD.Common.Attributes.Properties;
 using ICD.Common.Utils.Xml;
 using ICD.Connect.Settings;
 
