@@ -5,18 +5,14 @@ using ICD.Connect.Protocol.Extensions;
 using ICD.Connect.Protocol.Ports;
 using ICD.Connect.Settings.Core;
 using ICD.Common.Utils;
-
 using System;
 using ICD.Connect.Protocol.Ports.ComPort;
-using System.Text;
 using ICD.Common.Properties;
 using ICD.Connect.Protocol.SerialQueues;
 using ICD.Connect.Protocol.EventArguments;
 using ICD.Connect.Protocol.Data;
 using ICD.Connect.Protocol.SerialBuffers;
 using System.Collections.Generic;
-using ICD.Common.Services;
-using ICD.Connect.API.Commands;
 //using ICD.Connect.Cameras.Visca.CommandBuilder;
 //using System.Threading;
 

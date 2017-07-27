@@ -1,10 +1,5 @@
 ﻿using ICD.Connect.Conferencing.Cameras;
 using ICD.Connect.Devices;
-using ICD.Connect.Protocol.Ports;
-using ICD.Connect.Protocol.Extensions;
-using ICD.Common.EventArguments;
-using ICD.Connect.Settings.Core;
-using ICD.Common.Services.Logging;
 using ICD.Connect.API.Commands;
 using System.Collections.Generic;
 
@@ -19,7 +14,7 @@ namespace ICD.Connect.Cameras
 
         public abstract void Stop();
 
-                public override void BuildConsoleStatus(ICD.Connect.API.Nodes.AddStatusRowDelegate addRow)
+                public override void BuildConsoleStatus(API.Nodes.AddStatusRowDelegate addRow)
         {
             base.BuildConsoleStatus(addRow);
         }
