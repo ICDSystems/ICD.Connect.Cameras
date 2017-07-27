@@ -28,6 +28,7 @@ namespace ICD.Connect.Cameras.Visca
         private ISerialBuffer SerialBuffer { get; set; }
         private ISerialQueue SerialQueue { get; set; }
         private ViscaCommandHandler CommandHandler { get; set; }
+
         private readonly Dictionary<string, int> m_RetryCounts = new Dictionary<string, int>();
         private readonly SafeCriticalSection m_RetryLock = new SafeCriticalSection();
 
@@ -40,27 +41,7 @@ namespace ICD.Connect.Cameras.Visca
 
         public override void Move(eCameraAction action)
         {
-            switch (action)
-            {
-                case eCameraAction.ZoomIn:
-                    SendCommand(CommandHandler.Move(1, eCameraAction.ZoomIn));
-                    break;
-                case eCameraAction.ZoomOut:
-                    SendCommand(CommandHandler.Move(1, eCameraAction.ZoomOut));
-                    break;
-                case eCameraAction.Up:
-                    SendCommand(CommandHandler.Move(1, eCameraAction.Up));
-                    break;
-                case eCameraAction.Down:
-                    SendCommand(CommandHandler.Move(1, eCameraAction.Down));
-                    break;
-                case eCameraAction.Left:
-                    SendCommand(CommandHandler.Move(1, eCameraAction.Left));
-                    break;
-                case eCameraAction.Right:
-                    SendCommand(CommandHandler.Move(1, eCameraAction.Right));
-                    break;
-            }
+             SendCommand(CommandHandler.Move(1, action));
         }
 
         public override void Stop()
