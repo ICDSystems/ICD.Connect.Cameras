@@ -78,8 +78,25 @@ namespace ICD.Connect.Cameras.Visca
     }
     public class ViscaCommandHandler
     {
+        private int m_defaultPanSpeed = 8;
+        private int m_defaultTiltSpeed = 8;
+        private int m_defaultZoomSpeed = 4;
 
-        public byte GetIdsByte(int sender, int recipient)
+        public void SetDefaultPanSpeed(int panSpeed)
+        {
+            m_defaultPanSpeed = MathUtils.Clamp(panSpeed, 0, 24);
+        }
+
+        public void SetDefaultTiltSpeed(int tiltSpeed)
+        {
+            m_defaultTiltSpeed= MathUtils.Clamp(tiltSpeed, 0, 24);
+        }
+
+        public void SetDefaultZoomSpeed(int zoomSpeed)
+        {
+            m_defaultZoomSpeed = MathUtils.Clamp(zoomSpeed, 0, 7);
+        }
+        public static byte GetIdsByte(int sender, int recipient)
         {
             sender = MathUtils.Clamp(sender, 0, 7);
             recipient = MathUtils.Clamp(recipient, 0, 7);
@@ -139,7 +156,7 @@ namespace ICD.Connect.Cameras.Visca
         public string Move(int Id, eCameraAction action)
         {
             //Move with defaults
-            return Move(Id, action, 8, 8, 3);
+            return Move(Id, action, m_defaultPanSpeed, m_defaultTiltSpeed, m_defaultZoomSpeed);
         }
 
         /// <summary>
