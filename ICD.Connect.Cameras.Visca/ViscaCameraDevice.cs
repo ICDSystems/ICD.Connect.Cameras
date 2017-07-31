@@ -45,6 +45,16 @@ namespace ICD.Connect.Cameras.Visca
             SendCommand(CommandHandler.Stop(1));
         }
 
+        /// <summary>
+        /// Release resources.
+        /// </summary>
+        protected override void DisposeFinal(bool disposing)
+        {
+            SetPort(null);
+
+            base.DisposeFinal(disposing);
+        }
+
         //Class Settings
 
         /// <summary>
@@ -91,11 +101,6 @@ namespace ICD.Connect.Cameras.Visca
         #endregion
 
         #region Port Callbacks
-
-        private void SerialDataReceived(object sender, StringEventArgs args)
-        {
-            IcdConsole.PrintLine(StringUtils.ToHexLiteral(args.Data));
-        }
 
         /// <summary>
         /// Called when the port online state changes.
