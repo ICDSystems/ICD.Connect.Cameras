@@ -1,4 +1,6 @@
-﻿using ICD.Common.EventArguments;
+﻿using System;
+using System.Collections.Generic;
+using ICD.Common.EventArguments;
 using ICD.Common.Properties;
 using ICD.Common.Services;
 using ICD.Common.Services.Logging;
@@ -7,69 +9,111 @@ using ICD.Common.Utils.Timers;
 using ICD.Connect.Conferencing.Cameras;
 using ICD.Connect.Protocol.Extensions;
 using ICD.Connect.Protocol.Network.WebPorts;
-using ICD.Connect.Protocol.SerialBuffers;
-using ICD.Connect.Protocol.SerialQueues;
 using ICD.Connect.Settings.Core;
-using Newtonsoft.Json.Linq;
-using System;
 
 namespace ICD.Connect.Cameras.Panasonic
 {
+
     public sealed class PanasonicCameraAwDevice : AbstractCameraDevice<PanasonicCameraAwDeviceSettings>
     {
+        #region properties
 
-        private PanasonicCommandHandler CommandHandler;
-        //Messages can only be sent once every 130 seconds
-        private const long SENDING_UPDATE_INTERVAL = 130;
-        private const long FAILURE_UPDATE_INTERVAL_INCREMENT = 1000 * 10;
-        private const long FAILURE_UPDATE_INTERVAL_LIMIT = 1000 * 60;
+        private const long RATE_LIMIT = 130;
 
-        //private readonly SafeTimer m_SharingTimer;
-        //private readonly SafeCriticalSection m_SharingTimerSection;
+        private static readonly Dictionary<string, string> s_ErrorMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            {"rER", "Port data returned error with code"},
+            {"er1", "Command is unsupported"},
+            {"er2", "Camera is powered down or busy"},
+            {"er3", "Command is out of range"},
+        };
 
-        //private long m_SharingUpdateInterval;
-
-        private ISerialBuffer SerialBuffer { get; set; }
-        private ISerialQueue SerialQueue { get; set; }
-
-        private bool m_ClearedToSend;
-
-        private const string PORT_ACCEPT = "application/json";
         private IWebPort m_Port;
+
+        private readonly IcdTimer m_DelayTimer;
+
+        private readonly SafeCriticalSection m_CommandSection;
+        private readonly Queue<string> m_CommandList;
+
+        #endregion
+
+        #region Inerface Methods
 
         public override void Move(eCameraAction action)
         {
-            string commandUrl = CommandHandler.Move(action);
-            string response = m_Port.Get(commandUrl);
-
-            ParsePortData(response);
+            SendCommand(PanasonicCommandBuilder.Move(action));
         }
 
         public override void Stop()
         {
-            string commandUrl = CommandHandler.Stop();
-            string response = m_Port.Get(commandUrl);
-
-            ParsePortData(response);
+            SendCommand(PanasonicCommandBuilder.Stop());
+            SendCommand(PanasonicCommandBuilder.StopZoom());
         }
+
+        #endregion
+
+        #region methods
 
         public PanasonicCameraAwDevice()
         {
-            CommandHandler = new PanasonicCommandHandler();
+            m_CommandList = new Queue<string>();
+            m_CommandSection = new SafeCriticalSection();
+
+            m_DelayTimer = new IcdTimer();
+            m_DelayTimer.OnElapsed += TimerElapsed;
+        }
+
+        #endregion
+
+        private void TimerElapsed(object sender, EventArgs args)
+        {
+            m_CommandSection.Enter();
+            try
+            {
+                m_DelayTimer.Stop();
+
+                if (m_CommandList.Count > 0)
+                    SendCommand(m_CommandList.Dequeue());
+
+                m_DelayTimer.Restart(RATE_LIMIT);
+            }
+            finally
+            {
+                m_CommandSection.Leave();
+            }
         }
 
         /// <summary>
-        /// Logs to logging core.
+        /// Responsible for dispatching commands from the command buffer.
         /// </summary>
-        /// <param name="severity"></param>
-        /// <param name="message"></param>
-        /// <param name="args"></param>
-        private void Log(eSeverity severity, string message, params object[] args)
+        /// <param name="command"></param>
+        private void SendCommand(string command)
         {
-            message = string.Format(message, args);
-            message = string.Format("{0} - {1}", GetType().Name, message);
+            m_CommandSection.Enter();
+            try
+            {
+                if (m_DelayTimer.IsRunning)
+                    m_CommandList.Enqueue(command);
+                else
+                {
+                    try
+                    {
+                        ParsePortData(command, m_Port.Get(command));
+                    }
+                    catch (Exception ex)
+                    {
+                        Log(eSeverity.Error, "Failed to make request - {0}", ex.Message);
+                        m_CommandList.Clear();
+                        m_DelayTimer.Stop();
+                    }
+                }
 
-            ServiceProvider.GetService<ILoggerService>().AddEntry(severity, message);
+                m_DelayTimer.Restart(RATE_LIMIT);
+            }
+            finally
+            {
+                m_CommandSection.Leave();
+            }
         }
 
         /// <summary>
@@ -94,12 +138,24 @@ namespace ICD.Connect.Cameras.Panasonic
             Unsubscribe(m_Port);
             m_Port = port;
             Subscribe(m_Port);
+        }
 
-            if (m_Port != null)
-                m_Port.Accept = PORT_ACCEPT;
+        /// <summary>
+        /// Logs to logging core.
+        /// </summary>
+        /// <param name="severity"></param>
+        /// <param name="message"></param>
+        /// <param name="args"></param>
+        private void Log(eSeverity severity, string message, params object[] args)
+        {
+            message = string.Format(message, args);
+            message = string.Format("{0} - {1}", GetType().Name, message);
+
+            ServiceProvider.GetService<ILoggerService>().AddEntry(severity, message);
         }
 
         #region Port Callbacks
+
         /// <summary>
         /// Subscribe to the port events.
         /// </summary>
@@ -133,6 +189,7 @@ namespace ICD.Connect.Cameras.Panasonic
         {
             UpdateCachedOnlineStatus();
         }
+
         #endregion
 
         #region Settings
@@ -178,39 +235,25 @@ namespace ICD.Connect.Cameras.Panasonic
             SetPort(port);
         }
 
-        #endregion
-
-        private void ParsePortData(string response)
+        private void ParsePortData(string command, string response)
         {
             if (string.IsNullOrEmpty(response))
                 return;
 
             response = response.Trim();
 
-            try
-            {
-                if (string.Equals(response.Substring(0, 3), "rER", StringComparison.OrdinalIgnoreCase))
-                {
-                    Log(eSeverity.Error, "Port data returned error with code {0}", response);
-                }
-            }
-            catch (Exception)
-            {
-                Log(eSeverity.Error, "Failed to parse data returned from camera");
-            }
+            if (command.ToLower().Contains(response.ToLower()))
+                return;
+
+            string code = response.Substring(0, 3);
+
+            string message;
+            if (!s_ErrorMap.TryGetValue(code, out message))
+                message = "Unexpected error code";
+
+            Log(eSeverity.Error, "{0} - {1}", response, message);
         }
 
-        /// <summary>
-        /// Increments the update interval up to the failure limit.
-        /// </summary>
-        private void IncrementUpdateInterval()
-        {
-            //m_SharingUpdateInterval += FAILURE_UPDATE_INTERVAL_INCREMENT;
-            //if (m_SharingUpdateInterval > FAILURE_UPDATE_INTERVAL_LIMIT)
-            //    m_SharingUpdateInterval = FAILURE_UPDATE_INTERVAL_LIMIT;
-
-            //m_SharingTimer.Reset(m_SharingUpdateInterval, m_SharingUpdateInterval);
-        }
-
+        #endregion
     }
 }
