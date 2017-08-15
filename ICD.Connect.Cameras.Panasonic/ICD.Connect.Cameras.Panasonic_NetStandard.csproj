@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="ICD.Connect.Cameras.projectinfo" />
     <None Remove="ICD.Connect.Devices_SimplSharp.suo" />
     <None Remove="ICD.Connect.projectinfo" />
     <None Remove="ICD.SimplSharp.projectinfo" />
