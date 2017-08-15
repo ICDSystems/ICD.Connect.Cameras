@@ -61,8 +61,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="KrangPlugin.cs" />
-    <Compile Include="PanasonicCameraDevice.cs" />
-    <Compile Include="PanasonicCameraDeviceSettings.cs" />
+    <Compile Include="PanasonicCameraAwDevice.cs" />
+    <Compile Include="PanasonicCameraAwDeviceSettings.cs" />
     <Compile Include="PanasonicCommandBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="Properties\ControlSystem.cfg" />
