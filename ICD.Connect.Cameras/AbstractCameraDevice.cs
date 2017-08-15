@@ -28,8 +28,8 @@ namespace ICD.Connect.Cameras
             foreach (IConsoleCommand command in GetBaseConsoleCommands())
                 yield return command;
 
-            yield return new GenericConsoleCommand<eCameraAction>("Move", "Moves or zooms the camera device", v => this.Move(v));
-            yield return new ConsoleCommand("Stop", "Stops the camera", () => this.Stop());
+            yield return new GenericConsoleCommand<eCameraAction>("Move", "Moves or zooms the camera device", v => Move(v));
+            yield return new ConsoleCommand("Stop", "Stops the camera", () => Stop());
         }
 
         /// <summary>
