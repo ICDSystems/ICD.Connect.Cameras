@@ -14,11 +14,6 @@ namespace ICD.Connect.Cameras
 
         public abstract void Stop();
 
-                public override void BuildConsoleStatus(API.Nodes.AddStatusRowDelegate addRow)
-        {
-            base.BuildConsoleStatus(addRow);
-        }
-
         /// <summary>
         /// Gets the child console commands.
         /// </summary>
