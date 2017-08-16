@@ -61,6 +61,8 @@ namespace ICD.Connect.Cameras.Panasonic
 
             m_DelayTimer = new IcdTimer();
             m_DelayTimer.OnElapsed += TimerElapsed;
+
+            Controls.Add(new GenericCameraRouteSourceControl<PanasonicCameraAwDevice>(this, 0));
         }
 
         #endregion

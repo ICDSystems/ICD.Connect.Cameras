@@ -35,6 +35,11 @@ namespace ICD.Connect.Cameras.Visca
         #region Methods
         //Camera Methods
 
+        public ViscaCameraDevice()
+        {
+            Controls.Add(new GenericCameraRouteSourceControl<ViscaCameraDevice>(this, 0));
+        }
+
         public override void Move(eCameraAction action)
         {
              SendCommand(CommandHandler.Move(1, action));
