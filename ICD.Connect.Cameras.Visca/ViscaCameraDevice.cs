@@ -13,8 +13,6 @@ using ICD.Connect.Protocol.EventArguments;
 using ICD.Connect.Protocol.Data;
 using ICD.Connect.Protocol.SerialBuffers;
 using System.Collections.Generic;
-//using ICD.Connect.Cameras.Visca.CommandBuilder;
-//using System.Threading;
 
 namespace ICD.Connect.Cameras.Visca
 {
