@@ -76,6 +76,8 @@ namespace ICD.Connect.Cameras.Visca
             queue.Timeout = 3 * 1000;
 
             SetSerialQueue(queue);
+
+			UpdateCachedOnlineStatus();
         }
 
         [PublicAPI]

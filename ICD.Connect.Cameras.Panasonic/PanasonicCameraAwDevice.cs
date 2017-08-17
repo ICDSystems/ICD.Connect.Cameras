@@ -140,6 +140,8 @@ namespace ICD.Connect.Cameras.Panasonic
             Unsubscribe(m_Port);
             m_Port = port;
             Subscribe(m_Port);
+
+			UpdateCachedOnlineStatus();
         }
 
         /// <summary>
