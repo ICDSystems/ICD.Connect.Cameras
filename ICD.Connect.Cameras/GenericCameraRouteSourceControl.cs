@@ -10,49 +10,51 @@ using ICD.Connect.Routing.EventArguments;
 
 namespace ICD.Connect.Cameras
 {
-    public sealed class GenericCameraRouteSourceControl<TCameraDevice> : AbstractRouteSourceControl<TCameraDevice>
-        where TCameraDevice : ICameraDevice
-    {
-        public override event EventHandler<TransmissionStateEventArgs> OnActiveTransmissionStateChanged;
+	public sealed class GenericCameraRouteSourceControl<TCameraDevice> : AbstractRouteSourceControl<TCameraDevice>
+		where TCameraDevice : ICameraDevice
+	{
+		public override event EventHandler<TransmissionStateEventArgs> OnActiveTransmissionStateChanged;
 
-        public GenericCameraRouteSourceControl(TCameraDevice parent, int id)
-            : base(parent, id)
-        {
-        }
+		public GenericCameraRouteSourceControl(TCameraDevice parent, int id)
+			: base(parent, id)
+		{
+		}
 
-        protected override void DisposeFinal(bool disposing)
-        {
-            OnActiveTransmissionStateChanged = null;
+		protected override void DisposeFinal(bool disposing)
+		{
+			OnActiveTransmissionStateChanged = null;
 
-            base.DisposeFinal(disposing);
-        }
+			base.DisposeFinal(disposing);
+		}
 
-        public override bool GetActiveTransmissionState(int output, eConnectionType type)
-        {
-            if (EnumUtils.HasMultipleFlags(type))
-                return
-                    EnumUtils.GetFlagsExceptNone(type)
-                             .Select(f => GetActiveTransmissionState(output, f))
-                             .Unanimous(false);
+		public override bool GetActiveTransmissionState(int output, eConnectionType type)
+		{
+			if (EnumUtils.HasMultipleFlags(type))
+			{
+				return
+					EnumUtils.GetFlagsExceptNone(type)
+					         .Select(f => GetActiveTransmissionState(output, f))
+					         .Unanimous(false);
+			}
 
-            if (output != 1)
-            {
-                string message = string.Format("{0} has no {1} output at address {2}", this, type, output);
-                throw new KeyNotFoundException(message);
-            }
+			if (output != 1)
+			{
+				string message = string.Format("{0} has no {1} output at address {2}", this, type, output);
+				throw new KeyNotFoundException(message);
+			}
 
-            switch (type)
-            {
-                case eConnectionType.Video:
-                    return true;
-                default:
-                    throw new ArgumentOutOfRangeException("type");
-            }
-        }
+			switch (type)
+			{
+				case eConnectionType.Video:
+					return true;
+				default:
+					throw new ArgumentOutOfRangeException("type");
+			}
+		}
 
-        public override IEnumerable<ConnectorInfo> GetOutputs()
-        {
-            yield return new ConnectorInfo(1, eConnectionType.Video);
-        }
-    }
+		public override IEnumerable<ConnectorInfo> GetOutputs()
+		{
+			yield return new ConnectorInfo(1, eConnectionType.Video);
+		}
+	}
 }

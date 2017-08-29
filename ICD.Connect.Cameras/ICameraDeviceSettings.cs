@@ -2,7 +2,7 @@
 
 namespace ICD.Connect.Cameras
 {
-    public interface ICameraDeviceSettings : IDeviceSettings
-    {
-    }
+	public interface ICameraDeviceSettings : IDeviceSettings
+	{
+	}
 }
