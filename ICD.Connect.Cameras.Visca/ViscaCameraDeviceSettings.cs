@@ -2,11 +2,10 @@
 using ICD.Common.Properties;
 using ICD.Connect.Settings.Attributes.Factories;
 using ICD.Common.Utils.Xml;
-using ICD.Connect.Settings;
 
 namespace ICD.Connect.Cameras.Visca
 {
-    public class ViscaCameraDeviceSettings : AbstractCameraDeviceSettings
+    public sealed class ViscaCameraDeviceSettings : AbstractCameraDeviceSettings
     {
         private const string FACTORY_NAME = "ViscaCamera";
         private const string PORT_ELEMENT = "Port";

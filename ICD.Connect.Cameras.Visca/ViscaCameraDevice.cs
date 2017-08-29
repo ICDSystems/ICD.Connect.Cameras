@@ -1,18 +1,18 @@
-﻿using ICD.Common.EventArguments;
+﻿using System;
+using System.Collections.Generic;
+using ICD.Common.Properties;
 using ICD.Common.Services.Logging;
+using ICD.Common.Utils;
+using ICD.Common.Utils.EventArguments;
 using ICD.Connect.Conferencing.Cameras;
+using ICD.Connect.Protocol.Data;
+using ICD.Connect.Protocol.EventArguments;
 using ICD.Connect.Protocol.Extensions;
 using ICD.Connect.Protocol.Ports;
-using ICD.Connect.Settings.Core;
-using ICD.Common.Utils;
-using System;
 using ICD.Connect.Protocol.Ports.ComPort;
-using ICD.Common.Properties;
-using ICD.Connect.Protocol.SerialQueues;
-using ICD.Connect.Protocol.EventArguments;
-using ICD.Connect.Protocol.Data;
 using ICD.Connect.Protocol.SerialBuffers;
-using System.Collections.Generic;
+using ICD.Connect.Protocol.SerialQueues;
+using ICD.Connect.Settings.Core;
 
 namespace ICD.Connect.Cameras.Visca
 {
@@ -313,6 +313,7 @@ namespace ICD.Connect.Cameras.Visca
 
         #endregion
 
+		/// <summary>
         /// Queues the command to be sent to the device.
         /// </summary>
         /// <param name="command"></param>
@@ -338,7 +339,7 @@ namespace ICD.Connect.Cameras.Visca
         /// Queues the command to be sent to the device.
         /// Replaces an existing command if it matches the comparer.
         /// </summary>
-        /// <param name="command"></param>
+		/// <param name="data"></param>
         /// <param name="comparer"></param>
         public void SendCommand(string data, Func<string, string, bool> comparer)
         {
