@@ -6,6 +6,7 @@ using ICD.Common.Services.Logging;
 using ICD.Common.Utils;
 using ICD.Common.Utils.EventArguments;
 using ICD.Common.Utils.Timers;
+using ICD.Connect.API.Commands;
 using ICD.Connect.Conferencing.Cameras;
 using ICD.Connect.Protocol.Extensions;
 using ICD.Connect.Protocol.Network.WebPorts;
@@ -37,7 +38,45 @@ namespace ICD.Connect.Cameras.Panasonic
 
 		#endregion
 
-		#region Inerface Methods
+		public PanasonicCameraAwDevice()
+		{
+			m_CommandList = new Queue<string>();
+			m_CommandSection = new SafeCriticalSection();
+
+			m_DelayTimer = new IcdTimer();
+			m_DelayTimer.OnElapsed += TimerElapsed;
+
+			Controls.Add(new GenericCameraRouteSourceControl<PanasonicCameraAwDevice>(this, 0));
+		}
+
+		#region Methods
+
+		/// <summary>
+		/// Sets the port for communication with the device.
+		/// </summary>
+		/// <param name="port"></param>
+		[PublicAPI]
+		public void SetPort(IWebPort port)
+		{
+			if (port == m_Port)
+				return;
+
+			Unsubscribe(m_Port);
+			m_Port = port;
+			Subscribe(m_Port);
+
+			UpdateCachedOnlineStatus();
+		}
+
+		public void PowerOn()
+		{
+			SendCommand(PanasonicCommandBuilder.PowerOn());
+		}
+
+		public void PowerOff()
+		{
+			SendCommand(PanasonicCommandBuilder.PowerOff());
+		}
 
 		public override void Move(eCameraAction action)
 		{
@@ -52,24 +91,10 @@ namespace ICD.Connect.Cameras.Panasonic
 
 		#endregion
 
-		#region methods
-
-		public PanasonicCameraAwDevice()
-		{
-			m_CommandList = new Queue<string>();
-			m_CommandSection = new SafeCriticalSection();
-
-			m_DelayTimer = new IcdTimer();
-			m_DelayTimer.OnElapsed += TimerElapsed;
-
-			Controls.Add(new GenericCameraRouteSourceControl<PanasonicCameraAwDevice>(this, 0));
-		}
-
-		#endregion
-
 		private void TimerElapsed(object sender, EventArgs args)
 		{
 			m_CommandSection.Enter();
+
 			try
 			{
 				m_DelayTimer.Stop();
@@ -92,6 +117,7 @@ namespace ICD.Connect.Cameras.Panasonic
 		private void SendCommand(string command)
 		{
 			m_CommandSection.Enter();
+
 			try
 			{
 				if (m_DelayTimer.IsRunning)
@@ -125,23 +151,6 @@ namespace ICD.Connect.Cameras.Panasonic
 		protected override bool GetIsOnlineStatus()
 		{
 			return m_Port != null && m_Port.IsOnline;
-		}
-
-		/// <summary>
-		/// Sets the port for communication with the device.
-		/// </summary>
-		/// <param name="port"></param>
-		[PublicAPI]
-		public void SetPort(IWebPort port)
-		{
-			if (port == m_Port)
-				return;
-
-			Unsubscribe(m_Port);
-			m_Port = port;
-			Subscribe(m_Port);
-
-			UpdateCachedOnlineStatus();
 		}
 
 		/// <summary>
@@ -256,6 +265,32 @@ namespace ICD.Connect.Cameras.Panasonic
 				message = "Unexpected error code";
 
 			Log(eSeverity.Error, "{0} - {1}", response, message);
+		}
+
+		#endregion
+
+		#region Console
+
+		/// <summary>
+		/// Gets the child console commands.
+		/// </summary>
+		/// <returns></returns>
+		public override IEnumerable<IConsoleCommand> GetConsoleCommands()
+		{
+			foreach (IConsoleCommand command in GetBaseConsoleCommands())
+				yield return command;
+
+			yield return new ConsoleCommand("PowerOn", "Powers the camera device", () => PowerOn());
+			yield return new ConsoleCommand("PowerOff", "Places the camera device on standby", () => PowerOff());
+		}
+
+		/// <summary>
+		/// Workaround for "unverifiable code" warning.
+		/// </summary>
+		/// <returns></returns>
+		private IEnumerable<IConsoleCommand> GetBaseConsoleCommands()
+		{
+			return base.GetConsoleCommands();
 		}
 
 		#endregion

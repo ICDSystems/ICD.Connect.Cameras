@@ -8,9 +8,25 @@ namespace ICD.Connect.Cameras.Panasonic
 	{
 		private const string PTS = "PTS";
 		private const string ZOOM = "Z";
+		private const string POWER = "O";
 
 		private const int DEFAULT_SPEED = 24;
 		private const int STOP_SPEED = 50;
+
+		public static string PowerOn()
+		{
+			return GetCommandUrl(POWER, 1);
+		}
+
+		public static string PowerOff()
+		{
+			return GetCommandUrl(POWER, 0);
+		}
+
+		public static string PowerQuery()
+		{
+			return GetCommandUrl(POWER);
+		}
 
 		public static string Stop()
 		{
