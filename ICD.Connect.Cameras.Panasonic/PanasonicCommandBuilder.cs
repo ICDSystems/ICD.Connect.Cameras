@@ -1,32 +1,32 @@
 ﻿using System;
-using ICD.Common.Properties;
+using System.Text;
 using ICD.Connect.Conferencing.Cameras;
 
 namespace ICD.Connect.Cameras.Panasonic
 {
 	public static class PanasonicCommandBuilder
 	{
-		private const int DEFAULT_SPEED = 24;
+		private const string PTS = "PTS";
+		private const string ZOOM = "Z";
 
-		[PublicAPI]
+		private const int DEFAULT_SPEED = 24;
+		private const int STOP_SPEED = 50;
+
 		public static string Stop()
 		{
-			return GetCommandUrl("%23PTS5050");
+			return GetCommandUrl(PTS, STOP_SPEED, STOP_SPEED);
 		}
 
-		[PublicAPI]
 		public static string StopZoom()
 		{
-			return GetCommandUrl("%23Z50");
+			return GetCommandUrl(ZOOM, STOP_SPEED);
 		}
 
-		[PublicAPI]
 		public static string Move(eCameraAction action)
 		{
 			return Move(action, DEFAULT_SPEED);
 		}
 
-		[PublicAPI]
 		public static string Move(eCameraAction action, int speed)
 		{
 			string speedString = GetSpeedStringBasedOnDirection(action, speed);
@@ -35,23 +35,33 @@ namespace ICD.Connect.Cameras.Panasonic
 			{
 				case eCameraAction.Down:
 				case eCameraAction.Up:
-					return GetCommandUrl(String.Format("%23PTS50{0}", speedString));
+					return GetCommandUrl(PTS, STOP_SPEED, speedString);
 
 				case eCameraAction.Left:
 				case eCameraAction.Right:
-					return GetCommandUrl(String.Format("%23PTS{0}50", speedString));
+					return GetCommandUrl(PTS, speedString, STOP_SPEED);
 
 				case eCameraAction.ZoomIn:
 				case eCameraAction.ZoomOut:
-					return GetCommandUrl(String.Format("%23Z{0}", speedString));
+					return GetCommandUrl(ZOOM, speedString);
+
 				default:
 					throw new ArgumentOutOfRangeException("action");
 			}
 		}
 
+		private static string GetCommandUrl(string command, params object[] parameters)
+		{
+			StringBuilder builder = new StringBuilder(command);
+			foreach (object parameter in parameters)
+				builder.Append(parameter);
+
+			return GetCommandUrl(builder.ToString());
+		}
+
 		private static string GetCommandUrl(string command)
 		{
-			return string.Format("cgi-bin/aw_ptz?cmd={0}&res=1", command);
+			return string.Format("cgi-bin/aw_ptz?cmd=%23{0}&res=1", command);
 		}
 
 		private static string GetSpeedStringBasedOnDirection(eCameraAction action, int speed)
@@ -61,28 +71,28 @@ namespace ICD.Connect.Cameras.Panasonic
 			switch (action)
 			{
 				case eCameraAction.Down:
-					returnSpeed = 50 - speed;
+					returnSpeed = STOP_SPEED - speed;
 					break;
 				case eCameraAction.Up:
-					returnSpeed = 50 + speed;
+					returnSpeed = STOP_SPEED + speed;
 					break;
 				case eCameraAction.Left:
-					returnSpeed = 50 - speed;
+					returnSpeed = STOP_SPEED - speed;
 					break;
 				case eCameraAction.Right:
-					returnSpeed = 50 + speed;
+					returnSpeed = STOP_SPEED + speed;
 					break;
 				case eCameraAction.ZoomIn:
-					returnSpeed = 50 + speed;
+					returnSpeed = STOP_SPEED + speed;
 					break;
 				case eCameraAction.ZoomOut:
-					returnSpeed = 50 - speed;
+					returnSpeed = STOP_SPEED - speed;
 					break;
 				default:
 					throw new ArgumentOutOfRangeException("action");
 			}
 
-			return String.Format("{0:00}", returnSpeed);
+			return string.Format("{0:00}", returnSpeed);
 		}
 	}
 }
