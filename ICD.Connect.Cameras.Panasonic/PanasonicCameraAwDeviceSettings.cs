@@ -1,6 +1,6 @@
 ﻿using System;
 using ICD.Common.Properties;
-using ICD.Connect.Settings.Attributes.Factories;
+using ICD.Connect.Settings.Attributes;
 
 namespace ICD.Connect.Cameras.Panasonic
 {
@@ -18,7 +18,7 @@ namespace ICD.Connect.Cameras.Panasonic
 		/// </summary>
 		public override Type OriginatorType { get { return typeof(PanasonicCameraAwDevice); } }
 
-		[PublicAPI, XmlDeviceSettingsFactoryMethod(FACTORY_NAME)]
+		[PublicAPI, XmlFactoryMethod(FACTORY_NAME)]
 		public static PanasonicCameraAwDeviceSettings FromXml(string xml)
 		{
 			PanasonicCameraAwDeviceSettings output = new PanasonicCameraAwDeviceSettings();

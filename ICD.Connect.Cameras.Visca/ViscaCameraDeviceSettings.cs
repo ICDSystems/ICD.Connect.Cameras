@@ -1,7 +1,7 @@
 ﻿using System;
 using ICD.Common.Properties;
 using ICD.Common.Utils.Xml;
-using ICD.Connect.Settings.Attributes.Factories;
+using ICD.Connect.Settings.Attributes;
 
 namespace ICD.Connect.Cameras.Visca
 {
@@ -20,7 +20,7 @@ namespace ICD.Connect.Cameras.Visca
 		/// </summary>
 		public override Type OriginatorType { get { return typeof(ViscaCameraDevice); } }
 
-		[PublicAPI, XmlDeviceSettingsFactoryMethod(FACTORY_NAME)]
+		[PublicAPI, XmlFactoryMethod(FACTORY_NAME)]
 		public static ViscaCameraDeviceSettings FromXml(string xml)
 		{
 			ViscaCameraDeviceSettings output = new ViscaCameraDeviceSettings();
