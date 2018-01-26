@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Text;
-using ICD.Connect.Conferencing.Cameras;
+using ICD.Common.Properties;
 
 namespace ICD.Connect.Cameras.Panasonic
 {
@@ -38,29 +38,48 @@ namespace ICD.Connect.Cameras.Panasonic
 			return GetCommandUrl(ZOOM, STOP_SPEED);
 		}
 
-		public static string Move(eCameraAction action)
+		[PublicAPI]
+		public static string PanTilt(eCameraPanTiltAction action)
 		{
-			return Move(action, DEFAULT_SPEED);
+			return PanTilt(action, DEFAULT_SPEED);
 		}
 
-		public static string Move(eCameraAction action, int speed)
+		[PublicAPI]
+		public static string PanTilt(eCameraPanTiltAction action, int speed)
 		{
 			string speedString = GetSpeedStringBasedOnDirection(action, speed);
-
 			switch (action)
 			{
-				case eCameraAction.Down:
-				case eCameraAction.Up:
-					return GetCommandUrl(PTS, STOP_SPEED, speedString);
-
-				case eCameraAction.Left:
-				case eCameraAction.Right:
+				case eCameraPanTiltAction.Left:
+				case eCameraPanTiltAction.Right:
 					return GetCommandUrl(PTS, speedString, STOP_SPEED);
+				case eCameraPanTiltAction.Up:
+				case eCameraPanTiltAction.Down:
+					return GetCommandUrl(PTS, STOP_SPEED, speedString);
+				case eCameraPanTiltAction.Stop:
+					return Stop();
+				default:
+					throw new ArgumentOutOfRangeException("action");
+			}
+		}
 
-				case eCameraAction.ZoomIn:
-				case eCameraAction.ZoomOut:
+		[PublicAPI]
+		public static string Zoom(eCameraZoomAction action)
+		{
+			return Zoom(action, DEFAULT_SPEED);
+		}
+
+		[PublicAPI]
+		public static string Zoom(eCameraZoomAction action, int speed)
+		{
+			string speedString = GetSpeedStringBasedOnDirection(action, speed);
+			switch (action)
+			{
+				case eCameraZoomAction.ZoomIn:
+				case eCameraZoomAction.ZoomOut:
 					return GetCommandUrl(ZOOM, speedString);
-
+				case eCameraZoomAction.Stop:
+					return StopZoom();
 				default:
 					throw new ArgumentOutOfRangeException("action");
 			}
@@ -80,29 +99,48 @@ namespace ICD.Connect.Cameras.Panasonic
 			return string.Format("cgi-bin/aw_ptz?cmd=%23{0}&res=1", command);
 		}
 
-		private static string GetSpeedStringBasedOnDirection(eCameraAction action, int speed)
+		private static string GetSpeedStringBasedOnDirection(eCameraPanTiltAction action, int speed)
 		{
 			int returnSpeed;
 
 			switch (action)
 			{
-				case eCameraAction.Down:
+				case eCameraPanTiltAction.Down:
 					returnSpeed = STOP_SPEED - speed;
 					break;
-				case eCameraAction.Up:
+				case eCameraPanTiltAction.Up:
 					returnSpeed = STOP_SPEED + speed;
 					break;
-				case eCameraAction.Left:
+				case eCameraPanTiltAction.Left:
 					returnSpeed = STOP_SPEED - speed;
 					break;
-				case eCameraAction.Right:
+				case eCameraPanTiltAction.Right:
 					returnSpeed = STOP_SPEED + speed;
 					break;
-				case eCameraAction.ZoomIn:
+				case eCameraPanTiltAction.Stop:
+					returnSpeed = STOP_SPEED;
+					break;
+				default:
+					throw new ArgumentOutOfRangeException("action");
+			}
+
+			return string.Format("{0:00}", returnSpeed);
+		}
+
+		private static string GetSpeedStringBasedOnDirection(eCameraZoomAction action, int speed)
+		{
+			int returnSpeed;
+
+			switch (action)
+			{
+				case eCameraZoomAction.ZoomIn:
 					returnSpeed = STOP_SPEED + speed;
 					break;
-				case eCameraAction.ZoomOut:
+				case eCameraZoomAction.ZoomOut:
 					returnSpeed = STOP_SPEED - speed;
+					break;
+				case eCameraZoomAction.Stop:
+					returnSpeed = STOP_SPEED;
 					break;
 				default:
 					throw new ArgumentOutOfRangeException("action");
@@ -112,3 +150,4 @@ namespace ICD.Connect.Cameras.Panasonic
 		}
 	}
 }
+				

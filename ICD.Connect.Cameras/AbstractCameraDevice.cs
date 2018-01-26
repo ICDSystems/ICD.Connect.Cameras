@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using ICD.Connect.API.Commands;
-using ICD.Connect.Conferencing.Cameras;
 using ICD.Connect.Devices;
 
 namespace ICD.Connect.Cameras
@@ -8,11 +7,13 @@ namespace ICD.Connect.Cameras
 	public abstract class AbstractCameraDevice<TSettings> : AbstractDevice<TSettings>, ICameraDevice
 		where TSettings : ICameraDeviceSettings, new()
 	{
+		public abstract int? CameraId { get; }
 		#region Methods
 
-		public abstract void Move(eCameraAction action);
+		
+		//public abstract void Move(eCameraPanTiltAction action);
 
-		public abstract void Stop();
+		//public abstract void Stop();
 
 		/// <summary>
 		/// Gets the child console commands.
@@ -23,8 +24,8 @@ namespace ICD.Connect.Cameras
 			foreach (IConsoleCommand command in GetBaseConsoleCommands())
 				yield return command;
 
-			yield return new GenericConsoleCommand<eCameraAction>("Move", "Moves or zooms the camera device", v => Move(v));
-			yield return new ConsoleCommand("Stop", "Stops the camera", () => Stop());
+			//yield return new GenericConsoleCommand<eCameraPanTiltAction>("Move", "Moves or zooms the camera device", v => Move(v));
+			//yield return new ConsoleCommand("Stop", "Stops the camera", () => Stop());
 		}
 
 		/// <summary>

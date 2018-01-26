@@ -1,23 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using ICD.Common.Properties;
-using ICD.Common.Services;
-using ICD.Common.Services.Logging;
 using ICD.Common.Utils;
 using ICD.Common.Utils.EventArguments;
+using ICD.Common.Utils.Services;
+using ICD.Common.Utils.Services.Logging;
 using ICD.Common.Utils.Timers;
 using ICD.Connect.API.Commands;
-using ICD.Connect.Conferencing.Cameras;
+using ICD.Connect.Cameras.Controls;
 using ICD.Connect.Protocol.Extensions;
 using ICD.Connect.Protocol.Network.WebPorts;
 using ICD.Connect.Settings.Core;
 
 namespace ICD.Connect.Cameras.Panasonic
 {
-	public sealed class PanasonicCameraAwDevice : AbstractCameraDevice<PanasonicCameraAwDeviceSettings>
-	{
-		#region properties
+	public sealed class PanasonicCameraAwDevice : AbstractCameraDevice<PanasonicCameraAwDeviceSettings>,
+		ICameraWithPanTilt, ICameraWithZoom
 
+	{
+		#region Properties
+		public override int? CameraId { get { return 0; } }//TODO: Fix Me
 		private const long RATE_LIMIT = 130;
 
 		private static readonly Dictionary<string, string> s_ErrorMap =
@@ -47,6 +49,8 @@ namespace ICD.Connect.Cameras.Panasonic
 			m_DelayTimer.OnElapsed += TimerElapsed;
 
 			Controls.Add(new GenericCameraRouteSourceControl<PanasonicCameraAwDevice>(this, 0));
+			Controls.Add(new PanTiltControl<PanasonicCameraAwDevice>(this, 1));
+			Controls.Add(new ZoomControl<PanasonicCameraAwDevice>(this, 2));
 		}
 
 		#region Methods
@@ -78,15 +82,14 @@ namespace ICD.Connect.Cameras.Panasonic
 			SendCommand(PanasonicCommandBuilder.PowerOff());
 		}
 
-		public override void Move(eCameraAction action)
+		public void PanTilt(eCameraPanTiltAction action)
 		{
-			SendCommand(PanasonicCommandBuilder.Move(action));
+			SendCommand(PanasonicCommandBuilder.PanTilt(action));
 		}
 
-		public override void Stop()
+		public void Zoom(eCameraZoomAction action)
 		{
-			SendCommand(PanasonicCommandBuilder.Stop());
-			SendCommand(PanasonicCommandBuilder.StopZoom());
+			SendCommand(PanasonicCommandBuilder.Zoom(action));
 		}
 
 		#endregion
@@ -126,7 +129,9 @@ namespace ICD.Connect.Cameras.Panasonic
 				{
 					try
 					{
-						ParsePortData(command, m_Port.Get(command));
+						string response;
+						m_Port.Get(command, out response);
+						ParsePortData(command, response );
 					}
 					catch (Exception ex)
 					{
