@@ -19,19 +19,36 @@ namespace ICD.Connect.Cameras.Visca
 		private const int DEFAULT_ZOOM_SPEED = 4;
 		#endregion
 
-		#region Public Control API
+		#region Public Commands
+		/// <summary>
+		/// Gets the Pan/Tilt Command, using the default speed
+		/// </summary>
+		/// <param name="id">The sequential Id of the camera to perform the operation on.</param>
+		/// <param name="action">The Pan/Tilt action desired.</param>
 		[PublicAPI]
 		public static string GetPanTiltCommand(int id, eCameraPanTiltAction action)
 		{
 			return GetPanTiltCommand(id, action, DEFAULT_PAN_SPEED, DEFAULT_TILT_SPEED);
 		}
 
+		/// <summary>
+		/// Gets the Zoom Command URL, using the default provided.
+		/// </summary>
+		/// <param name="id">The sequential Id of the camera to perform the operation on.</param>
+		/// <param name="action">The Zoom action desired.</param>
 		[PublicAPI]
 		public static string GetZoomCommand(int id, eCameraZoomAction action)
 		{
 			return GetZoomCommand(id, action, DEFAULT_ZOOM_SPEED);
 		}
 
+		/// <summary>
+		/// Gets the Pan/Tilt Command, using the speed provided.
+		/// </summary>
+		/// <param name="id">The sequential Id of the camera to perform the operation on.</param>
+		/// <param name="action">The Pan/Tilt action desired.</param>
+		/// <param name="panSpeed">The desired speed for panning.</param>
+		/// <param name="tiltSpeed">The desired speed for tilting.</param>
 		[PublicAPI]
 		public static string GetPanTiltCommand(int id, eCameraPanTiltAction action, int panSpeed, int tiltSpeed)
 		{
@@ -47,10 +64,17 @@ namespace ICD.Connect.Cameras.Visca
 					return BuildRightCommand(id, panSpeed, tiltSpeed);
 				case eCameraPanTiltAction.Stop:
 					return BuildStopPanTiltCommand(id);
+				default:
+					throw new ArgumentOutOfRangeException("action");
 			}
-			return null;
 		}
 
+		/// <summary>
+		/// Gets the Zoom Command URL, using the speed provided.
+		/// </summary>
+		/// <param name="id">The sequential Id of the camera to perform the operation on.</param>
+		/// <param name="action">The Zoom action desired.</param>
+		/// <param name="zoomSpeed">The desired speed, where 0 is still and 50 is fastest possible</param>
 		[PublicAPI]
 		public static string GetZoomCommand(int id, eCameraZoomAction action, int zoomSpeed)
 		{
@@ -62,16 +86,24 @@ namespace ICD.Connect.Cameras.Visca
 					return BuildZoomOutCommand(id, zoomSpeed);
 				case eCameraZoomAction.Stop:
 					return BuildStopZoomCommand(id);
+				default:
+					throw new ArgumentOutOfRangeException("action");
 			}
-			return null;
 		}
 
+		/// <summary>
+		/// Gets the command which tells all VISCA cameras in a chain of VISCA cameras to discover their own ids.
+		/// </summary>
 		[PublicAPI]
 		public static string GetSetAddressCommand()
 		{
 			return BuildSetAddressCommand();
 		}
 
+		/// <summary>
+		/// Gets the command to clear all pending commands for the given camera.
+		/// </summary>
+		/// <param name="id">The sequential id of the camera to clear.</param>
 		[PublicAPI]
 		public static string GetClearCommand(int id)
 		{

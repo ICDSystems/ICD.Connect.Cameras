@@ -6,46 +6,62 @@ namespace ICD.Connect.Cameras.Panasonic
 {
 	public static class PanasonicCommandBuilder
 	{
+		#region String Constants
 		private const string PTS = "PTS";
 		private const string ZOOM = "Z";
 		private const string POWER = "O";
+		#endregion
 
+		#region Default Speeds
 		private const int DEFAULT_SPEED = 24;
 		private const int STOP_SPEED = 50;
+		#endregion
 
-		public static string PowerOn()
+		#region Public Commands
+		/// <summary>
+		/// Gets the Power On Command URL
+		/// </summary>
+		[PublicAPI]
+		public static string GetPowerOnCommand()
 		{
 			return GetCommandUrl(POWER, 1);
 		}
 
-		public static string PowerOff()
+		/// <summary>
+		/// Gets the Power Off Command URL
+		/// </summary>
+		[PublicAPI]
+		public static string GetPowerOffCommand()
 		{
 			return GetCommandUrl(POWER, 0);
 		}
 
-		public static string PowerQuery()
+		/// <summary>
+		/// Gets the Power Query Command URL
+		/// </summary>
+		[PublicAPI]
+		public static string GetPowerQueryCommand()
 		{
 			return GetCommandUrl(POWER);
 		}
 
-		public static string Stop()
-		{
-			return GetCommandUrl(PTS, STOP_SPEED, STOP_SPEED);
-		}
-
-		public static string StopZoom()
-		{
-			return GetCommandUrl(ZOOM, STOP_SPEED);
-		}
-
+		/// <summary>
+		/// Gets the Pan/Tilt Command URL, using the default speed
+		/// </summary>
+		/// <param name="action">The Pan/Tilt action desired.</param>
 		[PublicAPI]
-		public static string PanTilt(eCameraPanTiltAction action)
+		public static string GetPanTiltCommand(eCameraPanTiltAction action)
 		{
-			return PanTilt(action, DEFAULT_SPEED);
+			return GetPanTiltCommand(action, DEFAULT_SPEED);
 		}
 
+		/// <summary>
+		/// Gets the Pan/Tilt Command URL, using the speed provided.
+		/// </summary>
+		/// <param name="action">The Pan/Tilt action desired.</param>
+		/// <param name="speed">The desired speed, where 0 is still and 50 is fastest possible</param>
 		[PublicAPI]
-		public static string PanTilt(eCameraPanTiltAction action, int speed)
+		public static string GetPanTiltCommand(eCameraPanTiltAction action, int speed)
 		{
 			string speedString = GetSpeedStringBasedOnDirection(action, speed);
 			switch (action)
@@ -57,20 +73,29 @@ namespace ICD.Connect.Cameras.Panasonic
 				case eCameraPanTiltAction.Down:
 					return GetCommandUrl(PTS, STOP_SPEED, speedString);
 				case eCameraPanTiltAction.Stop:
-					return Stop();
+					return GetPanTiltStopCommand();
 				default:
 					throw new ArgumentOutOfRangeException("action");
 			}
 		}
 
+		/// <summary>
+		/// Gets the Zoom Command URL, using the default speed
+		/// </summary>
+		/// <param name="action">The Zoom action desired.</param>
 		[PublicAPI]
-		public static string Zoom(eCameraZoomAction action)
+		public static string GetZoomCommand(eCameraZoomAction action)
 		{
-			return Zoom(action, DEFAULT_SPEED);
+			return GetZoomCommand(action, DEFAULT_SPEED);
 		}
 
+		/// <summary>
+		/// Gets the Zoom Command URL, using the speed provided.
+		/// </summary>
+		/// <param name="action">The Zoom action desired.</param>
+		/// <param name="speed">The desired speed, where 0 is still and 50 is fastest possible</param>
 		[PublicAPI]
-		public static string Zoom(eCameraZoomAction action, int speed)
+		public static string GetZoomCommand(eCameraZoomAction action, int speed)
 		{
 			string speedString = GetSpeedStringBasedOnDirection(action, speed);
 			switch (action)
@@ -79,10 +104,27 @@ namespace ICD.Connect.Cameras.Panasonic
 				case eCameraZoomAction.ZoomOut:
 					return GetCommandUrl(ZOOM, speedString);
 				case eCameraZoomAction.Stop:
-					return StopZoom();
+					return GetStopZoomCommand();
 				default:
 					throw new ArgumentOutOfRangeException("action");
 			}
+		}
+		#endregion
+
+		#region Builders
+		private static string GetPanTiltStopCommand()
+		{
+			return GetCommandUrl(PTS, STOP_SPEED, STOP_SPEED);
+		}
+
+		private static string GetStopZoomCommand()
+		{
+			return GetCommandUrl(ZOOM, STOP_SPEED);
+		}
+
+		private static string GetCommandUrl(string command)
+		{
+			return string.Format("cgi-bin/aw_ptz?cmd=%23{0}&res=1", command);
 		}
 
 		private static string GetCommandUrl(string command, params object[] parameters)
@@ -92,11 +134,6 @@ namespace ICD.Connect.Cameras.Panasonic
 				builder.Append(parameter);
 
 			return GetCommandUrl(builder.ToString());
-		}
-
-		private static string GetCommandUrl(string command)
-		{
-			return string.Format("cgi-bin/aw_ptz?cmd=%23{0}&res=1", command);
 		}
 
 		private static string GetSpeedStringBasedOnDirection(eCameraPanTiltAction action, int speed)
@@ -148,6 +185,7 @@ namespace ICD.Connect.Cameras.Panasonic
 
 			return string.Format("{0:00}", returnSpeed);
 		}
+		#endregion
 	}
 }
 				

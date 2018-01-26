@@ -76,22 +76,22 @@ namespace ICD.Connect.Cameras.Panasonic
 
 		public void PowerOn()
 		{
-			SendCommand(PanasonicCommandBuilder.PowerOn());
+			SendCommand(PanasonicCommandBuilder.GetPowerOnCommand());
 		}
 
 		public void PowerOff()
 		{
-			SendCommand(PanasonicCommandBuilder.PowerOff());
+			SendCommand(PanasonicCommandBuilder.GetPowerOffCommand());
 		}
 
 		public void PanTilt(eCameraPanTiltAction action)
 		{
-			SendCommand(PanasonicCommandBuilder.PanTilt(action));
+			SendCommand(PanasonicCommandBuilder.GetPanTiltCommand(action));
 		}
 
 		public void Zoom(eCameraZoomAction action)
 		{
-			SendCommand(PanasonicCommandBuilder.Zoom(action));
+			SendCommand(PanasonicCommandBuilder.GetZoomCommand(action));
 		}
 
 		#endregion
