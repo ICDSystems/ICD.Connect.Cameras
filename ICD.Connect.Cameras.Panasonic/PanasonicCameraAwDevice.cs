@@ -8,6 +8,7 @@ using ICD.Common.Utils.Services.Logging;
 using ICD.Common.Utils.Timers;
 using ICD.Connect.API.Commands;
 using ICD.Connect.Cameras.Controls;
+using ICD.Connect.Devices.Controls;
 using ICD.Connect.Protocol.Extensions;
 using ICD.Connect.Protocol.Network.WebPorts;
 using ICD.Connect.Settings.Core;
@@ -15,7 +16,7 @@ using ICD.Connect.Settings.Core;
 namespace ICD.Connect.Cameras.Panasonic
 {
 	public sealed class PanasonicCameraAwDevice : AbstractCameraDevice<PanasonicCameraAwDeviceSettings>,
-		ICameraWithPanTilt, ICameraWithZoom
+		ICameraWithPanTilt, ICameraWithZoom, IDeviceWithPower
 
 	{
 		#region Properties
@@ -51,6 +52,7 @@ namespace ICD.Connect.Cameras.Panasonic
 			Controls.Add(new GenericCameraRouteSourceControl<PanasonicCameraAwDevice>(this, 0));
 			Controls.Add(new PanTiltControl<PanasonicCameraAwDevice>(this, 1));
 			Controls.Add(new ZoomControl<PanasonicCameraAwDevice>(this, 2));
+			Controls.Add(new PowerDeviceControl<PanasonicCameraAwDevice>(this, 3));
 		}
 
 		#region Methods
