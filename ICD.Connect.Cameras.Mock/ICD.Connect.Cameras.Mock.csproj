@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	<OutputType>Library</OutputType>
+    <TargetFramework>netstandard2.0</TargetFramework>
+	<RootNamespace>ICD.Connect.Cameras.Mock</RootNamespace>
+	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	<Deterministic>false</Deterministic>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG;STANDARD</DefineConstants>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <OutputPath>binNetCoreApp\$(Configuration)\</OutputPath>
+    <DefineConstants>TRACE;STANDARD</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="SIMPLSharpLogs\**" />
+    <EmbeddedResource Remove="SIMPLSharpLogs\**" />
+    <None Remove="SIMPLSharpLogs\**" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Remove="ObfuscationSettings.cs" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Remove=".gitignore" />
+    <None Remove="ICD.Connect.Devices_SimplSharp.suo" />
+    <None Remove="ICD.Connect.projectinfo" />
+    <None Remove="ICD.SimplSharp.projectinfo" />
+	<None Remove="Properties\ControlSystem.cfg" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\ICD.Connect.Settings\ICD.Connect.Settings\ICD.Connect.Settings_NetStandard.csproj" />
+    <ProjectReference Include="..\ICD.Connect.Cameras\ICD.Connect.Cameras_NetStandard.csproj" />
+  </ItemGroup>
+
+</Project>
