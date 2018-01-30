@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using ICD.Common.Utils.Extensions;
+using ICD.Connect.API.Commands;
 using ICD.Connect.Devices.Controls;
 
 namespace ICD.Connect.Cameras.Controls
 {
-	public class PresetControl<T> : AbstractDeviceControl<T>, IPresetControl
+	public sealed class PresetControl<T> : AbstractDeviceControl<T>, IPresetControl
 		where T : ICameraWithPresets
 	{
 		/// <summary>
@@ -16,8 +17,9 @@ namespace ICD.Connect.Cameras.Controls
 		/// <param name="id"></param>
 		public PresetControl(T parent, int id) : base(parent, id)
 		{
-		} 
+		}
 
+		#region IPresetControl
 		public event EventHandler OnPresetsChanged;
 
 		/// <summary>
@@ -52,5 +54,31 @@ namespace ICD.Connect.Cameras.Controls
 		{
 			return Parent.Presets.Select(p => p.Value).OrderBy(p => p.ListPosition).ToArray();
 		}
+		#endregion
+
+		#region Console
+
+		/// <summary>
+		/// Gets the child console commands.
+		/// </summary>
+		/// <returns></returns>
+		public override IEnumerable<IConsoleCommand> GetConsoleCommands()
+		{
+			foreach (IConsoleCommand command in GetBaseConsoleCommands())
+				yield return command;
+
+			yield return new GenericConsoleCommand<int>("Activate Preset", "Sends the stop signal to the camera.", (preset) => ActivatePreset(preset));
+		}
+
+		/// <summary>
+		/// Workaround for the "unverifiable code" warning.
+		/// </summary>
+		/// <returns></returns>
+		private IEnumerable<IConsoleCommand> GetBaseConsoleCommands()
+		{
+			return base.GetConsoleCommands();
+		}
+
+		#endregion
 	}
 }
