@@ -110,6 +110,29 @@ namespace ICD.Connect.Cameras.Visca
 			return BuildClearCommand(id);
 		}
 
+		/// <summary>
+		/// Gets the command to wake the camera.
+		/// </summary>
+		/// <param name="id">The sequential id of the camera to power on</param>
+		/// <returns></returns>
+		[PublicAPI]
+		public static string GetPowerOnCommand(int id)
+		{
+			return BuildPowerOnCommand(id);
+		}
+
+
+		/// <summary>
+		/// Gets the command to park the camera facing the wall and disable video.
+		/// </summary>
+		/// <param name="id">The sequential id of the camera to power off.</param>
+		/// <returns></returns>
+		[PublicAPI]
+		public static string GetPowerOffCommand(int id)
+		{
+			return BuildPowerOnCommand(id);
+		}
+
 		#endregion
 
 		#region Byte Builders
@@ -292,6 +315,32 @@ namespace ICD.Connect.Cameras.Visca
 				MESSAGE_START_BYTE,
 				0x00,
 				0x01,
+				MESSAGE_END_BYTE
+			});
+		}
+
+		private static string BuildPowerOnCommand(int id)
+		{
+			return StringUtils.ToString(new byte[]
+			{
+				GetIdsByte(0, id),
+				MESSAGE_START_BYTE,
+				0x04,
+				0x00,
+				0x02,
+				MESSAGE_END_BYTE
+			});
+		}
+
+		private static string BuildPowerOffCommand(int id)
+		{
+			return StringUtils.ToString(new byte[]
+			{
+				GetIdsByte(0, id),
+				MESSAGE_START_BYTE,
+				0x04,
+				0x00,
+				0x03,
 				MESSAGE_END_BYTE
 			});
 		}
