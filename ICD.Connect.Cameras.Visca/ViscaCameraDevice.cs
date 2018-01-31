@@ -20,7 +20,6 @@ namespace ICD.Connect.Cameras.Visca
 	public sealed class ViscaCameraDevice : AbstractCameraDevice<ViscaCameraDeviceSettings>,
 		ICameraWithPanTilt, ICameraWithZoom, IDeviceWithPower
 	{
-		public override int? CameraId { get { return 0; } }//TODO: Fix Me
 		private ISerialQueue SerialQueue { get; set; }
 
 		private readonly Dictionary<string, int> m_RetryCounts = new Dictionary<string, int>();

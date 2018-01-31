@@ -7,7 +7,6 @@ namespace ICD.Connect.Cameras
 	public abstract class AbstractCameraDevice<TSettings> : AbstractDevice<TSettings>, ICameraDevice
 		where TSettings : ICameraDeviceSettings, new()
 	{
-		public abstract int? CameraId { get; }
 		#region Methods
 
 		

@@ -4,7 +4,6 @@ namespace ICD.Connect.Cameras
 {
 	public interface ICameraDevice : IDevice
 	{
-		int? CameraId { get; }
 	}
 }
 

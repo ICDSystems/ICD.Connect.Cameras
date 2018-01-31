@@ -20,7 +20,6 @@ namespace ICD.Connect.Cameras.Panasonic
 
 	{
 		#region Properties
-		public override int? CameraId { get { return 0; } }//TODO: Fix Me
 		private const long RATE_LIMIT = 130;
 
 		private static readonly Dictionary<string, string> s_ErrorMap =

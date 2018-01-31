@@ -5,7 +5,7 @@ using ICD.Common.Utils.Xml;
 namespace ICD.Connect.Cameras
 {
 	/// <summary>
-	/// CameraPreset provides information about a near camera preset.
+	/// CameraPreset provides information about a camera preset.
 	/// </summary>
 	public struct CameraPreset
 	{
@@ -54,6 +54,20 @@ namespace ICD.Connect.Cameras
 			m_CameraId = cameraId;
 			m_ListPosition = listPosition;
 			m_Name = name;
+		}
+
+		/// <summary>
+		/// Constructor.
+		/// </summary>
+		/// <param name="presetId"></param>
+		/// <param name="listPosition"></param>
+		/// <param name="name"></param>
+		public CameraPreset(int presetId, int listPosition, string name)
+		{
+			m_PresetId = presetId;
+			m_ListPosition = listPosition;
+			m_Name = name;
+			m_CameraId = 0;
 		}
 
 		/// <summary>

@@ -12,7 +12,6 @@ namespace ICD.Connect.Cameras.Mock
 		ICameraWithPanTilt, ICameraWithZoom, ICameraWithPresets, IDeviceWithPower
 	{
 		#region Properties
-		public override int? CameraId { get { return 0; } }
 		private bool m_Powered;
 		private int m_VPosition;
 		private int m_HPosition;
@@ -103,7 +102,7 @@ namespace ICD.Connect.Cameras.Mock
 				Logger.AddEntry(eSeverity.Warning, "Mock camera preset must be between 1 and {0}, preset was not stored.", MaxPresets);
 				return;
 			}
-			Presets.Add(presetId, new CameraPreset(presetId, CameraId == null ? 0 : CameraId.Value, presetId, string.Format("Preset{0}", presetId)));
+			Presets.Add(presetId, new CameraPreset(presetId, Id, presetId, string.Format("Preset{0}", presetId)));
 			m_PresetPositions.Add(presetId, new CameraPosition{HPosition = m_HPosition, VPosition = m_VPosition, ZPosition = m_ZPosition});
 		}
 		#endregion
