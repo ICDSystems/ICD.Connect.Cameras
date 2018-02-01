@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using ICD.Common.Utils.Extensions;
 using ICD.Connect.API.Commands;
 using ICD.Connect.Devices.Controls;
@@ -52,7 +51,7 @@ namespace ICD.Connect.Cameras.Controls
 		/// <returns></returns>
 		public IEnumerable<CameraPreset> GetPresets()
 		{
-			return Parent.Presets.Select(p => p.Value).OrderBy(p => p.ListPosition).ToArray();
+			return Parent.GetPresets();
 		}
 		#endregion
 

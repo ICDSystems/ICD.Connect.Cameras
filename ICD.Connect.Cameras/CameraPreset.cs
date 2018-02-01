@@ -11,7 +11,6 @@ namespace ICD.Connect.Cameras
 	{
 		private readonly int m_PresetId;
 		private readonly int m_CameraId;
-		private readonly int m_ListPosition;
 		private readonly string m_Name;
 
 		#region Region Properties
@@ -25,11 +24,6 @@ namespace ICD.Connect.Cameras
 		/// Gets the camera id.
 		/// </summary>
 		public int CameraId { get { return m_CameraId; } }
-
-		/// <summary>
-		/// Gets the list position.
-		/// </summary>
-		public int ListPosition { get { return m_ListPosition; } }
 
 		/// <summary>
 		/// Gets the name.
@@ -46,28 +40,12 @@ namespace ICD.Connect.Cameras
 		/// </summary>
 		/// <param name="presetId"></param>
 		/// <param name="cameraId"></param>
-		/// <param name="listPosition"></param>
 		/// <param name="name"></param>
-		public CameraPreset(int presetId, int cameraId, int listPosition, string name)
+		public CameraPreset(int presetId, int cameraId, string name)
 		{
 			m_PresetId = presetId;
 			m_CameraId = cameraId;
-			m_ListPosition = listPosition;
 			m_Name = name;
-		}
-
-		/// <summary>
-		/// Constructor.
-		/// </summary>
-		/// <param name="presetId"></param>
-		/// <param name="listPosition"></param>
-		/// <param name="name"></param>
-		public CameraPreset(int presetId, int listPosition, string name)
-		{
-			m_PresetId = presetId;
-			m_ListPosition = listPosition;
-			m_Name = name;
-			m_CameraId = 0;
 		}
 
 		/// <summary>
@@ -81,7 +59,6 @@ namespace ICD.Connect.Cameras
 			{
 				reader.ReadToNextElement();
 
-				int listPosition = reader.GetAttributeAsInt("item");
 				int presetId = 0;
 				int cameraId = 0;
 				string name = null;
@@ -109,7 +86,7 @@ namespace ICD.Connect.Cameras
 					child.Dispose();
 				}
 
-				return new CameraPreset(presetId, cameraId, listPosition, name);
+				return new CameraPreset(presetId, cameraId, name);
 			}
 		}
 
@@ -163,7 +140,6 @@ namespace ICD.Connect.Cameras
 				int hash = 17;
 				hash = hash * 23 + m_PresetId;
 				hash = hash * 23 + m_CameraId;
-				hash = hash * 23 + m_ListPosition;
 				hash = hash * 23 + (m_Name == null ? 0 : m_Name.GetHashCode());
 				return hash;
 			}

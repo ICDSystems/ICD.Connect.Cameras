@@ -21,7 +21,7 @@ namespace ICD.Connect.Cameras.Mock
 
 		public MockCameraDevice()
 		{
-			Presets = new Dictionary<int, CameraPreset>();
+			m_Presets = new Dictionary<int, CameraPreset>();
 			m_PresetPositions = new Dictionary<int, CameraPosition>();
 			Controls.Add(new GenericCameraRouteSourceControl<MockCameraDevice>(this, 0));
 			Controls.Add(new PanTiltControl<MockCameraDevice>(this, 1));
@@ -80,7 +80,13 @@ namespace ICD.Connect.Cameras.Mock
 
 		#region ICameraWithPresets
 		public int MaxPresets { get { return 4; } }
-		public Dictionary<int, CameraPreset> Presets { get; private set; }
+		private readonly Dictionary<int, CameraPreset> m_Presets;
+
+		public IEnumerable<CameraPreset> GetPresets()
+		{
+			return m_Presets.Values;
+		}
+
 		public void ActivatePreset(int presetId)
 		{
 			if (presetId < 1 || presetId > MaxPresets)
@@ -102,7 +108,7 @@ namespace ICD.Connect.Cameras.Mock
 				Logger.AddEntry(eSeverity.Warning, "Mock camera preset must be between 1 and {0}, preset was not stored.", MaxPresets);
 				return;
 			}
-			Presets.Add(presetId, new CameraPreset(presetId, Id, presetId, string.Format("Preset{0}", presetId)));
+			m_Presets.Add(presetId, new CameraPreset(presetId, Id, string.Format("Preset{0}", presetId)));
 			m_PresetPositions.Add(presetId, new CameraPosition{HPosition = m_HPosition, VPosition = m_VPosition, ZPosition = m_ZPosition});
 		}
 		#endregion

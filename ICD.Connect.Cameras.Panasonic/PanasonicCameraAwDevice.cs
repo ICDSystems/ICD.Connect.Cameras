@@ -54,8 +54,44 @@ namespace ICD.Connect.Cameras.Panasonic
 			Controls.Add(new PowerDeviceControl<PanasonicCameraAwDevice>(this, 3));
 		}
 
-		#region Methods
+		#region ICameraWithPanTilt
+		public void PanTilt(eCameraPanTiltAction action)
+		{
+			SendCommand(PanasonicCommandBuilder.GetPanTiltCommand(action));
+		}
+		#endregion
 
+		#region ICameraWithZoom
+		public void Zoom(eCameraZoomAction action)
+		{
+			SendCommand(PanasonicCommandBuilder.GetZoomCommand(action));
+		}
+		#endregion
+
+		#region IDeviceWithPower
+		public void PowerOn()
+		{
+			SendCommand(PanasonicCommandBuilder.GetPowerOnCommand());
+		}
+
+		public void PowerOff()
+		{
+			SendCommand(PanasonicCommandBuilder.GetPowerOffCommand());
+		}
+		#endregion
+
+		#region DeviceBase
+		/// <summary>
+		/// Gets the current online status of the device.
+		/// </summary>
+		/// <returns></returns>
+		protected override bool GetIsOnlineStatus()
+		{
+			return m_Port != null && m_Port.IsOnline;
+		}
+		#endregion
+
+		#region Public API
 		/// <summary>
 		/// Sets the port for communication with the device.
 		/// </summary>
@@ -72,29 +108,9 @@ namespace ICD.Connect.Cameras.Panasonic
 
 			UpdateCachedOnlineStatus();
 		}
-
-		public void PowerOn()
-		{
-			SendCommand(PanasonicCommandBuilder.GetPowerOnCommand());
-		}
-
-		public void PowerOff()
-		{
-			SendCommand(PanasonicCommandBuilder.GetPowerOffCommand());
-		}
-
-		public void PanTilt(eCameraPanTiltAction action)
-		{
-			SendCommand(PanasonicCommandBuilder.GetPanTiltCommand(action));
-		}
-
-		public void Zoom(eCameraZoomAction action)
-		{
-			SendCommand(PanasonicCommandBuilder.GetZoomCommand(action));
-		}
-
 		#endregion
 
+		#region Private Methods
 		private void TimerElapsed(object sender, EventArgs args)
 		{
 			m_CommandSection.Enter();
@@ -114,10 +130,6 @@ namespace ICD.Connect.Cameras.Panasonic
 			}
 		}
 
-		/// <summary>
-		/// Responsible for dispatching commands from the command buffer.
-		/// </summary>
-		/// <param name="command"></param>
 		private void SendCommand(string command)
 		{
 			m_CommandSection.Enter();
@@ -150,21 +162,25 @@ namespace ICD.Connect.Cameras.Panasonic
 			}
 		}
 
-		/// <summary>
-		/// Gets the current online status of the device.
-		/// </summary>
-		/// <returns></returns>
-		protected override bool GetIsOnlineStatus()
+		private void ParsePortData(string command, string response)
 		{
-			return m_Port != null && m_Port.IsOnline;
+			if (string.IsNullOrEmpty(response))
+				return;
+
+			response = response.Trim();
+
+			if (command.ToLower().Contains(response.ToLower()))
+				return;
+
+			string code = response.Substring(0, 3);
+
+			string message;
+			if (!s_ErrorMap.TryGetValue(code, out message))
+				message = "Unexpected error code";
+
+			Log(eSeverity.Error, "{0} - {1}", response, message);
 		}
 
-		/// <summary>
-		/// Logs to logging core.
-		/// </summary>
-		/// <param name="severity"></param>
-		/// <param name="message"></param>
-		/// <param name="args"></param>
 		private void Log(eSeverity severity, string message, params object[] args)
 		{
 			message = string.Format(message, args);
@@ -172,6 +188,8 @@ namespace ICD.Connect.Cameras.Panasonic
 
 			ServiceProvider.GetService<ILoggerService>().AddEntry(severity, message);
 		}
+		#endregion
+
 
 		#region Port Callbacks
 
@@ -252,25 +270,6 @@ namespace ICD.Connect.Cameras.Panasonic
 				Log(eSeverity.Error, "No Web Port with id {0}", settings.Port);
 
 			SetPort(port);
-		}
-
-		private void ParsePortData(string command, string response)
-		{
-			if (string.IsNullOrEmpty(response))
-				return;
-
-			response = response.Trim();
-
-			if (command.ToLower().Contains(response.ToLower()))
-				return;
-
-			string code = response.Substring(0, 3);
-
-			string message;
-			if (!s_ErrorMap.TryGetValue(code, out message))
-				message = "Unexpected error code";
-
-			Log(eSeverity.Error, "{0} - {1}", response, message);
 		}
 
 		#endregion

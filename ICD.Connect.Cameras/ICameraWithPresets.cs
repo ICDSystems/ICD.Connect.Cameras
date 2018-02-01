@@ -12,7 +12,7 @@ namespace ICD.Connect.Cameras
 		/// <summary>
 		/// Dictionary of presets, indexed by integer.
 		/// </summary>
-		Dictionary<int, CameraPreset> Presets { get; }
+		IEnumerable<CameraPreset> GetPresets();
 
 		/// <summary>
 		/// Tells the camera to change its position to the given preset.
