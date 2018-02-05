@@ -124,7 +124,7 @@ namespace ICD.Connect.Cameras.Panasonic
 
 		private static string GetCommandUrl(string command)
 		{
-			return string.Format("cgi-bin/aw_ptz?cmd=%23{0}&res=1", command);
+			return string.Format("/cgi-bin/aw_ptz?cmd=%23{0}&res=1", command);
 		}
 
 		private static string GetCommandUrl(string command, params object[] parameters)

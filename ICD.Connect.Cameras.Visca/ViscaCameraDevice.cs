@@ -300,7 +300,7 @@ namespace ICD.Connect.Cameras.Visca
 			if (port != null && port.IsOnline)
 			{
 				SendCommand(ViscaCommandBuilder.GetSetAddressCommand());
-				SendCommand(ViscaCommandBuilder.GetClearCommand(DEFAULT_ID));
+				SendCommand(ViscaCommandBuilder.GetClearCommand());
 			}
 		}
 

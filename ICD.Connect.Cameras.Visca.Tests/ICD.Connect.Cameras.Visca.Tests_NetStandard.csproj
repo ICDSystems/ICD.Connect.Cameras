@@ -1,7 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+	<ApplicationIcon />
+    <OutputType>Library</OutputType>
+    <StartupObject />
+    <RootNamespace>ICD.Connect.Cameras.Visca.Tests</RootNamespace>
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -19,8 +23,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\..\ICD.Connect.Conferencing\ICD.Connect.Conferencing\ICD.Connect.Conferencing_NetStandard.csproj" />
-    <ProjectReference Include="..\ICD.Connect.Cameras.Panasonic\ICD.Connect.Cameras.Panasonic_NetStandard.csproj" />
+    <ProjectReference Include="..\ICD.Connect.Cameras.Visca\ICD.Connect.Cameras.Visca_NetStandard.csproj" />
   </ItemGroup>
 
   <ItemGroup>

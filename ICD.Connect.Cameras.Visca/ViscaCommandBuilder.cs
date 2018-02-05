@@ -103,11 +103,10 @@ namespace ICD.Connect.Cameras.Visca
 		/// <summary>
 		/// Gets the command to clear all pending commands for the given camera.
 		/// </summary>
-		/// <param name="id">The sequential id of the camera to clear.</param>
 		[PublicAPI]
-		public static string GetClearCommand(int id)
+		public static string GetClearCommand()
 		{
-			return BuildClearCommand(id);
+			return BuildClearCommand();
 		}
 
 		/// <summary>
@@ -130,20 +129,16 @@ namespace ICD.Connect.Cameras.Visca
 		[PublicAPI]
 		public static string GetPowerOffCommand(int id)
 		{
-			return BuildPowerOnCommand(id);
+			return BuildPowerOffCommand(id);
 		}
 
 		#endregion
 
 		#region Byte Builders
-		private static byte GetIdsByte(int sender, int recipient)
+		private static byte GetIdsByte( int recipient)
 		{
-			sender = MathUtils.Clamp(sender, 0, 7);
-			recipient = MathUtils.Clamp(recipient, 0, 7);
-
-			byte idByte = (byte)(sender << 4);
-			idByte += (byte)recipient;
-			return idByte.SetBit(7, true);
+			recipient = MathUtils.Clamp(recipient, 1, 7);
+			return (byte)(0x80 + recipient);
 		}
 
 		private static byte GetPanSpeedByte(int speed)
@@ -177,7 +172,7 @@ namespace ICD.Connect.Cameras.Visca
 		{
 			return StringUtils.ToString(new byte[]
 			{
-				GetIdsByte(0, id),
+				GetIdsByte(id),
 				MESSAGE_START_BYTE,
 				0x06,
 				0x01,
@@ -192,17 +187,17 @@ namespace ICD.Connect.Cameras.Visca
 
 		private static string BuildUpCommand(int id, int panSpeed, int tiltSpeed)
 		{
-			return StringUtils.ToString(new byte[] 
-			{ 
-				GetIdsByte(0, id),
-				MESSAGE_START_BYTE, 
-				0x06, 
-				0x01, 
-				GetPanSpeedByte(panSpeed), 
-				GetTiltSpeedByte(tiltSpeed), 
-				0x03, 
-				0x01, 
-				MESSAGE_END_BYTE 
+			return StringUtils.ToString(new byte[]
+			{
+				GetIdsByte(id),
+				MESSAGE_START_BYTE,
+				0x06,
+				0x01,
+				GetPanSpeedByte(panSpeed),
+				GetTiltSpeedByte(tiltSpeed),
+				0x03,
+				0x01,
+				MESSAGE_END_BYTE
 			});
 		}
 
@@ -210,7 +205,7 @@ namespace ICD.Connect.Cameras.Visca
 		{
 			return StringUtils.ToString(new byte[]
 			{
-				GetIdsByte(0, id), 
+				GetIdsByte(id),
 				MESSAGE_START_BYTE,
 				0x06,
 				0x01,
@@ -227,7 +222,7 @@ namespace ICD.Connect.Cameras.Visca
 		{
 			return StringUtils.ToString(new byte[]
 			{
-				GetIdsByte(0, id), 
+				GetIdsByte(id),
 				MESSAGE_START_BYTE,
 				0x06,
 				0x01,
@@ -244,7 +239,7 @@ namespace ICD.Connect.Cameras.Visca
 		{
 			return StringUtils.ToString(new byte[]
 			{
-				GetIdsByte(0, id), 
+				GetIdsByte(id),
 				MESSAGE_START_BYTE,
 				0x06,
 				0x01,
@@ -261,7 +256,7 @@ namespace ICD.Connect.Cameras.Visca
 		{
 			return StringUtils.ToString(new byte[]
 			{
-				GetIdsByte(0, id),
+				GetIdsByte(id),
 				MESSAGE_START_BYTE,
 				0x04,
 				0x07,
@@ -274,11 +269,11 @@ namespace ICD.Connect.Cameras.Visca
 		{
 			return StringUtils.ToString(new byte[]
 			{
-				GetIdsByte(0, id),
+				GetIdsByte(id),
 				MESSAGE_START_BYTE,
 				0x04,
 				0x07,
-				GetZoomInSpeedByte(zoomSpeed), 
+				GetZoomInSpeedByte(zoomSpeed),
 				MESSAGE_END_BYTE
 			});
 		}
@@ -287,7 +282,7 @@ namespace ICD.Connect.Cameras.Visca
 		{
 			return StringUtils.ToString(new byte[]
 			{
-				GetIdsByte(0, id), 
+				GetIdsByte(id),
 				MESSAGE_START_BYTE,
 				0x04,
 				0x07,
@@ -307,11 +302,11 @@ namespace ICD.Connect.Cameras.Visca
 			});
 		}
 
-		private static string BuildClearCommand(int id)
+		private static string BuildClearCommand()
 		{
 			return StringUtils.ToString(new byte[]
 			{
-				GetIdsByte(0, id), 
+				0x88,
 				MESSAGE_START_BYTE,
 				0x00,
 				0x01,
@@ -323,7 +318,7 @@ namespace ICD.Connect.Cameras.Visca
 		{
 			return StringUtils.ToString(new byte[]
 			{
-				GetIdsByte(0, id),
+				GetIdsByte(id),
 				MESSAGE_START_BYTE,
 				0x04,
 				0x00,
@@ -336,7 +331,7 @@ namespace ICD.Connect.Cameras.Visca
 		{
 			return StringUtils.ToString(new byte[]
 			{
-				GetIdsByte(0, id),
+				GetIdsByte(id),
 				MESSAGE_START_BYTE,
 				0x04,
 				0x00,

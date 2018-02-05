@@ -23,7 +23,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\..\ICD.Connect.Conferencing\ICD.Connect.Conferencing\ICD.Connect.Conferencing_NetStandard.csproj" />
     <ProjectReference Include="..\ICD.Connect.Cameras.Panasonic\ICD.Connect.Cameras.Panasonic_NetStandard.csproj" />
   </ItemGroup>
 
