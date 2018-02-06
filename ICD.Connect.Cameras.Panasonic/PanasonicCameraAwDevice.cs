@@ -38,6 +38,9 @@ namespace ICD.Connect.Cameras.Panasonic
 		private readonly SafeCriticalSection m_CommandSection;
 		private readonly Queue<string> m_CommandList;
 
+		private int? m_PanTiltSpeed;
+		private int? m_ZoomSpeed;
+
 		#endregion
 
 		public PanasonicCameraAwDevice()
@@ -57,14 +60,18 @@ namespace ICD.Connect.Cameras.Panasonic
 		#region ICameraWithPanTilt
 		public void PanTilt(eCameraPanTiltAction action)
 		{
-			SendCommand(PanasonicCommandBuilder.GetPanTiltCommand(action));
+			SendCommand(m_PanTiltSpeed == null
+							? PanasonicCommandBuilder.GetPanTiltCommand(action)
+							: PanasonicCommandBuilder.GetPanTiltCommand(action, m_PanTiltSpeed.Value));
 		}
 		#endregion
 
 		#region ICameraWithZoom
 		public void Zoom(eCameraZoomAction action)
 		{
-			SendCommand(PanasonicCommandBuilder.GetZoomCommand(action));
+			SendCommand(m_ZoomSpeed == null
+							? PanasonicCommandBuilder.GetZoomCommand(action)
+							: PanasonicCommandBuilder.GetZoomCommand(action, m_ZoomSpeed.Value));
 		}
 		#endregion
 
@@ -240,6 +247,8 @@ namespace ICD.Connect.Cameras.Panasonic
 			base.CopySettingsFinal(settings);
 
 			settings.Port = m_Port == null ? (int?)null : m_Port.Id;
+			settings.PanTiltSpeed = m_PanTiltSpeed;
+			settings.ZoomSpeed = m_ZoomSpeed;
 		}
 
 		/// <summary>
@@ -270,6 +279,9 @@ namespace ICD.Connect.Cameras.Panasonic
 				Log(eSeverity.Error, "No Web Port with id {0}", settings.Port);
 
 			SetPort(port);
+
+			m_PanTiltSpeed = settings.PanTiltSpeed;
+			m_ZoomSpeed = settings.ZoomSpeed;
 		}
 
 		#endregion

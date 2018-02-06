@@ -17,6 +17,8 @@ namespace ICD.Connect.Cameras.Mock
 		private int m_HPosition;
 		private int m_ZPosition;
 		private readonly Dictionary<int, CameraPosition> m_PresetPositions;
+		private int? m_PanTiltSpeed;
+		private int? m_ZoomSpeed;
 		#endregion
 
 		public MockCameraDevice()
@@ -33,26 +35,26 @@ namespace ICD.Connect.Cameras.Mock
 		#region ICameraWithPanTilt
 		public void PanTilt(eCameraPanTiltAction action)
 		{
+			int speed = m_PanTiltSpeed == null ? 1 : m_PanTiltSpeed.Value;
 			switch (action)
 			{
 				case eCameraPanTiltAction.Left:
-					m_HPosition = MathUtils.Clamp(m_HPosition - 1, int.MinValue, int.MaxValue);
+					m_HPosition = MathUtils.Clamp(m_HPosition - speed, int.MinValue, int.MaxValue);
 					break;
 				case eCameraPanTiltAction.Right:
-					m_HPosition = MathUtils.Clamp(m_HPosition + 1, int.MinValue, int.MaxValue);
+					m_HPosition = MathUtils.Clamp(m_HPosition + speed, int.MinValue, int.MaxValue);
 					break;
 				case eCameraPanTiltAction.Up:
-					m_VPosition = MathUtils.Clamp(m_VPosition + 1, int.MinValue, int.MaxValue);
+					m_VPosition = MathUtils.Clamp(m_VPosition + speed, int.MinValue, int.MaxValue);
 					break;
 				case eCameraPanTiltAction.Down:
-					m_VPosition = MathUtils.Clamp(m_VPosition - 1, int.MinValue, int.MaxValue);
+					m_VPosition = MathUtils.Clamp(m_VPosition - speed, int.MinValue, int.MaxValue);
 					break;
 				case eCameraPanTiltAction.Stop:
 					break;
 				default:
 					throw new ArgumentOutOfRangeException("action");
 			}
-			ThreadingUtils.Sleep(100);
 			LogCameraMovement(action.ToString());
 		}
 		#endregion
@@ -60,20 +62,20 @@ namespace ICD.Connect.Cameras.Mock
 		#region ICameraWithZoom
 		public void Zoom(eCameraZoomAction action)
 		{
+			int speed = m_ZoomSpeed == null ? 1 : m_ZoomSpeed.Value;
 			switch (action)
 			{
 				case eCameraZoomAction.ZoomIn:
-					m_ZPosition = MathUtils.Clamp(m_ZPosition + 1, int.MinValue, int.MaxValue);
+					m_ZPosition = MathUtils.Clamp(m_ZPosition + speed, int.MinValue, int.MaxValue);
 					break;
 				case eCameraZoomAction.ZoomOut:
-					m_ZPosition = MathUtils.Clamp(m_ZPosition - 1, int.MinValue, int.MaxValue);
+					m_ZPosition = MathUtils.Clamp(m_ZPosition - speed, int.MinValue, int.MaxValue);
 					break;
 				case eCameraZoomAction.Stop:
 					break;
 				default:
 					throw new ArgumentOutOfRangeException("action");
 			}
-			ThreadingUtils.Sleep(100);
 			LogCameraMovement(action.ToString());
 		}
 		#endregion
@@ -151,6 +153,27 @@ namespace ICD.Connect.Cameras.Mock
 		private void QueryCoordinates()
 		{
 			Logger.AddEntry(eSeverity.Informational, "Coordinates: h{0},v{1},z{2}", m_HPosition, m_VPosition, m_ZPosition);
+		}
+
+		#endregion
+
+		#region Settings
+		protected override void ApplySettingsFinal(MockCameraDeviceSettings settings, ICD.Connect.Settings.Core.IDeviceFactory factory)
+		{
+			base.ApplySettingsFinal(settings, factory);
+			m_PanTiltSpeed = settings.PanTiltSpeed;
+			m_ZoomSpeed = settings.ZoomSpeed;
+		}
+
+		/// <summary>
+		/// Override to apply properties to the settings instance.
+		/// </summary>
+		/// <param name="settings"></param>
+		protected override void CopySettingsFinal(MockCameraDeviceSettings settings)
+		{
+			base.CopySettingsFinal(settings);
+			settings.PanTiltSpeed = m_PanTiltSpeed;
+			settings.ZoomSpeed = m_ZoomSpeed;
 		}
 
 		#endregion

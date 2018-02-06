@@ -29,6 +29,9 @@ namespace ICD.Connect.Cameras.Visca
 		private const int DEFAULT_ID = 1;
 		private const char DELIMITER = '\xFF';
 
+		private int? m_PanTiltSpeed;
+		private int? m_ZoomSpeed;
+
 		public ViscaCameraDevice()
 		{
 			Controls.Add(new GenericCameraRouteSourceControl<ViscaCameraDevice>(this, 0));
@@ -40,12 +43,16 @@ namespace ICD.Connect.Cameras.Visca
 		#region PTZ
 		public void PanTilt(eCameraPanTiltAction action)
 		{
-			SendCommand(ViscaCommandBuilder.GetPanTiltCommand(DEFAULT_ID, action));
+			SendCommand(m_PanTiltSpeed == null
+				            ? ViscaCommandBuilder.GetPanTiltCommand(DEFAULT_ID, action)
+				            : ViscaCommandBuilder.GetPanTiltCommand(DEFAULT_ID, action, m_PanTiltSpeed.Value, m_PanTiltSpeed.Value));
 		}
 
 		public void Zoom(eCameraZoomAction action)
 		{
-			SendCommand(ViscaCommandBuilder.GetZoomCommand(DEFAULT_ID, action));
+			SendCommand(m_ZoomSpeed == null
+						    ? ViscaCommandBuilder.GetZoomCommand(DEFAULT_ID, action)
+							: ViscaCommandBuilder.GetZoomCommand(DEFAULT_ID, action, m_ZoomSpeed.Value));
 		}
 		#endregion
 
@@ -268,6 +275,8 @@ namespace ICD.Connect.Cameras.Visca
 				settings.Port = SerialQueue.Port.Id;
 			else
 				settings.Port = null;
+			settings.PanTiltSpeed = m_PanTiltSpeed;
+			settings.ZoomSpeed = m_ZoomSpeed;
 		}
 
 		/// <summary>
@@ -302,6 +311,9 @@ namespace ICD.Connect.Cameras.Visca
 				SendCommand(ViscaCommandBuilder.GetSetAddressCommand());
 				SendCommand(ViscaCommandBuilder.GetClearCommand());
 			}
+
+			m_PanTiltSpeed = settings.PanTiltSpeed;
+			m_ZoomSpeed = settings.ZoomSpeed;
 		}
 
 		#endregion
