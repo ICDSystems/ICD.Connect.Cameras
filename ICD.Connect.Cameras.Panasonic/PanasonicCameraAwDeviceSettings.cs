@@ -6,6 +6,7 @@ using ICD.Connect.Settings.Attributes;
 
 namespace ICD.Connect.Cameras.Panasonic
 {
+	[KrangSettings(FACTORY_NAME)]
 	public sealed class PanasonicCameraAwDeviceSettings : AbstractCameraDeviceSettings
 	{
 		private int? m_PanTiltSpeed;
@@ -55,14 +56,6 @@ namespace ICD.Connect.Cameras.Panasonic
 		/// Gets the type of the originator for this settings instance.
 		/// </summary>
 		public override Type OriginatorType { get { return typeof(PanasonicCameraAwDevice); } }
-
-		[PublicAPI, XmlFactoryMethod(FACTORY_NAME)]
-		public static PanasonicCameraAwDeviceSettings FromXml(string xml)
-		{
-			PanasonicCameraAwDeviceSettings output = new PanasonicCameraAwDeviceSettings();
-			output.ParseXml(xml);
-			return output;
-		}
 
 		/// <summary>
 		/// Updates the settings from xml.
