@@ -61,7 +61,7 @@ namespace ICD.Connect.Cameras.Visca
 		public static ViscaCameraDeviceSettings FromXml(string xml)
 		{
 			ViscaCameraDeviceSettings output = new ViscaCameraDeviceSettings();
-			ParseXml(output, xml);
+			output.ParseXml(xml);
 			return output;
 		}
 
@@ -77,11 +77,16 @@ namespace ICD.Connect.Cameras.Visca
 				writer.WriteElementString(PORT_ELEMENT, IcdXmlConvert.ToString((int)Port));
 		}
 
-		private static void ParseXml(ViscaCameraDeviceSettings instance, string xml)
+		/// <summary>
+		/// Updates the settings from xml.
+		/// </summary>
+		/// <param name="xml"></param>
+		public override void ParseXml(string xml)
 		{
-			instance.PanTiltSpeed = XmlUtils.TryReadChildElementContentAsInt(xml, PAN_TILT_SPEED_ELEMENT);
-			instance.ZoomSpeed = XmlUtils.TryReadChildElementContentAsInt(xml, ZOOM_SPEED_ELEMENT);
-			AbstractCameraDeviceSettings.ParseXml(instance, xml);
+			base.ParseXml(xml);
+
+			PanTiltSpeed = XmlUtils.TryReadChildElementContentAsInt(xml, PAN_TILT_SPEED_ELEMENT);
+			ZoomSpeed = XmlUtils.TryReadChildElementContentAsInt(xml, ZOOM_SPEED_ELEMENT);
 		}
 	}
 }

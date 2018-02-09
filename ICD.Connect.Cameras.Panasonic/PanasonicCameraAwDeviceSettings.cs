@@ -60,15 +60,20 @@ namespace ICD.Connect.Cameras.Panasonic
 		public static PanasonicCameraAwDeviceSettings FromXml(string xml)
 		{
 			PanasonicCameraAwDeviceSettings output = new PanasonicCameraAwDeviceSettings();
-			ParseXml(output, xml);
+			output.ParseXml(xml);
 			return output;
 		}
 
-		private static void ParseXml(PanasonicCameraAwDeviceSettings instance, string xml)
+		/// <summary>
+		/// Updates the settings from xml.
+		/// </summary>
+		/// <param name="xml"></param>
+		public override void ParseXml(string xml)
 		{
-			instance.PanTiltSpeed = XmlUtils.TryReadChildElementContentAsInt(xml, PAN_TILT_SPEED_ELEMENT);
-			instance.ZoomSpeed = XmlUtils.TryReadChildElementContentAsInt(xml, ZOOM_SPEED_ELEMENT);
-			AbstractCameraDeviceSettings.ParseXml(instance, xml);
+			base.ParseXml(xml);
+
+			PanTiltSpeed = XmlUtils.TryReadChildElementContentAsInt(xml, PAN_TILT_SPEED_ELEMENT);
+			ZoomSpeed = XmlUtils.TryReadChildElementContentAsInt(xml, ZOOM_SPEED_ELEMENT);
 		}
 	}
 }
