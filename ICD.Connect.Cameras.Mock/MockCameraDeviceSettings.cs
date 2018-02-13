@@ -6,6 +6,7 @@ using ICD.Connect.Settings.Attributes;
 
 namespace ICD.Connect.Cameras.Mock
 {
+	[KrangSettings(FACTORY_NAME)]
 	public sealed class MockCameraDeviceSettings : AbstractCameraDeviceSettings
 	{
 		private int? m_PanTiltSpeed;
@@ -55,14 +56,6 @@ namespace ICD.Connect.Cameras.Mock
 		/// Gets the type of the originator for this settings instance.
 		/// </summary>
 		public override Type OriginatorType { get { return typeof(MockCameraDevice); } }
-
-		[PublicAPI, XmlFactoryMethod(FACTORY_NAME)]
-		public static MockCameraDeviceSettings FromXml(string xml)
-		{
-			MockCameraDeviceSettings output = new MockCameraDeviceSettings();
-			output.ParseXml(xml);
-			return output;
-		}
 
 		/// <summary>
 		/// Updates the settings from xml.
