@@ -4,11 +4,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{B13D593D-8BBF-4E20-ABD8-47C6095E7D3E}</ProjectGuid>
+    <ProjectGuid>{48DD677D-B341-4466-B866-7A96E2F94560}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ICD.Connect.Cameras</RootNamespace>
-    <AssemblyName>ICD.Connect.Cameras_SimplSharp</AssemblyName>
+    <RootNamespace>ICD.Connect.Cameras.Mock</RootNamespace>
+    <AssemblyName>ICD.Connect.Cameras.Mock_SimplSharp</AssemblyName>
     <ProjectTypeGuids>{0B4745B0-194B-4BB6-8E21-E9057CA92500};{4D628B5B-2FBC-4AA6-8C16-197242AEB884};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <PlatformFamilyName>WindowsCE</PlatformFamilyName>
     <PlatformID>E2BECB1F-8C8C-41ba-B736-9BE7D946A398</PlatformID>
@@ -49,33 +49,20 @@
     <Reference Include="mscorlib" />
     <Reference Include="SimplSharpCustomAttributesInterface, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1099c178b3b54c3b, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\ProgramData\Crestron\SDK\SimplSharpCustomAttributesInterface.dll</HintPath>
+      <HintPath>..\..\..\..\..\ProgramData\Crestron\SDK\SimplSharpCustomAttributesInterface.dll</HintPath>
     </Reference>
     <Reference Include="SimplSharpHelperInterface, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1099c178b3b54c3b, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\ProgramData\Crestron\SDK\SimplSharpHelperInterface.dll</HintPath>
+      <HintPath>..\..\..\..\..\ProgramData\Crestron\SDK\SimplSharpHelperInterface.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AbstractCameraDevice.cs" />
-    <Compile Include="AbstractCameraDeviceSettings.cs" />
-    <Compile Include="CameraPreset.cs" />
-    <Compile Include="Controls\PresetControl.cs" />
-    <Compile Include="Controls\ZoomControl.cs" />
-    <Compile Include="Controls\IPanTiltControl.cs" />
-    <Compile Include="Controls\IPresetControl.cs" />
-    <Compile Include="Controls\IZoomControl.cs" />
-    <Compile Include="Controls\PanTiltControl.cs" />
-    <Compile Include="eCameraActions.cs" />
-    <Compile Include="GenericCameraRouteSourceControl.cs" />
-    <Compile Include="ICameraDevice.cs" />
-    <Compile Include="ICameraDeviceSettings.cs" />
-    <Compile Include="ICameraWithPanTilt.cs" />
-    <Compile Include="ICameraWithPresets.cs" />
-    <Compile Include="ICameraWithZoom.cs" />
+    <Compile Include="KrangPlugin.cs" />
+    <Compile Include="MockCameraDevice.cs" />
+    <Compile Include="MockCameraDeviceSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="Properties\ControlSystem.cfg" />
   </ItemGroup>
@@ -92,14 +79,6 @@
       <Project>{FD46A717-5836-4B73-ADD0-2706639DA8ED}</Project>
       <Name>ICD.Connect.Devices_SimplSharp</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\ICD.Connect.Protocol\ICD.Connect.Protocol.Network\ICD.Connect.Protocol.Network_SimplSharp.csproj">
-      <Project>{5ED52F05-EA6C-4FC5-8AA0-9B9727F6AECD}</Project>
-      <Name>ICD.Connect.Protocol.Network_SimplSharp</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\ICD.Connect.Protocol\ICD.Connect.Protocol\ICD.Connect.Protocol_SimplSharp.csproj">
-      <Project>{2E4E01B8-D4EA-4FB1-9FCE-0A0DC8D83C8A}</Project>
-      <Name>ICD.Connect.Protocol_SimplSharp</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\ICD.Connect.Routing\ICD.Connect.Routing\ICD.Connect.Routing_SimplSharp.csproj">
       <Project>{B0C0CA1C-FA55-4BEA-8A8B-EDB2141C523E}</Project>
       <Name>ICD.Connect.Routing_SimplSharp</Name>
@@ -107,6 +86,10 @@
     <ProjectReference Include="..\..\ICD.Connect.Settings\ICD.Connect.Settings\ICD.Connect.Settings_SimplSharp.csproj">
       <Project>{5B84EB3C-1C3A-4C4D-98C2-69F67CF51D5A}</Project>
       <Name>ICD.Connect.Settings_SimplSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ICD.Connect.Cameras\ICD.Connect.Cameras_SimplSharp.csproj">
+      <Project>{B13D593D-8BBF-4E20-ABD8-47C6095E7D3E}</Project>
+      <Name>ICD.Connect.Cameras_SimplSharp</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CompactFramework.CSharp.targets" />

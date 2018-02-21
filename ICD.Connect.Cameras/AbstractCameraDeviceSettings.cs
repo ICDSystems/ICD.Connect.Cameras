@@ -30,7 +30,7 @@ namespace ICD.Connect.Cameras
 		public override void ParseXml(string xml)
 		{
 			base.ParseXml(xml);
-			
+
 			Port = XmlUtils.TryReadChildElementContentAsInt(xml, PORT_ELEMENT);
 		}
 	}

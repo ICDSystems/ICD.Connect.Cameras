@@ -7,17 +7,18 @@ using ICD.Common.Utils.Services;
 using ICD.Common.Utils.Services.Logging;
 using ICD.Common.Utils.Timers;
 using ICD.Connect.API.Commands;
-using ICD.Connect.Conferencing.Cameras;
+using ICD.Connect.Cameras.Controls;
 using ICD.Connect.Protocol.Extensions;
 using ICD.Connect.Protocol.Network.WebPorts;
 using ICD.Connect.Settings.Core;
 
 namespace ICD.Connect.Cameras.Panasonic
 {
-	public sealed class PanasonicCameraAwDevice : AbstractCameraDevice<PanasonicCameraAwDeviceSettings>
-	{
-		#region properties
+	public sealed class PanasonicCameraAwDevice : AbstractCameraDevice<PanasonicCameraAwDeviceSettings>,
+		ICameraWithPanTilt, ICameraWithZoom, IDeviceWithPower
 
+	{
+		#region Properties
 		private const long RATE_LIMIT = 130;
 
 		private static readonly Dictionary<string, string> s_ErrorMap =
@@ -36,6 +37,9 @@ namespace ICD.Connect.Cameras.Panasonic
 		private readonly SafeCriticalSection m_CommandSection;
 		private readonly Queue<string> m_CommandList;
 
+		private int? m_PanTiltSpeed;
+		private int? m_ZoomSpeed;
+
 		#endregion
 
 		public PanasonicCameraAwDevice()
@@ -47,10 +51,53 @@ namespace ICD.Connect.Cameras.Panasonic
 			m_DelayTimer.OnElapsed += TimerElapsed;
 
 			Controls.Add(new GenericCameraRouteSourceControl<PanasonicCameraAwDevice>(this, 0));
+			Controls.Add(new PanTiltControl<PanasonicCameraAwDevice>(this, 1));
+			Controls.Add(new ZoomControl<PanasonicCameraAwDevice>(this, 2));
+			Controls.Add(new PowerDeviceControl<PanasonicCameraAwDevice>(this, 3));
 		}
 
-		#region Methods
+		#region ICameraWithPanTilt
+		public void PanTilt(eCameraPanTiltAction action)
+		{
+			SendCommand(m_PanTiltSpeed == null
+							? PanasonicCommandBuilder.GetPanTiltCommand(action)
+							: PanasonicCommandBuilder.GetPanTiltCommand(action, m_PanTiltSpeed.Value));
+		}
+		#endregion
 
+		#region ICameraWithZoom
+		public void Zoom(eCameraZoomAction action)
+		{
+			SendCommand(m_ZoomSpeed == null
+							? PanasonicCommandBuilder.GetZoomCommand(action)
+							: PanasonicCommandBuilder.GetZoomCommand(action, m_ZoomSpeed.Value));
+		}
+		#endregion
+
+		#region IDeviceWithPower
+		public void PowerOn()
+		{
+			SendCommand(PanasonicCommandBuilder.GetPowerOnCommand());
+		}
+
+		public void PowerOff()
+		{
+			SendCommand(PanasonicCommandBuilder.GetPowerOffCommand());
+		}
+		#endregion
+
+		#region DeviceBase
+		/// <summary>
+		/// Gets the current online status of the device.
+		/// </summary>
+		/// <returns></returns>
+		protected override bool GetIsOnlineStatus()
+		{
+			return m_Port != null && m_Port.IsOnline;
+		}
+		#endregion
+
+		#region Public API
 		/// <summary>
 		/// Sets the port for communication with the device.
 		/// </summary>
@@ -67,30 +114,9 @@ namespace ICD.Connect.Cameras.Panasonic
 
 			UpdateCachedOnlineStatus();
 		}
-
-		public void PowerOn()
-		{
-			SendCommand(PanasonicCommandBuilder.PowerOn());
-		}
-
-		public void PowerOff()
-		{
-			SendCommand(PanasonicCommandBuilder.PowerOff());
-		}
-
-		public override void Move(eCameraAction action)
-		{
-			SendCommand(PanasonicCommandBuilder.Move(action));
-		}
-
-		public override void Stop()
-		{
-			SendCommand(PanasonicCommandBuilder.Stop());
-			SendCommand(PanasonicCommandBuilder.StopZoom());
-		}
-
 		#endregion
 
+		#region Private Methods
 		private void TimerElapsed(object sender, EventArgs args)
 		{
 			m_CommandSection.Enter();
@@ -110,10 +136,6 @@ namespace ICD.Connect.Cameras.Panasonic
 			}
 		}
 
-		/// <summary>
-		/// Responsible for dispatching commands from the command buffer.
-		/// </summary>
-		/// <param name="command"></param>
 		private void SendCommand(string command)
 		{
 			m_CommandSection.Enter();
@@ -146,21 +168,25 @@ namespace ICD.Connect.Cameras.Panasonic
 			}
 		}
 
-		/// <summary>
-		/// Gets the current online status of the device.
-		/// </summary>
-		/// <returns></returns>
-		protected override bool GetIsOnlineStatus()
+		private void ParsePortData(string command, string response)
 		{
-			return m_Port != null && m_Port.IsOnline;
+			if (string.IsNullOrEmpty(response))
+				return;
+
+			response = response.Trim();
+
+			if (command.ToLower().Contains(response.ToLower()))
+				return;
+
+			string code = response.Substring(0, 3);
+
+			string message;
+			if (!s_ErrorMap.TryGetValue(code, out message))
+				message = "Unexpected error code";
+
+			Log(eSeverity.Error, "{0} - {1}", response, message);
 		}
 
-		/// <summary>
-		/// Logs to logging core.
-		/// </summary>
-		/// <param name="severity"></param>
-		/// <param name="message"></param>
-		/// <param name="args"></param>
 		private void Log(eSeverity severity, string message, params object[] args)
 		{
 			message = string.Format(message, args);
@@ -168,6 +194,8 @@ namespace ICD.Connect.Cameras.Panasonic
 
 			ServiceProvider.GetService<ILoggerService>().AddEntry(severity, message);
 		}
+		#endregion
+
 
 		#region Port Callbacks
 
@@ -218,6 +246,8 @@ namespace ICD.Connect.Cameras.Panasonic
 			base.CopySettingsFinal(settings);
 
 			settings.Port = m_Port == null ? (int?)null : m_Port.Id;
+			settings.PanTiltSpeed = m_PanTiltSpeed;
+			settings.ZoomSpeed = m_ZoomSpeed;
 		}
 
 		/// <summary>
@@ -248,25 +278,9 @@ namespace ICD.Connect.Cameras.Panasonic
 				Log(eSeverity.Error, "No Web Port with id {0}", settings.Port);
 
 			SetPort(port);
-		}
 
-		private void ParsePortData(string command, string response)
-		{
-			if (string.IsNullOrEmpty(response))
-				return;
-
-			response = response.Trim();
-
-			if (command.ToLower().Contains(response.ToLower()))
-				return;
-
-			string code = response.Substring(0, 3);
-
-			string message;
-			if (!s_ErrorMap.TryGetValue(code, out message))
-				message = "Unexpected error code";
-
-			Log(eSeverity.Error, "{0} - {1}", response, message);
+			m_PanTiltSpeed = settings.PanTiltSpeed;
+			m_ZoomSpeed = settings.ZoomSpeed;
 		}
 
 		#endregion
