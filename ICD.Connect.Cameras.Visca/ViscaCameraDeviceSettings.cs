@@ -5,6 +5,7 @@ using ICD.Connect.Settings.Attributes;
 
 namespace ICD.Connect.Cameras.Visca
 {
+	[KrangSettings(FACTORY_NAME)]
 	public sealed class ViscaCameraDeviceSettings : AbstractCameraDeviceSettings
 	{
 		private const string FACTORY_NAME = "ViscaCamera";
@@ -19,14 +20,6 @@ namespace ICD.Connect.Cameras.Visca
 		/// Gets the type of the originator for this settings instance.
 		/// </summary>
 		public override Type OriginatorType { get { return typeof(ViscaCameraDevice); } }
-
-		[PublicAPI, XmlFactoryMethod(FACTORY_NAME)]
-		public static ViscaCameraDeviceSettings FromXml(string xml)
-		{
-			ViscaCameraDeviceSettings output = new ViscaCameraDeviceSettings();
-			ParseXml(output, xml);
-			return output;
-		}
 
 		/// <summary>
 		/// Write settings elements to xml.

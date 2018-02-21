@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using ICD.Common.Properties;
-using ICD.Common.Services;
-using ICD.Common.Services.Logging;
 using ICD.Common.Utils;
 using ICD.Common.Utils.EventArguments;
+using ICD.Common.Utils.Services;
+using ICD.Common.Utils.Services.Logging;
 using ICD.Common.Utils.Timers;
 using ICD.Connect.API.Commands;
 using ICD.Connect.Conferencing.Cameras;
@@ -126,7 +126,9 @@ namespace ICD.Connect.Cameras.Panasonic
 				{
 					try
 					{
-						ParsePortData(command, m_Port.Get(command));
+						string response;
+						m_Port.Get(command, out response);
+						ParsePortData(command, response);
 					}
 					catch (Exception ex)
 					{

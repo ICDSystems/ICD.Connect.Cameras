@@ -4,7 +4,8 @@ using ICD.Connect.Settings.Attributes;
 
 namespace ICD.Connect.Cameras.Panasonic
 {
-	public class PanasonicCameraAwDeviceSettings : AbstractCameraDeviceSettings
+	[KrangSettings(FACTORY_NAME)]
+	public sealed class PanasonicCameraAwDeviceSettings : AbstractCameraDeviceSettings
 	{
 		private const string FACTORY_NAME = "PanasonicCamera";
 
@@ -17,13 +18,5 @@ namespace ICD.Connect.Cameras.Panasonic
 		/// Gets the type of the originator for this settings instance.
 		/// </summary>
 		public override Type OriginatorType { get { return typeof(PanasonicCameraAwDevice); } }
-
-		[PublicAPI, XmlFactoryMethod(FACTORY_NAME)]
-		public static PanasonicCameraAwDeviceSettings FromXml(string xml)
-		{
-			PanasonicCameraAwDeviceSettings output = new PanasonicCameraAwDeviceSettings();
-			ParseXml(output, xml);
-			return output;
-		}
 	}
 }
