@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using ICD.Common.Properties;
-using ICD.Common.Services.Logging;
 using ICD.Common.Utils;
 using ICD.Common.Utils.EventArguments;
-using ICD.Connect.Conferencing.Cameras;
+using ICD.Common.Utils.Services.Logging;
+using ICD.Connect.Cameras.Controls;
+using ICD.Connect.Devices.Controls;
 using ICD.Connect.Protocol.Data;
 using ICD.Connect.Protocol.EventArguments;
 using ICD.Connect.Protocol.Extensions;
@@ -16,37 +17,46 @@ using ICD.Connect.Settings.Core;
 
 namespace ICD.Connect.Cameras.Visca
 {
-	public sealed class ViscaCameraDevice : AbstractCameraDevice<ViscaCameraDeviceSettings>
+	public sealed class ViscaCameraDevice : AbstractCameraDevice<ViscaCameraDeviceSettings>,
+		ICameraWithPanTilt, ICameraWithZoom, IDeviceWithPower
 	{
-		private ISerialBuffer SerialBuffer { get; set; }
 		private ISerialQueue SerialQueue { get; set; }
-		private ViscaCommandHandler CommandHandler { get; set; }
 
 		private readonly Dictionary<string, int> m_RetryCounts = new Dictionary<string, int>();
 		private readonly SafeCriticalSection m_RetryLock = new SafeCriticalSection();
 
 		private const int MAX_RETRY_ATTEMPTS = 20;
-
+		private const int DEFAULT_ID = 1;
 		private const char DELIMITER = '\xFF';
 
-		#region Methods
-
-		//Camera Methods
+		private int? m_PanTiltSpeed;
+		private int? m_ZoomSpeed;
 
 		public ViscaCameraDevice()
 		{
 			Controls.Add(new GenericCameraRouteSourceControl<ViscaCameraDevice>(this, 0));
+			Controls.Add(new PanTiltControl<ViscaCameraDevice>(this, 1));
+			Controls.Add(new ZoomControl<ViscaCameraDevice>(this, 2));
+			Controls.Add(new PowerDeviceControl<ViscaCameraDevice>(this, 3));
 		}
 
-		public override void Move(eCameraAction action)
+		#region PTZ
+		public void PanTilt(eCameraPanTiltAction action)
 		{
-			SendCommand(CommandHandler.Move(1, action));
+			SendCommand(m_PanTiltSpeed == null
+				            ? ViscaCommandBuilder.GetPanTiltCommand(DEFAULT_ID, action)
+				            : ViscaCommandBuilder.GetPanTiltCommand(DEFAULT_ID, action, m_PanTiltSpeed.Value, m_PanTiltSpeed.Value));
 		}
 
-		public override void Stop()
+		public void Zoom(eCameraZoomAction action)
 		{
-			SendCommand(CommandHandler.Stop(1));
+			SendCommand(m_ZoomSpeed == null
+						    ? ViscaCommandBuilder.GetZoomCommand(DEFAULT_ID, action)
+							: ViscaCommandBuilder.GetZoomCommand(DEFAULT_ID, action, m_ZoomSpeed.Value));
 		}
+		#endregion
+
+		#region Methods
 
 		/// <summary>
 		/// Release resources.
@@ -54,17 +64,14 @@ namespace ICD.Connect.Cameras.Visca
 		protected override void DisposeFinal(bool disposing)
 		{
 			SetPort(null);
-
 			base.DisposeFinal(disposing);
 		}
-
-		//Class Settings
 
 		/// <summary>
 		/// Sets the wrapped port for communication with the hardware.
 		/// </summary>
 		/// <param name="port"></param>
-		public void SetPort(ISerialPort port)
+		private void SetPort(ISerialPort port)
 		{
 			if (port is IComPort)
 				ConfigureComPort(port as IComPort);
@@ -84,14 +91,14 @@ namespace ICD.Connect.Cameras.Visca
 		public static void ConfigureComPort(IComPort port)
 		{
 			port.SetComPortSpec(
-			                    eComBaudRates.ComspecBaudRate9600,
-			                    eComDataBits.ComspecDataBits8,
-			                    eComParityType.ComspecParityNone,
-			                    eComStopBits.ComspecStopBits1,
-			                    eComProtocolType.ComspecProtocolRS232,
-			                    eComHardwareHandshakeType.ComspecHardwareHandshakeNone,
-			                    eComSoftwareHandshakeType.ComspecSoftwareHandshakeNone,
-			                    false);
+								eComBaudRates.ComspecBaudRate9600,
+								eComDataBits.ComspecDataBits8,
+								eComParityType.ComspecParityNone,
+								eComStopBits.ComspecStopBits1,
+								eComProtocolType.ComspecProtocolRS232,
+								eComHardwareHandshakeType.ComspecHardwareHandshakeNone,
+								eComSoftwareHandshakeType.ComspecSoftwareHandshakeNone,
+								false);
 		}
 
 		/// <summary>
@@ -101,6 +108,16 @@ namespace ICD.Connect.Cameras.Visca
 		protected override bool GetIsOnlineStatus()
 		{
 			return SerialQueue != null && SerialQueue.Port != null && SerialQueue.Port.IsOnline;
+		}
+
+		public void PowerOn()
+		{
+			SendCommand(ViscaCommandBuilder.GetPowerOnCommand(DEFAULT_ID));
+		}
+
+		public void PowerOff()
+		{
+			SendCommand(ViscaCommandBuilder.GetPowerOffCommand(DEFAULT_ID));
 		}
 
 		#endregion
@@ -155,8 +172,8 @@ namespace ICD.Connect.Cameras.Visca
 				return;
 
 			IcdConsole.PrintLine(String.Format("Serial Data {0} - Serial Response {1}",
-			                                   StringUtils.ToHexLiteral(args.Data.Serialize()),
-			                                   StringUtils.ToHexLiteral(args.Response)));
+											   StringUtils.ToHexLiteral(args.Data.Serialize()),
+											   StringUtils.ToHexLiteral(args.Response)));
 
 			if (ViscaResponseHandler.HandleResponse(args.Response) == eViscaResponse.OK)
 				ParseQuery(args.Response);
@@ -186,7 +203,7 @@ namespace ICD.Connect.Cameras.Visca
 			else
 			{
 				Log(eSeverity.Error, "Command {0} failed too many times and hit the retry limit.",
-				    StringUtils.ToMixedReadableHexLiteral(command));
+					StringUtils.ToMixedReadableHexLiteral(command));
 				ResetRetryCount(command);
 			}
 		}
@@ -258,6 +275,8 @@ namespace ICD.Connect.Cameras.Visca
 				settings.Port = SerialQueue.Port.Id;
 			else
 				settings.Port = null;
+			settings.PanTiltSpeed = m_PanTiltSpeed;
+			settings.ZoomSpeed = m_ZoomSpeed;
 		}
 
 		/// <summary>
@@ -287,12 +306,14 @@ namespace ICD.Connect.Cameras.Visca
 				Logger.AddEntry(eSeverity.Error, String.Format("No serial port with Id {0}", settings.Port));
 
 			SetPort(port);
-			if (port.IsOnline)
+			if (port != null && port.IsOnline)
 			{
-				CommandHandler = new ViscaCommandHandler();
-				SendCommand(CommandHandler.SetAddress());
-				SendCommand(CommandHandler.Clear(1));
+				SendCommand(ViscaCommandBuilder.GetSetAddressCommand());
+				SendCommand(ViscaCommandBuilder.GetClearCommand());
 			}
+
+			m_PanTiltSpeed = settings.PanTiltSpeed;
+			m_ZoomSpeed = settings.ZoomSpeed;
 		}
 
 		#endregion
@@ -320,18 +341,7 @@ namespace ICD.Connect.Cameras.Visca
 			SerialQueue.Enqueue(command, comparer);
 		}
 
-		/// <summary>
-		/// Queues the command to be sent to the device.
-		/// Replaces an existing command if it matches the comparer.
-		/// </summary>
-		/// <param name="data"></param>
-		/// <param name="comparer"></param>
-		public void SendCommand(string data, Func<string, string, bool> comparer)
-		{
-			//SerialQueue.Enqueue(command, comparer);
-			SendCommand(new SerialData(data), (a, b) => comparer(a.Serialize(), b.Serialize()));
-		}
-
+		[PublicAPI]
 		public void SendCommand(string command)
 		{
 			SendCommand(new SerialData(command));
