@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using ICD.Connect.API.Commands;
-using ICD.Connect.API.Nodes;
-using ICD.Connect.Devices;
 using ICD.Connect.Devices.Controls;
 
 namespace ICD.Connect.Cameras.Controls

@@ -1,5 +1,4 @@
-﻿using ICD.Common.Properties;
-using ICD.Connect.Devices.Controls;
+﻿using ICD.Connect.Devices.Controls;
 
 namespace ICD.Connect.Cameras.Controls
 {
