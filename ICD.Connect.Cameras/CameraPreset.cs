@@ -1,6 +1,4 @@
-﻿using System;
-using ICD.Common.Properties;
-using ICD.Common.Utils.Xml;
+﻿using ICD.Common.Properties;
 
 namespace ICD.Connect.Cameras
 {
@@ -10,7 +8,6 @@ namespace ICD.Connect.Cameras
 	public struct CameraPreset
 	{
 		private readonly int m_PresetId;
-		private readonly int m_CameraId;
 		private readonly string m_Name;
 
 		#region Region Properties
@@ -19,11 +16,6 @@ namespace ICD.Connect.Cameras
 		/// Gets the preset id.
 		/// </summary>
 		public int PresetId { get { return m_PresetId; } }
-
-		/// <summary>
-		/// Gets the camera id.
-		/// </summary>
-		public int CameraId { get { return m_CameraId; } }
 
 		/// <summary>
 		/// Gets the name.
@@ -39,55 +31,11 @@ namespace ICD.Connect.Cameras
 		/// Constructor.
 		/// </summary>
 		/// <param name="presetId"></param>
-		/// <param name="cameraId"></param>
 		/// <param name="name"></param>
-		public CameraPreset(int presetId, int cameraId, string name)
+		public CameraPreset(int presetId, string name)
 		{
 			m_PresetId = presetId;
-			m_CameraId = cameraId;
 			m_Name = name;
-		}
-
-		/// <summary>
-		/// Instantiates a camera preset from a Preset element.
-		/// </summary>
-		/// <param name="xml"></param>
-		/// <returns></returns>
-		public static CameraPreset FromXml(string xml)
-		{
-			using (IcdXmlReader reader = new IcdXmlReader(xml))
-			{
-				reader.ReadToNextElement();
-
-				int presetId = 0;
-				int cameraId = 0;
-				string name = null;
-
-				foreach (IcdXmlReader child in reader.GetChildElements())
-				{
-					switch (child.Name)
-					{
-						case "CameraId":
-							cameraId = child.ReadElementContentAsInt();
-							break;
-
-						case "PresetId":
-							presetId = child.ReadElementContentAsInt();
-							break;
-
-						case "Name":
-							name = child.ReadElementContentAsString();
-							break;
-
-						default:
-							throw new ArgumentException("Unknown element: " + child.Name);
-					}
-
-					child.Dispose();
-				}
-
-				return new CameraPreset(presetId, cameraId, name);
-			}
 		}
 
 		#endregion
@@ -139,7 +87,6 @@ namespace ICD.Connect.Cameras
 			{
 				int hash = 17;
 				hash = hash * 23 + m_PresetId;
-				hash = hash * 23 + m_CameraId;
 				hash = hash * 23 + (m_Name == null ? 0 : m_Name.GetHashCode());
 				return hash;
 			}
