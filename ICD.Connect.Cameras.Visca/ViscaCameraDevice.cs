@@ -5,6 +5,7 @@ using ICD.Common.Utils;
 using ICD.Common.Utils.EventArguments;
 using ICD.Common.Utils.Services.Logging;
 using ICD.Connect.Cameras.Controls;
+using ICD.Connect.Devices.Controls;
 using ICD.Connect.Protocol.Data;
 using ICD.Connect.Protocol.EventArguments;
 using ICD.Connect.Protocol.Extensions;
