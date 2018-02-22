@@ -110,7 +110,7 @@ namespace ICD.Connect.Cameras.Mock
 				Logger.AddEntry(eSeverity.Warning, "Mock camera preset must be between 1 and {0}, preset was not stored.", MaxPresets);
 				return;
 			}
-			m_Presets.Add(presetId, new CameraPreset(presetId, Id, string.Format("Preset{0}", presetId)));
+			m_Presets.Add(presetId, new CameraPreset(presetId, string.Format("Preset{0}", presetId)));
 			m_PresetPositions.Add(presetId, new CameraPosition{HPosition = m_HPosition, VPosition = m_VPosition, ZPosition = m_ZPosition});
 		}
 		#endregion

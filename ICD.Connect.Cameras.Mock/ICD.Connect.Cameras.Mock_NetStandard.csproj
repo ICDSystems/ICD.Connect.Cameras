@@ -15,6 +15,7 @@
   <PropertyGroup>
     <OutputPath>binNetCoreApp\$(Configuration)\</OutputPath>
     <DefineConstants>TRACE;STANDARD</DefineConstants>
+    <AssemblyName>ICD.Connect.Cameras.Mock_NetStandard</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
