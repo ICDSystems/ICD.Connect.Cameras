@@ -63,6 +63,8 @@
     <Compile Include="AbstractCameraDevice.cs" />
     <Compile Include="AbstractCameraDeviceSettings.cs" />
     <Compile Include="CameraPreset.cs" />
+    <Compile Include="Controls\AbstractCameraDeviceControl.cs" />
+    <Compile Include="Controls\ICameraDeviceControl.cs" />
     <Compile Include="Controls\PresetControl.cs" />
     <Compile Include="Controls\ZoomControl.cs" />
     <Compile Include="Controls\IPanTiltControl.cs" />
