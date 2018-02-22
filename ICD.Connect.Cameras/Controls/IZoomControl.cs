@@ -1,8 +1,6 @@
-﻿using ICD.Connect.Devices.Controls;
-
-namespace ICD.Connect.Cameras.Controls
+﻿namespace ICD.Connect.Cameras.Controls
 {
-	public interface IZoomControl : IDeviceControl
+	public interface IZoomControl : ICameraDeviceControl
 	{
 		void Stop();
 		void ZoomIn();

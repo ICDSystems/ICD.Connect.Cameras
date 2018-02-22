@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using ICD.Connect.API.Commands;
-using ICD.Connect.Devices.Controls;
 
 namespace ICD.Connect.Cameras.Controls
 {
-	public sealed class PanTiltControl<T> : AbstractDeviceControl<T>, IPanTiltControl
+	public sealed class PanTiltControl<T> : AbstractCameraDeviceControl<T>, IPanTiltControl
 		where T : ICameraWithPanTilt
 	{
 		/// <summary>

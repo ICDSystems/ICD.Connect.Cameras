@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using ICD.Common.Properties;
-using ICD.Connect.Devices.Controls;
 
 namespace ICD.Connect.Cameras.Controls
 {
-	public interface IPresetControl : IDeviceControl
+	public interface IPresetControl : ICameraDeviceControl
 	{
 		/// <summary>
 		/// Raised when the presets are changed.

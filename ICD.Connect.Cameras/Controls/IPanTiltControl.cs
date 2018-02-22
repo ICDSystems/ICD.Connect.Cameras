@@ -1,8 +1,6 @@
-﻿using ICD.Connect.Devices.Controls;
-
-namespace ICD.Connect.Cameras.Controls
+﻿namespace ICD.Connect.Cameras.Controls
 {
-	public interface IPanTiltControl : IDeviceControl
+	public interface IPanTiltControl : ICameraDeviceControl
 	{
 		void Stop();
 		void PanLeft();

@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using ICD.Connect.API.Commands;
-using ICD.Connect.Devices.Controls;
 
 namespace ICD.Connect.Cameras.Controls
 {
-	public sealed class ZoomControl<T> : AbstractDeviceControl<T>, IZoomControl
+	public sealed class ZoomControl<T> : AbstractCameraDeviceControl<T>, IZoomControl
 		where T : ICameraWithZoom
 	{
 		/// <summary>

@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using ICD.Common.Utils.Extensions;
 using ICD.Connect.API.Commands;
-using ICD.Connect.Devices.Controls;
 
 namespace ICD.Connect.Cameras.Controls
 {
-	public sealed class PresetControl<T> : AbstractDeviceControl<T>, IPresetControl
+	public sealed class PresetControl<T> : AbstractCameraDeviceControl<T>, IPresetControl
 		where T : ICameraWithPresets
 	{
 		/// <summary>
