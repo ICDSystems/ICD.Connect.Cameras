@@ -17,20 +17,27 @@ namespace ICD.Connect.Cameras.Controls
 		}
 
 		#region IZoomControl
+
 		public void Stop()
 		{
-			Parent.Zoom(eCameraZoomAction.Stop);
+			Zoom(eCameraZoomAction.Stop);
 		}
 
 		public void ZoomIn()
 		{
-			Parent.Zoom(eCameraZoomAction.ZoomIn);
+			Zoom(eCameraZoomAction.ZoomIn);
 		}
 
 		public void ZoomOut()
 		{
-			Parent.Zoom(eCameraZoomAction.ZoomOut);
+			Zoom(eCameraZoomAction.ZoomOut);
 		}
+
+		public void Zoom(eCameraZoomAction action)
+		{
+			Parent.Zoom(action);
+		}
+
 		#endregion
 
 		#region Console

@@ -16,30 +16,37 @@ namespace ICD.Connect.Cameras.Controls
 		}
 
 		#region IPanTiltControl
+
 		public void Stop()
 		{
-			Parent.PanTilt(eCameraPanTiltAction.Stop);
+			PanTilt(eCameraPanTiltAction.Stop);
 		}
 
 		public void PanLeft()
 		{
-			Parent.PanTilt(eCameraPanTiltAction.Left);
+			PanTilt(eCameraPanTiltAction.Left);
 		}
 
 		public void PanRight()
 		{
-			Parent.PanTilt(eCameraPanTiltAction.Right);
+			PanTilt(eCameraPanTiltAction.Right);
 		}
 
 		public void TiltUp()
 		{
-			Parent.PanTilt(eCameraPanTiltAction.Up);
+			PanTilt(eCameraPanTiltAction.Up);
 		}
 
 		public void TiltDown()
 		{
-			Parent.PanTilt(eCameraPanTiltAction.Down);
+			PanTilt(eCameraPanTiltAction.Down);
 		}
+
+		public void PanTilt(eCameraPanTiltAction action)
+		{
+			Parent.PanTilt(action);
+		}
+
 		#endregion
 
 		#region Console

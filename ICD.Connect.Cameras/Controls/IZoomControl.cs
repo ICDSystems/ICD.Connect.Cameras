@@ -5,5 +5,6 @@
 		void Stop();
 		void ZoomIn();
 		void ZoomOut();
+		void Zoom(eCameraZoomAction action);
 	}
 }

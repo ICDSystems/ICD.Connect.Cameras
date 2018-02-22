@@ -7,5 +7,6 @@
 		void PanRight();
 		void TiltUp();
 		void TiltDown();
+		void PanTilt(eCameraPanTiltAction action);
 	}
 }
