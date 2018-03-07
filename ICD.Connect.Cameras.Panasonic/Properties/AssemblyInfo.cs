@@ -4,4 +4,4 @@
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("ICD.Connect.Cameras.Panasonic")]
 [assembly: AssemblyCopyright("Copyright ©  2018")]
-[assembly: AssemblyVersion("1.0.0.*")]
+[assembly: AssemblyVersion("1.0.0.0")]
