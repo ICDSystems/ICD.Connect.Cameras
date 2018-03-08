@@ -59,7 +59,7 @@ namespace ICD.Connect.Cameras.Panasonic
 			}
 		}
 
-		protected override void WriteElements(ICD.Common.Utils.Xml.IcdXmlTextWriter writer)
+		protected override void WriteElements(IcdXmlTextWriter writer)
 		{
 			base.WriteElements(writer);
 

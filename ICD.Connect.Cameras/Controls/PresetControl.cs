@@ -65,7 +65,7 @@ namespace ICD.Connect.Cameras.Controls
 			foreach (IConsoleCommand command in GetBaseConsoleCommands())
 				yield return command;
 
-			yield return new GenericConsoleCommand<int>("Activate Preset", "Sends the stop signal to the camera.", (preset) => ActivatePreset(preset));
+			yield return new GenericConsoleCommand<int>("Activate Preset", "Sends the stop signal to the camera.", preset => ActivatePreset(preset));
 		}
 
 		/// <summary>

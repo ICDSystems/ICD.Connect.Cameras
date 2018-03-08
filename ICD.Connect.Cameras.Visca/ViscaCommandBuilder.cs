@@ -1,7 +1,6 @@
 ﻿using System;
 using ICD.Common.Properties;
 using ICD.Common.Utils;
-using ICD.Common.Utils.Extensions;
 
 namespace ICD.Connect.Cameras.Visca
 {
