@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace ICD.Connect.Cameras
+namespace ICD.Connect.Cameras.Devices
 {
 	public interface ICameraWithPresets : ICameraDevice
 	{

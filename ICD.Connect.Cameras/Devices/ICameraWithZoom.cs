@@ -1,4 +1,4 @@
-﻿namespace ICD.Connect.Cameras
+﻿namespace ICD.Connect.Cameras.Devices
 {
 	public interface ICameraWithZoom : ICameraDevice
 	{

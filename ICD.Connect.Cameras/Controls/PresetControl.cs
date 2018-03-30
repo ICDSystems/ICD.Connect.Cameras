@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using ICD.Common.Utils.Extensions;
 using ICD.Connect.API.Commands;
+using ICD.Connect.Cameras.Devices;
 
 namespace ICD.Connect.Cameras.Controls
 {

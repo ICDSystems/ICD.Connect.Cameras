@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using ICD.Common.Utils;
 using ICD.Common.Utils.Extensions;
+using ICD.Connect.Cameras.Devices;
 using ICD.Connect.Routing;
 using ICD.Connect.Routing.Connections;
 using ICD.Connect.Routing.Controls;
 using ICD.Connect.Routing.EventArguments;
 
-namespace ICD.Connect.Cameras
+namespace ICD.Connect.Cameras.Controls
 {
 	public sealed class GenericCameraRouteSourceControl<TCameraDevice> : AbstractRouteSourceControl<TCameraDevice>
 		where TCameraDevice : ICameraDevice

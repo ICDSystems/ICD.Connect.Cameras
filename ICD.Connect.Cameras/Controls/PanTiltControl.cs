@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using ICD.Connect.API.Commands;
+using ICD.Connect.Cameras.Devices;
 
 namespace ICD.Connect.Cameras.Controls
 {
