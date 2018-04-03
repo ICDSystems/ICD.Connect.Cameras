@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using ICD.Connect.API.Commands;
+using ICD.Connect.API.Nodes;
 using ICD.Connect.Cameras.Devices;
 
 namespace ICD.Connect.Cameras.Controls
@@ -44,6 +45,39 @@ namespace ICD.Connect.Cameras.Controls
 		#region Console
 
 		/// <summary>
+		/// Gets the child console nodes.
+		/// </summary>
+		/// <returns></returns>
+		public override IEnumerable<IConsoleNodeBase> GetConsoleNodes()
+		{
+			foreach (IConsoleNodeBase node in GetBaseConsoleNodes())
+				yield return node;
+
+			foreach (IConsoleNodeBase node in ZoomControlConsole.GetConsoleNodes(this))
+				yield return node;
+		}
+
+		/// <summary>
+		/// Wrokaround for "unverifiable code" warning.
+		/// </summary>
+		/// <returns></returns>
+		private IEnumerable<IConsoleNodeBase> GetBaseConsoleNodes()
+		{
+			return base.GetConsoleNodes();
+		}
+
+		/// <summary>
+		/// Calls the delegate for each console status item.
+		/// </summary>
+		/// <param name="addRow"></param>
+		public override void BuildConsoleStatus(AddStatusRowDelegate addRow)
+		{
+			base.BuildConsoleStatus(addRow);
+
+			ZoomControlConsole.BuildConsoleStatus(this, addRow);
+		}
+
+		/// <summary>
 		/// Gets the child console commands.
 		/// </summary>
 		/// <returns></returns>
@@ -52,13 +86,12 @@ namespace ICD.Connect.Cameras.Controls
 			foreach (IConsoleCommand command in GetBaseConsoleCommands())
 				yield return command;
 
-			yield return new ConsoleCommand("Stop", "Sends the stop signal to the camera.", () => Stop());
-			yield return new ConsoleCommand("ZoomIn", "Sends the zoom in signal to the camera.", () => ZoomIn());
-			yield return new ConsoleCommand("ZoomOut", "Sends the zoom out signal to the camera.", () => ZoomOut());
+			foreach (IConsoleCommand command in ZoomControlConsole.GetConsoleCommands(this))
+				yield return command;
 		}
 
 		/// <summary>
-		/// Workaround for the "unverifiable code" warning.
+		/// Workaround for "unverifiable code" warning.
 		/// </summary>
 		/// <returns></returns>
 		private IEnumerable<IConsoleCommand> GetBaseConsoleCommands()
