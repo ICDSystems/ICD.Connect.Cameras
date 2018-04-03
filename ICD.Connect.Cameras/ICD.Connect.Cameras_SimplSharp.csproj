@@ -81,8 +81,12 @@
     <None Include="ObfuscationSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Proxies\Devices\AbstractProxyCameraDevice.cs" />
+    <Compile Include="Proxies\Devices\CameraApi.cs" />
     <Compile Include="Proxies\Devices\IProxyCameraDevice.cs" />
     <Compile Include="Proxies\Devices\ProxyCameraDevice.cs" />
+    <Compile Include="Proxies\Devices\ProxyCameraWithPanTilt.cs" />
+    <Compile Include="Proxies\Devices\ProxyCameraWithPresets.cs" />
+    <Compile Include="Proxies\Devices\ProxyCameraWithZoom.cs" />
     <None Include="Properties\ControlSystem.cfg" />
   </ItemGroup>
   <ItemGroup>
