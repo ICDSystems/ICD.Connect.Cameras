@@ -12,7 +12,8 @@ namespace ICD.Connect.Cameras.Controls
 		/// </summary>
 		/// <param name="parent"></param>
 		/// <param name="id"></param>
-		public PanTiltControl(T parent, int id) : base(parent, id)
+		public PanTiltControl(T parent, int id)
+			: base(parent, id)
 		{
 		}
 

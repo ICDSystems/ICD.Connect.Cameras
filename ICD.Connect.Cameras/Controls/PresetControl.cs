@@ -14,11 +14,13 @@ namespace ICD.Connect.Cameras.Controls
 		/// </summary>
 		/// <param name="parent"></param>
 		/// <param name="id"></param>
-		public PresetControl(T parent, int id) : base(parent, id)
+		public PresetControl(T parent, int id)
+			: base(parent, id)
 		{
 		}
 
 		#region IPresetControl
+
 		public event EventHandler OnPresetsChanged;
 
 		/// <summary>
@@ -53,6 +55,7 @@ namespace ICD.Connect.Cameras.Controls
 		{
 			return Parent.GetPresets();
 		}
+
 		#endregion
 
 		#region Console
@@ -66,7 +69,9 @@ namespace ICD.Connect.Cameras.Controls
 			foreach (IConsoleCommand command in GetBaseConsoleCommands())
 				yield return command;
 
-			yield return new GenericConsoleCommand<int>("Activate Preset", "Sends the stop signal to the camera.", preset => ActivatePreset(preset));
+			yield return
+				new GenericConsoleCommand<int>("Activate Preset", "Sends the stop signal to the camera.",
+				                               preset => ActivatePreset(preset));
 		}
 
 		/// <summary>
