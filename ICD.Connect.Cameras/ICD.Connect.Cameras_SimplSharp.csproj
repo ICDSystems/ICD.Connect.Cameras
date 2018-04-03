@@ -83,6 +83,13 @@
     <Compile Include="Devices\ICameraWithZoom.cs" />
     <None Include="ObfuscationSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Proxies\Controls\AbstractProxyCameraDeviceControl.cs" />
+    <Compile Include="Proxies\Controls\CameraControlApi.cs" />
+    <Compile Include="Proxies\Controls\IProxyCameraDeviceControl.cs" />
+    <Compile Include="Proxies\Controls\ProxyCameraDeviceControl.cs" />
+    <Compile Include="Proxies\Controls\ProxyPanTiltControl.cs" />
+    <Compile Include="Proxies\Controls\ProxyPresetControl.cs" />
+    <Compile Include="Proxies\Controls\ProxyZoomControl.cs" />
     <Compile Include="Proxies\Devices\AbstractProxyCameraDevice.cs" />
     <Compile Include="Proxies\Devices\CameraApi.cs" />
     <Compile Include="Proxies\Devices\IProxyCameraDevice.cs" />
@@ -121,9 +128,6 @@
       <Project>{5B84EB3C-1C3A-4C4D-98C2-69F67CF51D5A}</Project>
       <Name>ICD.Connect.Settings_SimplSharp</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Proxies\Controls\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CompactFramework.CSharp.targets" />
   <PropertyGroup>
