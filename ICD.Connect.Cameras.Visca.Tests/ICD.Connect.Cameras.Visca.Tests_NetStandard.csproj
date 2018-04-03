@@ -6,6 +6,7 @@
     <OutputType>Library</OutputType>
     <StartupObject />
     <RootNamespace>ICD.Connect.Cameras.Visca.Tests</RootNamespace>
+	<AssemblyName>ICD.Connect.Cameras.Visca.Tests</AssemblyName>
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
