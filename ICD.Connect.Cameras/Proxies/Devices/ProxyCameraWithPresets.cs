@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using ICD.Common.Properties;
+using ICD.Connect.API;
+using ICD.Connect.API.Info;
 using ICD.Connect.Cameras.Devices;
 
 namespace ICD.Connect.Cameras.Proxies.Devices
@@ -36,6 +38,21 @@ namespace ICD.Connect.Cameras.Proxies.Devices
 		public void StorePreset(int presetId)
 		{
 			CallMethod(CameraApi.METHOD_STORE_PRESET, presetId);
+		}
+
+		/// <summary>
+		/// Override to build initialization commands on top of the current class info.
+		/// </summary>
+		/// <param name="command"></param>
+		protected override void Initialize(ApiClassInfo command)
+		{
+			base.Initialize(command);
+
+			ApiCommandBuilder.UpdateCommand(command)
+			                 .GetProperty(CameraApi.HELP_PROPERTY_MAX_PRESETS)
+			                 .CallMethod(CameraApi.METHOD_GET_PRESETS)
+			                 .CompleteMethod()
+			                 .Complete();
 		}
 	}
 }

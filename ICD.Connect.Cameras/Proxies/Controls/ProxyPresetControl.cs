@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using ICD.Common.Properties;
+using ICD.Connect.API;
 using ICD.Connect.API.Commands;
+using ICD.Connect.API.Info;
 using ICD.Connect.API.Nodes;
 using ICD.Connect.Cameras.Controls;
 using ICD.Connect.Devices.Proxies.Devices;
@@ -38,6 +40,8 @@ namespace ICD.Connect.Cameras.Proxies.Controls
 			base.DisposeFinal(disposing);
 		}
 
+		#region Methods
+
 		/// <summary>
 		/// Gets the stored camera presets.
 		/// </summary>
@@ -63,6 +67,23 @@ namespace ICD.Connect.Cameras.Proxies.Controls
 		public void StorePreset(int presetId)
 		{
 			CallMethod(CameraControlApi.METHOD_STORE_PRESET, presetId);
+		}
+
+		#endregion
+
+		/// <summary>
+		/// Override to build initialization commands on top of the current class info.
+		/// </summary>
+		/// <param name="command"></param>
+		protected override void Initialize(ApiClassInfo command)
+		{
+			base.Initialize(command);
+
+			ApiCommandBuilder.UpdateCommand(command)
+			                 .GetProperty(CameraControlApi.PROPERTY_MAX_PRESETS)
+			                 .CallMethod(CameraControlApi.METHOD_GET_PRESETS)
+			                 .CompleteMethod()
+			                 .Complete();
 		}
 
 		#region Console
