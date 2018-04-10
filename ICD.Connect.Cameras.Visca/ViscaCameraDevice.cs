@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using ICD.Common.Properties;
 using ICD.Common.Utils;
-using ICD.Common.Utils.EventArguments;
 using ICD.Common.Utils.Services.Logging;
 using ICD.Connect.Cameras.Controls;
 using ICD.Connect.Cameras.Devices;
 using ICD.Connect.Devices;
 using ICD.Connect.Devices.Controls;
+using ICD.Connect.Devices.EventArguments;
 using ICD.Connect.Protocol.Data;
 using ICD.Connect.Protocol.EventArguments;
 using ICD.Connect.Protocol.Extensions;
@@ -257,7 +257,7 @@ namespace ICD.Connect.Cameras.Visca
 		{
 		}
 
-		private void SerialQueueOnIsOnlineStateChanged(object sender, BoolEventArgs args)
+		private void SerialQueueOnIsOnlineStateChanged(object sender, DeviceBaseOnlineStateApiEventArgs args)
 		{
 		}
 

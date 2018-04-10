@@ -11,6 +11,7 @@ using ICD.Connect.Cameras.Controls;
 using ICD.Connect.Cameras.Devices;
 using ICD.Connect.Devices;
 using ICD.Connect.Devices.Controls;
+using ICD.Connect.Devices.EventArguments;
 using ICD.Connect.Protocol.Extensions;
 using ICD.Connect.Protocol.Network.WebPorts;
 using ICD.Connect.Settings.Core;
@@ -230,8 +231,8 @@ namespace ICD.Connect.Cameras.Panasonic
 		/// Called when the port online state changes.
 		/// </summary>
 		/// <param name="sender"></param>
-		/// <param name="boolEventArgs"></param>
-		private void PortOnIsOnlineStateChanged(object sender, BoolEventArgs boolEventArgs)
+		/// <param name="args"></param>
+		private void PortOnIsOnlineStateChanged(object sender, DeviceBaseOnlineStateApiEventArgs args)
 		{
 			UpdateCachedOnlineStatus();
 		}
