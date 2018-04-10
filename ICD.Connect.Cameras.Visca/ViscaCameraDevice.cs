@@ -75,6 +75,9 @@ namespace ICD.Connect.Cameras.Visca
 		/// <param name="port"></param>
 		private void SetPort(ISerialPort port)
 		{
+			if (port == SerialQueue.Port)
+				return;
+
 			if (port is IComPort)
 				ConfigureComPort(port as IComPort);
 
