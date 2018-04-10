@@ -4,6 +4,8 @@ using ICD.Common.Utils;
 using ICD.Common.Utils.Services.Logging;
 using ICD.Connect.API.Commands;
 using ICD.Connect.Cameras.Controls;
+using ICD.Connect.Cameras.Devices;
+using ICD.Connect.Devices;
 using ICD.Connect.Devices.Controls;
 
 namespace ICD.Connect.Cameras.Mock

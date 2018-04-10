@@ -1,6 +1,7 @@
 ﻿using System;
 using ICD.Common.Utils;
 using ICD.Common.Utils.Xml;
+using ICD.Connect.Cameras.Devices;
 using ICD.Connect.Settings.Attributes;
 
 namespace ICD.Connect.Cameras.Mock
