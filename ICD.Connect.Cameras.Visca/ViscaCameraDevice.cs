@@ -124,20 +124,6 @@ namespace ICD.Connect.Cameras.Visca
 
 		#endregion
 
-		#region Port Callbacks
-
-		/// <summary>
-		/// Called when the port online state changes.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="args"></param>
-		private void PortOnIsOnlineStateChanged(object sender, BoolEventArgs args)
-		{
-			UpdateCachedOnlineStatus();
-		}
-
-		#endregion
-
 		#region SerialQueue Callbacks
 
 		private void Subscribe(ISerialQueue queue)
