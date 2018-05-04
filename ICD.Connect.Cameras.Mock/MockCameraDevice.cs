@@ -7,6 +7,7 @@ using ICD.Connect.Cameras.Controls;
 using ICD.Connect.Cameras.Devices;
 using ICD.Connect.Devices;
 using ICD.Connect.Devices.Controls;
+using ICD.Connect.Settings.Core;
 
 namespace ICD.Connect.Cameras.Mock
 {
@@ -160,7 +161,7 @@ namespace ICD.Connect.Cameras.Mock
 		#endregion
 
 		#region Settings
-		protected override void ApplySettingsFinal(MockCameraDeviceSettings settings, ICD.Connect.Settings.Core.IDeviceFactory factory)
+		protected override void ApplySettingsFinal(MockCameraDeviceSettings settings, IDeviceFactory factory)
 		{
 			base.ApplySettingsFinal(settings, factory);
 			m_PanTiltSpeed = settings.PanTiltSpeed;
