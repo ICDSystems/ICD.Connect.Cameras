@@ -1,5 +1,4 @@
-﻿using System;
-using ICD.Common.Utils;
+﻿using ICD.Common.Utils;
 using ICD.Common.Utils.Xml;
 using ICD.Connect.Cameras.Devices;
 using ICD.Connect.Protocol.Network.WebPorts;
@@ -8,21 +7,15 @@ using ICD.Connect.Settings.Attributes.SettingsProperties;
 
 namespace ICD.Connect.Cameras.Panasonic
 {
-	[KrangSettings(FACTORY_NAME)]
+	[KrangSettings("PanasonicCamera", typeof(PanasonicCameraAwDevice))]
 	public sealed class PanasonicCameraAwDeviceSettings : AbstractCameraDeviceSettings
 	{
-		private int? m_PanTiltSpeed;
-		private int? m_ZoomSpeed;
-
-        private const string FACTORY_NAME = "PanasonicCamera";
 		private const string PORT_ELEMENT = "Port";
 		private const string PAN_TILT_SPEED_ELEMENT = "PanTiltSpeed";
 		private const string ZOOM_SPEED_ELEMENT = "ZoomSpeed";
 
-		/// <summary>
-		/// Gets the originator factory name.
-		/// </summary>
-		public override string FactoryName { get { return FACTORY_NAME; } }
+		private int? m_PanTiltSpeed;
+		private int? m_ZoomSpeed;
 
 		[OriginatorIdSettingsProperty(typeof(IWebPort))]
 		public int? Port { get; set; }
@@ -81,10 +74,5 @@ namespace ICD.Connect.Cameras.Panasonic
 			PanTiltSpeed = XmlUtils.TryReadChildElementContentAsInt(xml, PAN_TILT_SPEED_ELEMENT);
 			ZoomSpeed = XmlUtils.TryReadChildElementContentAsInt(xml, ZOOM_SPEED_ELEMENT);
 		}
-
-		/// <summary>
-		/// Gets the type of the originator for this settings instance.
-		/// </summary>
-		public override Type OriginatorType { get { return typeof(PanasonicCameraAwDevice); } }
 	}
 }

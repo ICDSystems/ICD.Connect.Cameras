@@ -1,5 +1,4 @@
-﻿using System;
-using ICD.Common.Utils;
+﻿using ICD.Common.Utils;
 using ICD.Common.Utils.Xml;
 using ICD.Connect.Cameras.Devices;
 using ICD.Connect.Protocol.Ports;
@@ -8,20 +7,15 @@ using ICD.Connect.Settings.Attributes.SettingsProperties;
 
 namespace ICD.Connect.Cameras.Visca
 {
-	[KrangSettings(FACTORY_NAME)]
+	[KrangSettings("ViscaCamera", typeof(ViscaCameraDevice))]
 	public sealed class ViscaCameraDeviceSettings : AbstractCameraDeviceSettings
 	{
-		private int? m_PanTiltSpeed;
-		private int? m_ZoomSpeed;
-		private const string FACTORY_NAME = "ViscaCamera";
 		private const string PORT_ELEMENT = "Port";
 		private const string PAN_TILT_SPEED_ELEMENT = "PanTiltSpeed";
 		private const string ZOOM_SPEED_ELEMENT = "ZoomSpeed";
 
-		/// <summary>
-		/// Gets the originator factory name.
-		/// </summary>
-		public override string FactoryName { get { return FACTORY_NAME; } }
+		private int? m_PanTiltSpeed;
+		private int? m_ZoomSpeed;
 
 		[OriginatorIdSettingsProperty(typeof(ISerialPort))]
 		public int? Port { get; set; }
@@ -57,11 +51,6 @@ namespace ICD.Connect.Cameras.Visca
 				}
 			}
 		}
-
-		/// <summary>
-		/// Gets the type of the originator for this settings instance.
-		/// </summary>
-		public override Type OriginatorType { get { return typeof(ViscaCameraDevice); } }
 
 		/// <summary>
 		/// Write settings elements to xml.

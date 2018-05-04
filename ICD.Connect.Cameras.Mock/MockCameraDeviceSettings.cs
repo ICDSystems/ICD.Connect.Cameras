@@ -1,24 +1,18 @@
-﻿using System;
-using ICD.Common.Utils;
+﻿using ICD.Common.Utils;
 using ICD.Common.Utils.Xml;
 using ICD.Connect.Cameras.Devices;
 using ICD.Connect.Settings.Attributes;
 
 namespace ICD.Connect.Cameras.Mock
 {
-	[KrangSettings(FACTORY_NAME)]
+	[KrangSettings("MockCamera", typeof(MockCameraDevice))]
 	public sealed class MockCameraDeviceSettings : AbstractCameraDeviceSettings
 	{
-		private int? m_PanTiltSpeed;
-		private int? m_ZoomSpeed;
-		private const string FACTORY_NAME = "MockCamera";
 		private const string PAN_TILT_SPEED_ELEMENT = "PanTiltSpeed";
 		private const string ZOOM_SPEED_ELEMENT = "ZoomSpeed";
 
-		/// <summary>
-		/// Gets the originator factory name.
-		/// </summary>
-		public override string FactoryName { get { return FACTORY_NAME; } }
+		private int? m_PanTiltSpeed;
+		private int? m_ZoomSpeed;
 
 		public int? PanTiltSpeed
 		{
@@ -51,11 +45,6 @@ namespace ICD.Connect.Cameras.Mock
 				}
 			}
 		}
-
-		/// <summary>
-		/// Gets the type of the originator for this settings instance.
-		/// </summary>
-		public override Type OriginatorType { get { return typeof(MockCameraDevice); } }
 
 		/// <summary>
 		/// Updates the settings from xml.
