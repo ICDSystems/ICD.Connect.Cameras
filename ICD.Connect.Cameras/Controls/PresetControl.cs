@@ -10,6 +10,13 @@ namespace ICD.Connect.Cameras.Controls
 	public sealed class PresetControl<T> : AbstractCameraDeviceControl<T>, IPresetControl
 		where T : ICameraWithPresets
 	{
+		public event EventHandler OnPresetsChanged;
+
+		/// <summary>
+		/// Exposes the maximum number of presets this camera can support.
+		/// </summary>
+		public int MaxPresets { get { return Parent.MaxPresets; } }
+
 		/// <summary>
 		/// Constructor.
 		/// </summary>
@@ -18,16 +25,23 @@ namespace ICD.Connect.Cameras.Controls
 		public PresetControl(T parent, int id)
 			: base(parent, id)
 		{
+			Subscribe(parent);
 		}
 
-		#region IPresetControl
-
-		public event EventHandler OnPresetsChanged;
-
 		/// <summary>
-		/// Exposes the maximum number of presets this camera can support.
+		/// Override to release resources.
 		/// </summary>
-		public int MaxPresets { get { return Parent.MaxPresets; } }
+		/// <param name="disposing"></param>
+		protected override void DisposeFinal(bool disposing)
+		{
+			OnPresetsChanged = null;
+
+			Unsubscribe(Parent);
+
+			base.DisposeFinal(disposing);
+		}
+
+		#region Methods
 
 		/// <summary>
 		/// Tells the camera to change its position to the given preset.
@@ -45,7 +59,6 @@ namespace ICD.Connect.Cameras.Controls
 		public void StorePreset(int presetId)
 		{
 			Parent.StorePreset(presetId);
-			OnPresetsChanged.Raise(this);
 		}
 
 		/// <summary>
@@ -55,6 +68,38 @@ namespace ICD.Connect.Cameras.Controls
 		public IEnumerable<CameraPreset> GetPresets()
 		{
 			return Parent.GetPresets();
+		}
+
+		#endregion
+
+		#region Parent Callbacks
+
+		/// <summary>
+		/// Subscribe to the parent events.
+		/// </summary>
+		/// <param name="parent"></param>
+		private void Subscribe(T parent)
+		{
+			parent.OnPresetsChanged += ParentOnPresetsChanged;
+		}
+
+		/// <summary>
+		/// Unsubscribe from the parent events.
+		/// </summary>
+		/// <param name="parent"></param>
+		private void Unsubscribe(T parent)
+		{
+			parent.OnPresetsChanged -= ParentOnPresetsChanged;
+		}
+
+		/// <summary>
+		/// Called when the parent presets change.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="eventArgs"></param>
+		private void ParentOnPresetsChanged(object sender, EventArgs eventArgs)
+		{
+			OnPresetsChanged.Raise(this);
 		}
 
 		#endregion

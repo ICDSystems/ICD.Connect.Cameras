@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using ICD.Common.Properties;
 using ICD.Connect.API.Attributes;
 using ICD.Connect.Cameras.Proxies.Devices;
 
@@ -7,6 +9,12 @@ namespace ICD.Connect.Cameras.Devices
 	[ApiClass(typeof(ProxyCameraWithPresets), typeof(ICameraDevice))]
 	public interface ICameraWithPresets : ICameraDevice
 	{
+		/// <summary>
+		/// Raised when the presets are changed.
+		/// </summary>
+		[PublicAPI]
+		event EventHandler OnPresetsChanged;
+
 		/// <summary>
 		/// Gets the maximum number of presets this camera can support.
 		/// </summary>

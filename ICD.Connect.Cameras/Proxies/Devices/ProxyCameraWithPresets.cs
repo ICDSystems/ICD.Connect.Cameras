@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using ICD.Common.Properties;
 using ICD.Connect.API;
 using ICD.Connect.API.Info;
@@ -9,9 +10,25 @@ namespace ICD.Connect.Cameras.Proxies.Devices
 	public sealed class ProxyCameraWithPresets : AbstractProxyCameraDevice, ICameraWithPresets
 	{
 		/// <summary>
+		/// Raised when the presets are changed.
+		/// </summary>
+		public event EventHandler OnPresetsChanged;
+
+		/// <summary>
 		/// Exposes the maximum number of presets this camera can support.
 		/// </summary>
 		public int MaxPresets { get; [UsedImplicitly] private set; }
+
+		/// <summary>
+		/// Override to release resources.
+		/// </summary>
+		/// <param name="disposing"></param>
+		protected override void DisposeFinal(bool disposing)
+		{
+			OnPresetsChanged = null;
+
+			base.DisposeFinal(disposing);
+		}
 
 		/// <summary>
 		/// Dictionary of presets, indexed by integer.
