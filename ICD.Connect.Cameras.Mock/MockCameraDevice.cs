@@ -120,8 +120,7 @@ namespace ICD.Connect.Cameras.Mock
 		{
 			if (presetId < 1 || presetId > MaxPresets)
 			{
-				Logger.AddEntry(eSeverity.Warning, "Mock camera preset must be between 1 and {0}, preset was not loaded.",
-				                MaxPresets);
+				Log(eSeverity.Warning, "Mock camera preset must be between 1 and {0}, preset was not loaded.", MaxPresets);
 				return;
 			}
 			CameraPosition position = m_PresetPositions[presetId];
@@ -135,8 +134,7 @@ namespace ICD.Connect.Cameras.Mock
 		{
 			if (presetId < 1 || presetId > MaxPresets)
 			{
-				Logger.AddEntry(eSeverity.Warning, "Mock camera preset must be between 1 and {0}, preset was not stored.",
-				                MaxPresets);
+				Log(eSeverity.Warning, "Mock camera preset must be between 1 and {0}, preset was not stored.", MaxPresets);
 				return;
 			}
 
@@ -176,9 +174,9 @@ namespace ICD.Connect.Cameras.Mock
 
 		private void LogCameraMovement(string action)
 		{
-			Logger.AddEntry(eSeverity.Informational,
-			                "MockCamera {0}: Instruction {1}: New Position - h{2},v{3},z{4}",
-			                Name, action, m_HPosition, m_VPosition, m_ZPosition);
+			Log(eSeverity.Informational,
+			    "MockCamera {0}: Instruction {1}: New Position - h{2},v{3},z{4}",
+			    Name, action, m_HPosition, m_VPosition, m_ZPosition);
 		}
 
 		#endregion
@@ -187,12 +185,12 @@ namespace ICD.Connect.Cameras.Mock
 
 		private void QueryPowerState()
 		{
-			Logger.AddEntry(eSeverity.Informational, "Power State: {0}", m_Powered);
+			Log(eSeverity.Informational, "Power State: {0}", m_Powered);
 		}
 
 		private void QueryCoordinates()
 		{
-			Logger.AddEntry(eSeverity.Informational, "Coordinates: h{0},v{1},z{2}", m_HPosition, m_VPosition, m_ZPosition);
+			Log(eSeverity.Informational, "Coordinates: h{0},v{1},z{2}", m_HPosition, m_VPosition, m_ZPosition);
 		}
 
 		#endregion
