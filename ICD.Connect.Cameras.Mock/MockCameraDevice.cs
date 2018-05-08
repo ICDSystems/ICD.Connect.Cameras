@@ -35,6 +35,16 @@ namespace ICD.Connect.Cameras.Mock
 			Controls.Add(new PresetControl<MockCameraDevice>(this, 4));
 		}
 
+		/// <summary>
+		/// Release resources.
+		/// </summary>
+		protected override void DisposeFinal(bool disposing)
+		{
+			OnPresetsChanged = null;
+
+			base.DisposeFinal(disposing);
+		}
+
 		#region ICameraWithPanTilt
 		public void PanTilt(eCameraPanTiltAction action)
 		{
@@ -84,6 +94,9 @@ namespace ICD.Connect.Cameras.Mock
 		#endregion
 
 		#region ICameraWithPresets
+
+		public event EventHandler OnPresetsChanged;
+
 		public int MaxPresets { get { return 4; } }
 		private readonly Dictionary<int, CameraPreset> m_Presets;
 
@@ -115,6 +128,8 @@ namespace ICD.Connect.Cameras.Mock
 			}
 			m_Presets.Add(presetId, new CameraPreset(presetId, string.Format("Preset{0}", presetId)));
 			m_PresetPositions.Add(presetId, new CameraPosition{HPosition = m_HPosition, VPosition = m_VPosition, ZPosition = m_ZPosition});
+
+			OnPresetsChanged.Raise(this);
 		}
 		#endregion
 
