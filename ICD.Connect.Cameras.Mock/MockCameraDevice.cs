@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using ICD.Common.Utils;
+using ICD.Common.Utils.Extensions;
 using ICD.Common.Utils.Services.Logging;
 using ICD.Connect.API.Commands;
 using ICD.Connect.Cameras.Controls;
@@ -12,9 +13,10 @@ using ICD.Connect.Settings.Core;
 namespace ICD.Connect.Cameras.Mock
 {
 	public sealed class MockCameraDevice : AbstractCameraDevice<MockCameraDeviceSettings>,
-		ICameraWithPanTilt, ICameraWithZoom, ICameraWithPresets, IDeviceWithPower
+	                                       ICameraWithPanTilt, ICameraWithZoom, ICameraWithPresets, IDeviceWithPower
 	{
 		#region Properties
+
 		private bool m_Powered;
 		private int m_VPosition;
 		private int m_HPosition;
@@ -22,12 +24,17 @@ namespace ICD.Connect.Cameras.Mock
 		private readonly Dictionary<int, CameraPosition> m_PresetPositions;
 		private int? m_PanTiltSpeed;
 		private int? m_ZoomSpeed;
+
 		#endregion
 
+		/// <summary>
+		/// Constructor.
+		/// </summary>
 		public MockCameraDevice()
 		{
 			m_Presets = new Dictionary<int, CameraPreset>();
 			m_PresetPositions = new Dictionary<int, CameraPosition>();
+
 			Controls.Add(new GenericCameraRouteSourceControl<MockCameraDevice>(this, 0));
 			Controls.Add(new PanTiltControl<MockCameraDevice>(this, 1));
 			Controls.Add(new ZoomControl<MockCameraDevice>(this, 2));
@@ -46,6 +53,7 @@ namespace ICD.Connect.Cameras.Mock
 		}
 
 		#region ICameraWithPanTilt
+
 		public void PanTilt(eCameraPanTiltAction action)
 		{
 			int speed = m_PanTiltSpeed == null ? 1 : m_PanTiltSpeed.Value;
@@ -70,9 +78,11 @@ namespace ICD.Connect.Cameras.Mock
 			}
 			LogCameraMovement(action.ToString());
 		}
+
 		#endregion
 
 		#region ICameraWithZoom
+
 		public void Zoom(eCameraZoomAction action)
 		{
 			int speed = m_ZoomSpeed == null ? 1 : m_ZoomSpeed.Value;
@@ -91,6 +101,7 @@ namespace ICD.Connect.Cameras.Mock
 			}
 			LogCameraMovement(action.ToString());
 		}
+
 		#endregion
 
 		#region ICameraWithPresets
@@ -109,7 +120,8 @@ namespace ICD.Connect.Cameras.Mock
 		{
 			if (presetId < 1 || presetId > MaxPresets)
 			{
-				Logger.AddEntry(eSeverity.Warning, "Mock camera preset must be between 1 and {0}, preset was not loaded.", MaxPresets);
+				Logger.AddEntry(eSeverity.Warning, "Mock camera preset must be between 1 and {0}, preset was not loaded.",
+				                MaxPresets);
 				return;
 			}
 			CameraPosition position = m_PresetPositions[presetId];
@@ -123,17 +135,22 @@ namespace ICD.Connect.Cameras.Mock
 		{
 			if (presetId < 1 || presetId > MaxPresets)
 			{
-				Logger.AddEntry(eSeverity.Warning, "Mock camera preset must be between 1 and {0}, preset was not stored.", MaxPresets);
+				Logger.AddEntry(eSeverity.Warning, "Mock camera preset must be between 1 and {0}, preset was not stored.",
+				                MaxPresets);
 				return;
 			}
+
 			m_Presets.Add(presetId, new CameraPreset(presetId, string.Format("Preset{0}", presetId)));
-			m_PresetPositions.Add(presetId, new CameraPosition{HPosition = m_HPosition, VPosition = m_VPosition, ZPosition = m_ZPosition});
+			m_PresetPositions.Add(presetId,
+			                      new CameraPosition {HPosition = m_HPosition, VPosition = m_VPosition, ZPosition = m_ZPosition});
 
 			OnPresetsChanged.Raise(this);
 		}
+
 		#endregion
 
 		#region IDeviceWithPower
+
 		public void PowerOn()
 		{
 			m_Powered = true;
@@ -143,22 +160,27 @@ namespace ICD.Connect.Cameras.Mock
 		{
 			m_Powered = false;
 		}
+
 		#endregion
 
 		#region DeviceBase
+
 		protected override bool GetIsOnlineStatus()
 		{
 			return true;
 		}
+
 		#endregion
 
 		#region Private Methods
+
 		private void LogCameraMovement(string action)
 		{
 			Logger.AddEntry(eSeverity.Informational,
-							"MockCamera {0}: Instruction {1}: New Position - h{2},v{3},z{4}",
-							Name, action, m_HPosition, m_VPosition, m_ZPosition);
+			                "MockCamera {0}: Instruction {1}: New Position - h{2},v{3},z{4}",
+			                Name, action, m_HPosition, m_VPosition, m_ZPosition);
 		}
+
 		#endregion
 
 		#region QueryCommands
@@ -176,6 +198,7 @@ namespace ICD.Connect.Cameras.Mock
 		#endregion
 
 		#region Settings
+
 		protected override void ApplySettingsFinal(MockCameraDeviceSettings settings, IDeviceFactory factory)
 		{
 			base.ApplySettingsFinal(settings, factory);
@@ -209,8 +232,9 @@ namespace ICD.Connect.Cameras.Mock
 
 			yield return new ConsoleCommand("PowerOn", "Powers the camera device", () => PowerOn());
 			yield return new ConsoleCommand("PowerOff", "Places the camera device on standby", () => PowerOff());
-			yield return new ConsoleCommand("PowerQuery", "Returns the Powered State of the device", ()=> QueryPowerState());
-			yield return new ConsoleCommand("PositionQuery", "Querries the current position of the camera", ()=>QueryCoordinates());
+			yield return new ConsoleCommand("PowerQuery", "Returns the Powered State of the device", () => QueryPowerState());
+			yield return
+				new ConsoleCommand("PositionQuery", "Querries the current position of the camera", () => QueryCoordinates());
 		}
 
 		/// <summary>
