@@ -14,15 +14,15 @@ using ICD.Connect.Devices.EventArguments;
 using ICD.Connect.Protocol.Extensions;
 using ICD.Connect.Protocol.Network.WebPorts;
 using ICD.Connect.Settings;
-using ICD.Connect.Settings.Cores;
 
 namespace ICD.Connect.Cameras.Panasonic
 {
 	public sealed class PanasonicCameraAwDevice : AbstractCameraDevice<PanasonicCameraAwDeviceSettings>,
-		ICameraWithPanTilt, ICameraWithZoom, IDeviceWithPower
+	                                              ICameraWithPanTilt, ICameraWithZoom, IDeviceWithPower
 
 	{
 		#region Properties
+
 		private const long RATE_LIMIT = 130;
 
 		private static readonly Dictionary<string, string> s_ErrorMap =
@@ -61,24 +61,29 @@ namespace ICD.Connect.Cameras.Panasonic
 		}
 
 		#region ICameraWithPanTilt
+
 		public void PanTilt(eCameraPanTiltAction action)
 		{
 			SendCommand(m_PanTiltSpeed == null
-							? PanasonicCommandBuilder.GetPanTiltCommand(action)
-							: PanasonicCommandBuilder.GetPanTiltCommand(action, m_PanTiltSpeed.Value));
+				            ? PanasonicCommandBuilder.GetPanTiltCommand(action)
+				            : PanasonicCommandBuilder.GetPanTiltCommand(action, m_PanTiltSpeed.Value));
 		}
+
 		#endregion
 
 		#region ICameraWithZoom
+
 		public void Zoom(eCameraZoomAction action)
 		{
 			SendCommand(m_ZoomSpeed == null
-							? PanasonicCommandBuilder.GetZoomCommand(action)
-							: PanasonicCommandBuilder.GetZoomCommand(action, m_ZoomSpeed.Value));
+				            ? PanasonicCommandBuilder.GetZoomCommand(action)
+				            : PanasonicCommandBuilder.GetZoomCommand(action, m_ZoomSpeed.Value));
 		}
+
 		#endregion
 
 		#region IDeviceWithPower
+
 		public void PowerOn()
 		{
 			SendCommand(PanasonicCommandBuilder.GetPowerOnCommand());
@@ -88,9 +93,11 @@ namespace ICD.Connect.Cameras.Panasonic
 		{
 			SendCommand(PanasonicCommandBuilder.GetPowerOffCommand());
 		}
+
 		#endregion
 
 		#region DeviceBase
+
 		/// <summary>
 		/// Gets the current online status of the device.
 		/// </summary>
@@ -99,9 +106,11 @@ namespace ICD.Connect.Cameras.Panasonic
 		{
 			return m_Port != null && m_Port.IsOnline;
 		}
+
 		#endregion
 
 		#region Public API
+
 		/// <summary>
 		/// Sets the port for communication with the device.
 		/// </summary>
@@ -118,9 +127,11 @@ namespace ICD.Connect.Cameras.Panasonic
 
 			UpdateCachedOnlineStatus();
 		}
+
 		#endregion
 
 		#region Private Methods
+
 		private void TimerElapsed(object sender, EventArgs args)
 		{
 			m_CommandSection.Enter();
@@ -199,7 +210,6 @@ namespace ICD.Connect.Cameras.Panasonic
 			ServiceProvider.GetService<ILoggerService>().AddEntry(severity, message);
 		}
 		#endregion
-
 
 		#region Port Callbacks
 
