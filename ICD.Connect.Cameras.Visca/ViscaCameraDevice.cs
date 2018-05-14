@@ -290,7 +290,7 @@ namespace ICD.Connect.Cameras.Visca
 				port = factory.GetPortById((int)settings.Port) as ISerialPort;
 
 			if (port == null)
-				Logger.AddEntry(eSeverity.Error, String.Format("No serial port with Id {0}", settings.Port));
+				Log(eSeverity.Error, String.Format("No serial port with Id {0}", settings.Port));
 
 			SetPort(port);
 			if (port != null && port.IsOnline)
@@ -346,20 +346,6 @@ namespace ICD.Connect.Cameras.Visca
 			Subscribe(SerialQueue);
 
 			UpdateCachedOnlineStatus();
-		}
-
-		/// <summary>
-		/// Logs to logging core.
-		/// </summary>
-		/// <param name="severity"></param>
-		/// <param name="message"></param>
-		/// <param name="args"></param>
-		private void Log(eSeverity severity, string message, params object[] args)
-		{
-			message = string.Format(message, args);
-			message = string.Format("{0} - {1}", this, message);
-
-			Logger.AddEntry(severity, message);
 		}
 	}
 }
