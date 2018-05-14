@@ -116,11 +116,17 @@ namespace ICD.Connect.Cameras.Visca
 			return SerialQueue != null && SerialQueue.Port != null && SerialQueue.Port.IsOnline;
 		}
 
+		/// <summary>
+		/// Powers the device on.
+		/// </summary>
 		public void PowerOn()
 		{
 			SendCommand(ViscaCommandBuilder.GetPowerOnCommand(DEFAULT_ID));
 		}
 
+		/// <summary>
+		/// Powers the device off.
+		/// </summary>
 		public void PowerOff()
 		{
 			SendCommand(ViscaCommandBuilder.GetPowerOffCommand(DEFAULT_ID));
@@ -130,6 +136,10 @@ namespace ICD.Connect.Cameras.Visca
 
 		#region SerialQueue Callbacks
 
+		/// <summary>
+		/// Subscribe to the serial queue events.
+		/// </summary>
+		/// <param name="queue"></param>
 		private void Subscribe(ISerialQueue queue)
 		{
 			if (queue == null)
@@ -144,6 +154,10 @@ namespace ICD.Connect.Cameras.Visca
 			queue.Port.OnIsOnlineStateChanged += SerialQueueOnIsOnlineStateChanged;
 		}
 
+		/// <summary>
+		/// Unsubscribe from the serial queue events.
+		/// </summary>
+		/// <param name="queue"></param>
 		private void Unsubscribe(ISerialQueue queue)
 		{
 			if (queue == null)
