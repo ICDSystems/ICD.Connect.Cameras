@@ -12,11 +12,9 @@ using ICD.Connect.Protocol.Data;
 using ICD.Connect.Protocol.EventArguments;
 using ICD.Connect.Protocol.Extensions;
 using ICD.Connect.Protocol.Ports;
-using ICD.Connect.Protocol.Ports.ComPort;
 using ICD.Connect.Protocol.SerialBuffers;
 using ICD.Connect.Protocol.SerialQueues;
 using ICD.Connect.Settings;
-using ICD.Connect.Settings.Cores;
 
 namespace ICD.Connect.Cameras.Visca
 {
@@ -79,9 +77,6 @@ namespace ICD.Connect.Cameras.Visca
 			if (port == SerialQueue.Port)
 				return;
 
-			if (port is IComPort)
-				ConfigureComPort(port as IComPort);
-
 			ISerialBuffer buffer = new DelimiterSerialBuffer(DELIMITER);
 			SerialQueue queue = new SerialQueue();
 			queue.SetPort(port);
@@ -91,20 +86,6 @@ namespace ICD.Connect.Cameras.Visca
 			SetSerialQueue(queue);
 
 			UpdateCachedOnlineStatus();
-		}
-
-		[PublicAPI]
-		public static void ConfigureComPort(IComPort port)
-		{
-			port.SetComPortSpec(
-								eComBaudRates.ComspecBaudRate9600,
-								eComDataBits.ComspecDataBits8,
-								eComParityType.ComspecParityNone,
-								eComStopBits.ComspecStopBits1,
-								eComProtocolType.ComspecProtocolRS232,
-								eComHardwareHandshakeType.ComspecHardwareHandshakeNone,
-								eComSoftwareHandshakeType.ComspecSoftwareHandshakeNone,
-								false);
 		}
 
 		/// <summary>

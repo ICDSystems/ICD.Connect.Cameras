@@ -141,7 +141,17 @@ namespace ICD.Connect.Cameras.Visca
 		/// </summary>
 		public ViscaCameraDeviceSettings()
 		{
-			m_ComSpecProperties = new ComSpecProperties();
+			m_ComSpecProperties = new ComSpecProperties
+			{
+				ComSpecBaudRate = eComBaudRates.ComspecBaudRate9600,
+				ComSpecNumberOfDataBits = eComDataBits.ComspecDataBits8,
+				ComSpecParityType = eComParityType.ComspecParityNone,
+				ComSpecNumberOfStopBits = eComStopBits.ComspecStopBits1,
+				ComSpecProtocolType = eComProtocolType.ComspecProtocolRS232,
+				ComSpecHardwareHandShake = eComHardwareHandshakeType.ComspecHardwareHandshakeNone,
+				ComSpecSoftwareHandshake = eComSoftwareHandshakeType.ComspecSoftwareHandshakeNone,
+				ComSpecReportCtsChanges = false
+			};
 		}
 
 		/// <summary>
