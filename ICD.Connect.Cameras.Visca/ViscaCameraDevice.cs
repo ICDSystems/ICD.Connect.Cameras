@@ -158,10 +158,6 @@ namespace ICD.Connect.Cameras.Visca
 			if (args.Data == null)
 				return;
 
-			IcdConsole.PrintLine(String.Format("Serial Data {0} - Serial Response {1}",
-											   StringUtils.ToHexLiteral(args.Data.Serialize()),
-											   StringUtils.ToHexLiteral(args.Response)));
-
 			if (ViscaResponseHandler.HandleResponse(args.Response) == eViscaResponse.OK)
 				ParseQuery(args.Response);
 			else
