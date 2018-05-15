@@ -14,6 +14,7 @@ using ICD.Connect.Protocol.Extensions;
 using ICD.Connect.Protocol.Ports;
 using ICD.Connect.Protocol.SerialBuffers;
 using ICD.Connect.Protocol.SerialQueues;
+using ICD.Connect.Protocol.Settings;
 using ICD.Connect.Settings;
 
 namespace ICD.Connect.Cameras.Visca
@@ -28,6 +29,7 @@ namespace ICD.Connect.Cameras.Visca
 		private readonly Dictionary<string, int> m_RetryCounts = new Dictionary<string, int>();
 		private readonly SafeCriticalSection m_RetryLock = new SafeCriticalSection();
 
+		private readonly ComSpecProperties m_ComSpecProperties;
 
 		private int? m_PanTiltSpeed;
 		private int? m_ZoomSpeed;
@@ -38,6 +40,8 @@ namespace ICD.Connect.Cameras.Visca
 		/// </summary>
 		public ViscaCameraDevice()
 		{
+			m_ComSpecProperties = new ComSpecProperties();
+
 			Controls.Add(new GenericCameraRouteSourceControl<ViscaCameraDevice>(this, 0));
 			Controls.Add(new PanTiltControl<ViscaCameraDevice>(this, 1));
 			Controls.Add(new ZoomControl<ViscaCameraDevice>(this, 2));
@@ -307,8 +311,11 @@ namespace ICD.Connect.Cameras.Visca
 				settings.Port = SerialQueue.Port.Id;
 			else
 				settings.Port = null;
+
 			settings.PanTiltSpeed = m_PanTiltSpeed;
 			settings.ZoomSpeed = m_ZoomSpeed;
+
+			settings.ComSpecProperties.Copy(m_ComSpecProperties);
 		}
 
 		/// <summary>
@@ -319,6 +326,8 @@ namespace ICD.Connect.Cameras.Visca
 			base.ClearSettingsFinal();
 
 			SetPort(null);
+
+			m_ComSpecProperties.Clear();
 		}
 
 		/// <summary>
@@ -329,6 +338,8 @@ namespace ICD.Connect.Cameras.Visca
 		protected override void ApplySettingsFinal(ViscaCameraDeviceSettings settings, IDeviceFactory factory)
 		{
 			base.ApplySettingsFinal(settings, factory);
+
+			m_ComSpecProperties.Copy(settings.ComSpecProperties);
 
 			ISerialPort port = null;
 			if (settings.Port != null)

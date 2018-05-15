@@ -11,6 +11,7 @@ using ICD.Connect.Devices;
 using ICD.Connect.Devices.Controls;
 using ICD.Connect.Devices.EventArguments;
 using ICD.Connect.Protocol.Extensions;
+using ICD.Connect.Protocol.Network.Settings;
 using ICD.Connect.Protocol.Network.WebPorts;
 using ICD.Connect.Settings;
 
@@ -43,6 +44,8 @@ namespace ICD.Connect.Cameras.Panasonic
 		private int? m_PanTiltSpeed;
 		private int? m_ZoomSpeed;
 
+		private readonly UriProperties m_UriProperties;
+
 		#endregion
 
 		/// <summary>
@@ -50,6 +53,8 @@ namespace ICD.Connect.Cameras.Panasonic
 		/// </summary>
 		public PanasonicCameraAwDevice()
 		{
+			m_UriProperties = new UriProperties();
+
 			m_CommandList = new Queue<string>();
 			m_CommandSection = new SafeCriticalSection();
 
@@ -257,6 +262,8 @@ namespace ICD.Connect.Cameras.Panasonic
 			settings.Port = m_Port == null ? (int?)null : m_Port.Id;
 			settings.PanTiltSpeed = m_PanTiltSpeed;
 			settings.ZoomSpeed = m_ZoomSpeed;
+
+			settings.UriProperties.Copy(m_UriProperties);
 		}
 
 		/// <summary>
@@ -267,6 +274,8 @@ namespace ICD.Connect.Cameras.Panasonic
 			base.ClearSettingsFinal();
 
 			SetPort(null);
+
+			m_UriProperties.Clear();
 		}
 
 		/// <summary>
@@ -277,6 +286,8 @@ namespace ICD.Connect.Cameras.Panasonic
 		protected override void ApplySettingsFinal(PanasonicCameraAwDeviceSettings settings, IDeviceFactory factory)
 		{
 			base.ApplySettingsFinal(settings, factory);
+
+			m_UriProperties.Copy(settings.UriProperties);
 
 			IWebPort port = null;
 

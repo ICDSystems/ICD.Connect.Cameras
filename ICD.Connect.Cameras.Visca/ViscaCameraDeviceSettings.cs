@@ -10,7 +10,7 @@ using ICD.Connect.Settings.Attributes.SettingsProperties;
 namespace ICD.Connect.Cameras.Visca
 {
 	[KrangSettings("ViscaCamera", typeof(ViscaCameraDevice))]
-	public sealed class ViscaCameraDeviceSettings : AbstractCameraDeviceSettings, IComSpecProperties
+	public sealed class ViscaCameraDeviceSettings : AbstractCameraDeviceSettings, IComSpecSettings
 	{
 		private const string PORT_ELEMENT = "Port";
 		private const string PAN_TILT_SPEED_ELEMENT = "PanTiltSpeed";
@@ -57,6 +57,11 @@ namespace ICD.Connect.Cameras.Visca
 				}
 			}
 		}
+
+		/// <summary>
+		/// Gets the configurable Com Spec properties.
+		/// </summary>
+		public IComSpecProperties ComSpecProperties { get { return m_ComSpecProperties; } }
 
 		#endregion
 
