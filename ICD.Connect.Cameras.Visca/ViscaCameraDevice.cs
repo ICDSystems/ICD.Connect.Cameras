@@ -21,18 +21,21 @@ namespace ICD.Connect.Cameras.Visca
 	public sealed class ViscaCameraDevice : AbstractCameraDevice<ViscaCameraDeviceSettings>,
 		ICameraWithPanTilt, ICameraWithZoom, IDeviceWithPower
 	{
-		private ISerialQueue SerialQueue { get; set; }
-
-		private readonly Dictionary<string, int> m_RetryCounts = new Dictionary<string, int>();
-		private readonly SafeCriticalSection m_RetryLock = new SafeCriticalSection();
-
 		private const int MAX_RETRY_ATTEMPTS = 20;
 		private const int DEFAULT_ID = 1;
 		private const char DELIMITER = '\xFF';
 
+		private readonly Dictionary<string, int> m_RetryCounts = new Dictionary<string, int>();
+		private readonly SafeCriticalSection m_RetryLock = new SafeCriticalSection();
+
+
 		private int? m_PanTiltSpeed;
 		private int? m_ZoomSpeed;
+		private ISerialQueue SerialQueue { get; set; }
 
+		/// <summary>
+		/// Constructor.
+		/// </summary>
 		public ViscaCameraDevice()
 		{
 			Controls.Add(new GenericCameraRouteSourceControl<ViscaCameraDevice>(this, 0));
@@ -65,6 +68,7 @@ namespace ICD.Connect.Cameras.Visca
 		protected override void DisposeFinal(bool disposing)
 		{
 			SetPort(null);
+
 			base.DisposeFinal(disposing);
 		}
 
@@ -84,6 +88,20 @@ namespace ICD.Connect.Cameras.Visca
 			queue.Timeout = 3 * 1000;
 
 			SetSerialQueue(queue);
+
+			UpdateCachedOnlineStatus();
+		}
+
+		private void SetSerialQueue(ISerialQueue serialQueue)
+		{
+			Unsubscribe(SerialQueue);
+
+			if (SerialQueue != null)
+				SerialQueue.Dispose();
+
+			SerialQueue = serialQueue;
+
+			Subscribe(SerialQueue);
 
 			UpdateCachedOnlineStatus();
 		}
@@ -111,6 +129,35 @@ namespace ICD.Connect.Cameras.Visca
 		public void PowerOff()
 		{
 			SendCommand(ViscaCommandBuilder.GetPowerOffCommand(DEFAULT_ID));
+		}
+
+		/// <summary>
+		/// Queues the command to be sent to the device.
+		/// </summary>
+		/// <param name="command"></param>
+		[PublicAPI]
+		public void SendCommand(ISerialData command)
+		{
+			SerialQueue.Enqueue(command);
+		}
+
+		/// <summary>
+		/// Queues the command to be sent to the device.
+		/// Replaces an existing command if it matches the comparer.
+		/// </summary>
+		/// <param name="command"></param>
+		/// <param name="comparer"></param>
+		[PublicAPI]
+		public void SendCommand<TData>(TData command, Func<TData, TData, bool> comparer)
+			where TData : ISerialData
+		{
+			SerialQueue.Enqueue(command, comparer);
+		}
+
+		[PublicAPI]
+		public void SendCommand(string command)
+		{
+			SendCommand(new SerialData(command));
 		}
 
 		#endregion
@@ -211,6 +258,7 @@ namespace ICD.Connect.Cameras.Visca
 		private int GetRetryCount(string command)
 		{
 			m_RetryLock.Enter();
+
 			try
 			{
 				return m_RetryCounts.ContainsKey(command) ? m_RetryCounts[command] : 0;
@@ -224,6 +272,7 @@ namespace ICD.Connect.Cameras.Visca
 		private void ResetRetryCount(string command)
 		{
 			m_RetryLock.Enter();
+
 			try
 			{
 				m_RetryCounts.Remove(command);
@@ -300,48 +349,5 @@ namespace ICD.Connect.Cameras.Visca
 		}
 
 		#endregion
-
-		/// <summary>
-		/// Queues the command to be sent to the device.
-		/// </summary>
-		/// <param name="command"></param>
-		[PublicAPI]
-		public void SendCommand(ISerialData command)
-		{
-			SerialQueue.Enqueue(command);
-		}
-
-		/// <summary>
-		/// Queues the command to be sent to the device.
-		/// Replaces an existing command if it matches the comparer.
-		/// </summary>
-		/// <param name="command"></param>
-		/// <param name="comparer"></param>
-		[PublicAPI]
-		public void SendCommand<TData>(TData command, Func<TData, TData, bool> comparer)
-			where TData : ISerialData
-		{
-			SerialQueue.Enqueue(command, comparer);
-		}
-
-		[PublicAPI]
-		public void SendCommand(string command)
-		{
-			SendCommand(new SerialData(command));
-		}
-
-		private void SetSerialQueue(ISerialQueue serialQueue)
-		{
-			Unsubscribe(SerialQueue);
-
-			if (SerialQueue != null)
-				SerialQueue.Dispose();
-
-			SerialQueue = serialQueue;
-
-			Subscribe(SerialQueue);
-
-			UpdateCachedOnlineStatus();
-		}
 	}
 }

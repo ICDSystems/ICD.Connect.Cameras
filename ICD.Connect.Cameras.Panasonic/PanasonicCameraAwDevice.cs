@@ -45,6 +45,9 @@ namespace ICD.Connect.Cameras.Panasonic
 
 		#endregion
 
+		/// <summary>
+		/// Constructor.
+		/// </summary>
 		public PanasonicCameraAwDevice()
 		{
 			m_CommandList = new Queue<string>();
