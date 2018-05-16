@@ -263,7 +263,7 @@ namespace ICD.Connect.Cameras.Panasonic
 			settings.PanTiltSpeed = m_PanTiltSpeed;
 			settings.ZoomSpeed = m_ZoomSpeed;
 
-			settings.UriProperties.Copy(m_UriProperties);
+			settings.Copy(m_UriProperties);
 		}
 
 		/// <summary>
@@ -287,7 +287,7 @@ namespace ICD.Connect.Cameras.Panasonic
 		{
 			base.ApplySettingsFinal(settings, factory);
 
-			m_UriProperties.Copy(settings.UriProperties);
+			m_UriProperties.Copy(settings);
 
 			IWebPort port = null;
 

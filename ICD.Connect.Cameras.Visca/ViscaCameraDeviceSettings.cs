@@ -58,11 +58,6 @@ namespace ICD.Connect.Cameras.Visca
 			}
 		}
 
-		/// <summary>
-		/// Gets the configurable Com Spec properties.
-		/// </summary>
-		public IComSpecProperties ComSpecProperties { get { return m_ComSpecProperties; } }
-
 		#endregion
 
 		#region Com Spec

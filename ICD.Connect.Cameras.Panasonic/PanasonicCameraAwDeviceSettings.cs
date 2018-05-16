@@ -57,11 +57,6 @@ namespace ICD.Connect.Cameras.Panasonic
 			}
 		}
 
-		/// <summary>
-		/// Gets the configurable URI properties.
-		/// </summary>
-		public IUriProperties UriProperties { get { return m_UriProperties; } }
-
 		#endregion
 
 		#region URI

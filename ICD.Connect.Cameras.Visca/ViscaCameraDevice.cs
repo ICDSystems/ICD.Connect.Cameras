@@ -315,7 +315,7 @@ namespace ICD.Connect.Cameras.Visca
 			settings.PanTiltSpeed = m_PanTiltSpeed;
 			settings.ZoomSpeed = m_ZoomSpeed;
 
-			settings.ComSpecProperties.Copy(m_ComSpecProperties);
+			settings.Copy(m_ComSpecProperties);
 		}
 
 		/// <summary>
@@ -339,7 +339,7 @@ namespace ICD.Connect.Cameras.Visca
 		{
 			base.ApplySettingsFinal(settings, factory);
 
-			m_ComSpecProperties.Copy(settings.ComSpecProperties);
+			m_ComSpecProperties.Copy(settings);
 
 			ISerialPort port = null;
 			if (settings.Port != null)
