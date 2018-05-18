@@ -12,6 +12,7 @@ using ICD.Connect.Protocol.Data;
 using ICD.Connect.Protocol.EventArguments;
 using ICD.Connect.Protocol.Extensions;
 using ICD.Connect.Protocol.Ports;
+using ICD.Connect.Protocol.Ports.ComPort;
 using ICD.Connect.Protocol.SerialBuffers;
 using ICD.Connect.Protocol.SerialQueues;
 using ICD.Connect.Protocol.Settings;
@@ -80,10 +81,12 @@ namespace ICD.Connect.Cameras.Visca
 		/// Sets the wrapped port for communication with the hardware.
 		/// </summary>
 		/// <param name="port"></param>
-		private void SetPort(ISerialPort port)
+		public void SetPort(ISerialPort port)
 		{
 			if (port == SerialQueue.Port)
 				return;
+
+			ConfigurePort(port);
 
 			ISerialBuffer buffer = new DelimiterSerialBuffer(DELIMITER);
 			SerialQueue queue = new SerialQueue();
@@ -94,6 +97,17 @@ namespace ICD.Connect.Cameras.Visca
 			SetSerialQueue(queue);
 
 			UpdateCachedOnlineStatus();
+		}
+
+		/// <summary>
+		/// Configures the given port for communication with the device.
+		/// </summary>
+		/// <param name="port"></param>
+		private void ConfigurePort(ISerialPort port)
+		{
+			// Com
+			if (port is IComPort)
+				(port as IComPort).ApplyDeviceConfiguration(m_ComSpecProperties);
 		}
 
 		private void SetSerialQueue(ISerialQueue serialQueue)
