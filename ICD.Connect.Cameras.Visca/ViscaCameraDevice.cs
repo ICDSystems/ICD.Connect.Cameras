@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using ICD.Common.Properties;
 using ICD.Common.Utils;
+using ICD.Common.Utils.EventArguments;
 using ICD.Common.Utils.Services.Logging;
 using ICD.Connect.Cameras.Controls;
 using ICD.Connect.Cameras.Devices;
 using ICD.Connect.Devices;
 using ICD.Connect.Devices.Controls;
 using ICD.Connect.Devices.EventArguments;
+using ICD.Connect.Protocol;
 using ICD.Connect.Protocol.Data;
 using ICD.Connect.Protocol.EventArguments;
 using ICD.Connect.Protocol.Extensions;
@@ -27,6 +29,8 @@ namespace ICD.Connect.Cameras.Visca
 		private readonly Dictionary<string, int> m_RetryCounts = new Dictionary<string, int>();
 		private readonly SafeCriticalSection m_RetryLock = new SafeCriticalSection();
 
+		private readonly ConnectionStateManager m_ConnectionStateManager;
+
 		private const int MAX_RETRY_ATTEMPTS = 20;
 		private const int DEFAULT_ID = 1;
 		private const char DELIMITER = '\xFF';
@@ -36,13 +40,22 @@ namespace ICD.Connect.Cameras.Visca
 
 		public ViscaCameraDevice()
 		{
+			m_ConnectionStateManager = new ConnectionStateManager(this){ConfigurePort = ConfigurePort};
+			m_ConnectionStateManager.OnIsOnlineStateChanged += PortOnIsOnlineStateChanged;
+                   
 			Controls.Add(new GenericCameraRouteSourceControl<ViscaCameraDevice>(this, 0));
 			Controls.Add(new PanTiltControl<ViscaCameraDevice>(this, 1));
 			Controls.Add(new ZoomControl<ViscaCameraDevice>(this, 2));
 			Controls.Add(new PowerDeviceControl<ViscaCameraDevice>(this, 3));
 		}
 
+		private void PortOnIsOnlineStateChanged(object sender, BoolEventArgs e)
+		{
+			UpdateCachedOnlineStatus();
+		}
+
 		#region PTZ
+
 		public void PanTilt(eCameraPanTiltAction action)
 		{
 			SendCommand(m_PanTiltSpeed == null
@@ -56,6 +69,7 @@ namespace ICD.Connect.Cameras.Visca
 						    ? ViscaCommandBuilder.GetZoomCommand(DEFAULT_ID, action)
 							: ViscaCommandBuilder.GetZoomCommand(DEFAULT_ID, action, m_ZoomSpeed.Value));
 		}
+
 		#endregion
 
 		#region Methods
@@ -65,7 +79,9 @@ namespace ICD.Connect.Cameras.Visca
 		/// </summary>
 		protected override void DisposeFinal(bool disposing)
 		{
-			SetPort(null);
+			m_ConnectionStateManager.OnIsOnlineStateChanged -= PortOnIsOnlineStateChanged;
+			m_ConnectionStateManager.Dispose();
+
 			base.DisposeFinal(disposing);
 		}
 
@@ -73,7 +89,7 @@ namespace ICD.Connect.Cameras.Visca
 		/// Sets the wrapped port for communication with the hardware.
 		/// </summary>
 		/// <param name="port"></param>
-		private void SetPort(ISerialPort port)
+		private void ConfigurePort(ISerialPort port)
 		{
 			if (port == SerialQueue.Port)
 				return;
@@ -95,8 +111,7 @@ namespace ICD.Connect.Cameras.Visca
 		[PublicAPI]
 		public static void ConfigureComPort(IComPort port)
 		{
-			port.SetComPortSpec(
-								eComBaudRates.ComspecBaudRate9600,
+			port.SetComPortSpec(eComBaudRates.ComspecBaudRate9600,
 								eComDataBits.ComspecDataBits8,
 								eComParityType.ComspecParityNone,
 								eComStopBits.ComspecStopBits1,
@@ -112,7 +127,7 @@ namespace ICD.Connect.Cameras.Visca
 		/// <returns></returns>
 		protected override bool GetIsOnlineStatus()
 		{
-			return SerialQueue != null && SerialQueue.Port != null && SerialQueue.Port.IsOnline;
+			return m_ConnectionStateManager != null && m_ConnectionStateManager.IsConnected;
 		}
 
 		public void PowerOn()
@@ -262,10 +277,8 @@ namespace ICD.Connect.Cameras.Visca
 		{
 			base.CopySettingsFinal(settings);
 
-			if (SerialQueue != null && SerialQueue.Port != null)
-				settings.Port = SerialQueue.Port.Id;
-			else
-				settings.Port = null;
+			settings.Port = m_ConnectionStateManager.PortNumber;
+
 			settings.PanTiltSpeed = m_PanTiltSpeed;
 			settings.ZoomSpeed = m_ZoomSpeed;
 		}
@@ -277,7 +290,7 @@ namespace ICD.Connect.Cameras.Visca
 		{
 			base.ClearSettingsFinal();
 
-			SetPort(null);
+			m_ConnectionStateManager.SetPort(null);
 		}
 
 		/// <summary>
@@ -296,7 +309,7 @@ namespace ICD.Connect.Cameras.Visca
 			if (port == null)
 				Logger.AddEntry(eSeverity.Error, String.Format("No serial port with Id {0}", settings.Port));
 
-			SetPort(port);
+			m_ConnectionStateManager.SetPort(port);
 			if (port != null && port.IsOnline)
 			{
 				SendCommand(ViscaCommandBuilder.GetSetAddressCommand());
