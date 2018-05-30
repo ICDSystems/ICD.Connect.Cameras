@@ -140,9 +140,52 @@ namespace ICD.Connect.Cameras.Visca
 			SendCommand(ViscaCommandBuilder.GetPowerOffCommand(DEFAULT_ID));
 		}
 
+		/// <summary>
+		/// Queues the command to be sent to the device.
+		/// </summary>
+		/// <param name="command"></param>
+		[PublicAPI]
+		public void SendCommand(ISerialData command)
+		{
+			SerialQueue.Enqueue(command);
+		}
+
+		/// <summary>
+		/// Queues the command to be sent to the device.
+		/// Replaces an existing command if it matches the comparer.
+		/// </summary>
+		/// <param name="command"></param>
+		/// <param name="comparer"></param>
+		[PublicAPI]
+		public void SendCommand<TData>(TData command, Func<TData, TData, bool> comparer)
+			where TData : ISerialData
+		{
+			SerialQueue.Enqueue(command, comparer);
+		}
+
+		[PublicAPI]
+		public void SendCommand(string command)
+		{
+			SendCommand(new SerialData(command));
+		}
+
 		#endregion
 
 		#region SerialQueue Callbacks
+
+		private void SetSerialQueue(ISerialQueue serialQueue)
+		{
+			Unsubscribe(SerialQueue);
+
+			if (SerialQueue != null)
+				SerialQueue.Dispose();
+
+			SerialQueue = serialQueue;
+
+			Subscribe(SerialQueue);
+
+			UpdateCachedOnlineStatus();
+		}
 
 		private void Subscribe(ISerialQueue queue)
 		{
@@ -307,7 +350,7 @@ namespace ICD.Connect.Cameras.Visca
 				port = factory.GetPortById((int)settings.Port) as ISerialPort;
 
 			if (port == null)
-				Logger.AddEntry(eSeverity.Error, String.Format("No serial port with Id {0}", settings.Port));
+				Log(eSeverity.Error, String.Format("No serial port with Id {0}", settings.Port));
 
 			m_ConnectionStateManager.SetPort(port);
 			if (port != null && port.IsOnline)
@@ -321,62 +364,5 @@ namespace ICD.Connect.Cameras.Visca
 		}
 
 		#endregion
-
-		/// <summary>
-		/// Queues the command to be sent to the device.
-		/// </summary>
-		/// <param name="command"></param>
-		[PublicAPI]
-		public void SendCommand(ISerialData command)
-		{
-			SerialQueue.Enqueue(command);
-		}
-
-		/// <summary>
-		/// Queues the command to be sent to the device.
-		/// Replaces an existing command if it matches the comparer.
-		/// </summary>
-		/// <param name="command"></param>
-		/// <param name="comparer"></param>
-		[PublicAPI]
-		public void SendCommand<TData>(TData command, Func<TData, TData, bool> comparer)
-			where TData : ISerialData
-		{
-			SerialQueue.Enqueue(command, comparer);
-		}
-
-		[PublicAPI]
-		public void SendCommand(string command)
-		{
-			SendCommand(new SerialData(command));
-		}
-
-		private void SetSerialQueue(ISerialQueue serialQueue)
-		{
-			Unsubscribe(SerialQueue);
-
-			if (SerialQueue != null)
-				SerialQueue.Dispose();
-
-			SerialQueue = serialQueue;
-
-			Subscribe(SerialQueue);
-
-			UpdateCachedOnlineStatus();
-		}
-
-		/// <summary>
-		/// Logs to logging core.
-		/// </summary>
-		/// <param name="severity"></param>
-		/// <param name="message"></param>
-		/// <param name="args"></param>
-		private void Log(eSeverity severity, string message, params object[] args)
-		{
-			message = string.Format(message, args);
-			message = string.Format("{0} - {1}", this, message);
-
-			Logger.AddEntry(severity, message);
-		}
 	}
 }
