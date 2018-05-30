@@ -342,7 +342,7 @@ namespace ICD.Connect.Cameras.Visca
 		/// <param name="comparer"></param>
 		[PublicAPI]
 		public void SendCommand<TData>(TData command, Func<TData, TData, bool> comparer)
-			where TData : ISerialData
+			where TData : class, ISerialData
 		{
 			SerialQueue.Enqueue(command, comparer);
 		}
