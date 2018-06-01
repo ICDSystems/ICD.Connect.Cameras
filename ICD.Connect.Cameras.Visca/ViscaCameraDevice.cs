@@ -115,7 +115,7 @@ namespace ICD.Connect.Cameras.Visca
 		/// <returns></returns>
 		protected override bool GetIsOnlineStatus()
 		{
-			return m_ConnectionStateManager != null && m_ConnectionStateManager.IsConnected;
+			return m_ConnectionStateManager != null && m_ConnectionStateManager.IsOnline;
 		}
 
 		public void PowerOn()
@@ -342,7 +342,7 @@ namespace ICD.Connect.Cameras.Visca
 		/// <param name="comparer"></param>
 		[PublicAPI]
 		public void SendCommand<TData>(TData command, Func<TData, TData, bool> comparer)
-			where TData : ISerialData
+			where TData : class, ISerialData
 		{
 			SerialQueue.Enqueue(command, comparer);
 		}
