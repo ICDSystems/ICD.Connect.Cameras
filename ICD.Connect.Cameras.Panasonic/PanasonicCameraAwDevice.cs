@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using ICD.Common.Properties;
 using ICD.Common.Utils;
-using ICD.Common.Utils.Services;
 using ICD.Common.Utils.Services.Logging;
 using ICD.Common.Utils.Timers;
 using ICD.Connect.API.Commands;
@@ -190,15 +189,7 @@ namespace ICD.Connect.Cameras.Panasonic
 			Log(eSeverity.Error, "{0} - {1}", response, message);
 		}
 
-		private void Log(eSeverity severity, string message, params object[] args)
-		{
-			message = string.Format(message, args);
-			message = string.Format("{0} - {1}", GetType().Name, message);
-
-			ServiceProvider.GetService<ILoggerService>().AddEntry(severity, message);
-		}
 		#endregion
-
 
 		#region Port Callbacks
 
