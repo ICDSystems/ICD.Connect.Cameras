@@ -19,7 +19,6 @@ namespace ICD.Connect.Cameras.Panasonic
 
 		[OriginatorIdSettingsProperty(typeof(IWebPort))]
 		public int? Port { get; set; }
-
 		
 		public int? PanTiltSpeed
 		{
