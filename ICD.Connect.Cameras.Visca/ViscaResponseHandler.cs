@@ -9,7 +9,8 @@ namespace ICD.Connect.Cameras.Visca
 		private const byte RESPONSE_ACK_HIGH = 0x4;
 		private const byte RESPONSE_OK_HIGH = 0x5;
 		private const byte RESPONSE_ERR_HIGH = 0x6;
-
+		private const byte RESPONSE_CLEAR_FIRST = 0x01;
+		private const byte RESPONSE_CLEAR_SECOND = 0x00;
 
 		public static eViscaResponse HandleResponse(string response)
 		{
@@ -22,11 +23,14 @@ namespace ICD.Connect.Cameras.Visca
 			if (responseBytes.Length < 2)
 				return eViscaResponse.IMPROPER_FORMAT;
 
+			if (responseBytes.Length > 3 && responseBytes[1] == RESPONSE_CLEAR_FIRST && responseBytes[2] == RESPONSE_CLEAR_SECOND)
+				return eViscaResponse.CLEAR;
+
 			// compare only the high nibble, low nibble changes based on command sockets
 			byte responseHigh = (byte)(responseBytes[1] >> 4);
 
 			if (responseHigh == RESPONSE_ADDRESS_SET_HIGH)
-				return eViscaResponse.CLEAR;
+				return eViscaResponse.ADDRESS_SET;
 
 			if (responseHigh == RESPONSE_ACK_HIGH)
 				return eViscaResponse.ACK;
