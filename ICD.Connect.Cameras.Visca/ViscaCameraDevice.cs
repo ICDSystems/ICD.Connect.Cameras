@@ -40,9 +40,9 @@ namespace ICD.Connect.Cameras.Visca
 
 		public ViscaCameraDevice()
 		{
-			m_ConnectionStateManager = new ConnectionStateManager(this){ConfigurePort = ConfigurePort};
+			m_ConnectionStateManager = new ConnectionStateManager(this) { ConfigurePort = ConfigurePort };
 			m_ConnectionStateManager.OnIsOnlineStateChanged += PortOnIsOnlineStateChanged;
-                   
+
 			Controls.Add(new GenericCameraRouteSourceControl<ViscaCameraDevice>(this, 0));
 			Controls.Add(new PanTiltControl<ViscaCameraDevice>(this, 1));
 			Controls.Add(new ZoomControl<ViscaCameraDevice>(this, 2));
@@ -59,14 +59,14 @@ namespace ICD.Connect.Cameras.Visca
 		public void PanTilt(eCameraPanTiltAction action)
 		{
 			SendCommand(m_PanTiltSpeed == null
-				            ? ViscaCommandBuilder.GetPanTiltCommand(DEFAULT_ID, action)
-				            : ViscaCommandBuilder.GetPanTiltCommand(DEFAULT_ID, action, m_PanTiltSpeed.Value, m_PanTiltSpeed.Value));
+							? ViscaCommandBuilder.GetPanTiltCommand(DEFAULT_ID, action)
+							: ViscaCommandBuilder.GetPanTiltCommand(DEFAULT_ID, action, m_PanTiltSpeed.Value, m_PanTiltSpeed.Value));
 		}
 
 		public void Zoom(eCameraZoomAction action)
 		{
 			SendCommand(m_ZoomSpeed == null
-						    ? ViscaCommandBuilder.GetZoomCommand(DEFAULT_ID, action)
+							? ViscaCommandBuilder.GetZoomCommand(DEFAULT_ID, action)
 							: ViscaCommandBuilder.GetZoomCommand(DEFAULT_ID, action, m_ZoomSpeed.Value));
 		}
 
@@ -220,11 +220,12 @@ namespace ICD.Connect.Cameras.Visca
 			if (args.Data == null)
 				return;
 
-			IcdConsole.PrintLine(String.Format("Serial Data {0} - Serial Response {1}",
+			Log(eSeverity.Debug, string.Format("Serial Data {0} - Serial Response {1}",
 											   StringUtils.ToHexLiteral(args.Data.Serialize()),
 											   StringUtils.ToHexLiteral(args.Response)));
 
-			if (ViscaResponseHandler.HandleResponse(args.Response) == eViscaResponse.OK)
+			eViscaResponse response = ViscaResponseHandler.HandleResponse(args.Response);
+			if (!ViscaResponseHandler.ResponseIsError(response))
 				ParseQuery(args.Response);
 			else
 			{
@@ -236,7 +237,7 @@ namespace ICD.Connect.Cameras.Visca
 		private void ParseQuery(string data)
 		{
 			string response = data;
-			IcdConsole.PrintLine(response);
+			Log(eSeverity.Debug, response);
 		}
 
 		private void ParseError(ISerialData data)
