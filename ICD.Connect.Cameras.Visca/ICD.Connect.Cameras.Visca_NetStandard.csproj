@@ -43,7 +43,5 @@
   <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
-  <PropertyGroup>
-    <PostBuildEvent>REM Eazfuscator.NET is integrated with this project at MSBuild level: https://www.gapotchenko.com/eazfuscator.net/kb/100036</PostBuildEvent>
-  </PropertyGroup>
+
 </Project>
