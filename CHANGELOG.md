@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [3.2.1] - 2018-07-02
+### Changed
+ - Various Visca camera driver fixes
+
 ## [3.2.0] - 2018-06-04
 ### Changed
  - Serial devices use ConnectionStateManager for maintaining connection to remote endpoints
