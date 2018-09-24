@@ -126,12 +126,6 @@ namespace ICD.Connect.Cameras.Vaddio
 		/// <param name="port"></param>
 		public void SetPort(ISerialPort port)
 		{
-			if (port != null)
-			{
-				port.DebugRx = eDebugMode.Ascii;
-				port.DebugTx = eDebugMode.Ascii;
-			}
-
 			m_ConnectionStateManager.SetPort(port);
 		}
 
