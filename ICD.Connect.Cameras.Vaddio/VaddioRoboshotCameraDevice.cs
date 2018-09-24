@@ -10,12 +10,9 @@ using ICD.Connect.Cameras.Devices;
 using ICD.Connect.Devices;
 using ICD.Connect.Devices.Controls;
 using ICD.Connect.Protocol;
-using ICD.Connect.Protocol.Data;
 using ICD.Connect.Protocol.EventArguments;
 using ICD.Connect.Protocol.Extensions;
 using ICD.Connect.Protocol.Ports;
-using ICD.Connect.Protocol.SerialBuffers;
-using ICD.Connect.Protocol.SerialQueues;
 using ICD.Connect.Settings.Core;
 
 namespace ICD.Connect.Cameras.Vaddio
@@ -31,8 +28,7 @@ namespace ICD.Connect.Cameras.Vaddio
 		private const char DELIMITER = '\r';
 
 		private readonly ConnectionStateManager m_ConnectionStateManager;
-
-		private ISerialQueue m_SerialQueue;
+		private readonly VaddioRoboshotSerialBuffer m_SerialBuffer;
 
 		private int? m_PanSpeed;
 		private int? m_TiltSpeed;
@@ -62,8 +58,13 @@ namespace ICD.Connect.Cameras.Vaddio
 		/// </summary>
 		public VaddioRoboshotCameraDevice()
 		{
-			m_ConnectionStateManager = new ConnectionStateManager(this) { ConfigurePort = ConfigurePort };
+			m_SerialBuffer = new VaddioRoboshotSerialBuffer();
+			Subscribe(m_SerialBuffer);
+
+			m_ConnectionStateManager = new ConnectionStateManager(this);
+			m_ConnectionStateManager.OnSerialDataReceived += PortOnSerialDataReceived;
 			m_ConnectionStateManager.OnIsOnlineStateChanged += PortOnIsOnlineStateChanged;
+			m_ConnectionStateManager.OnConnectedStateChanged += PortOnConnectedStateChanged;
 
 			Controls.Add(new GenericCameraRouteSourceControl<VaddioRoboshotCameraDevice>(this, 0));
 			Controls.Add(new PanTiltControl<VaddioRoboshotCameraDevice>(this, 1));
@@ -83,6 +84,18 @@ namespace ICD.Connect.Cameras.Vaddio
 			m_ConnectionStateManager.Dispose();
 
 			base.DisposeFinal(disposing);
+
+			Unsubscribe(m_SerialBuffer);
+		}
+
+		/// <summary>
+		/// Called when we receive data from the device.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="stringEventArgs"></param>
+		private void PortOnSerialDataReceived(object sender, StringEventArgs stringEventArgs)
+		{
+			m_SerialBuffer.Enqueue(stringEventArgs.Data);
 		}
 
 		/// <summary>
@@ -93,6 +106,16 @@ namespace ICD.Connect.Cameras.Vaddio
 		private void PortOnIsOnlineStateChanged(object sender, BoolEventArgs e)
 		{
 			UpdateCachedOnlineStatus();
+		}
+
+		/// <summary>
+		/// Called when we gain/lose connection to the device.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="boolEventArgs"></param>
+		private void PortOnConnectedStateChanged(object sender, BoolEventArgs boolEventArgs)
+		{
+			m_SerialBuffer.Clear();
 		}
 
 		#region Methods
@@ -218,48 +241,18 @@ namespace ICD.Connect.Cameras.Vaddio
 			SendCommand("camera standby on");
 		}
 
-		/// <summary>
-		/// Queues the command to be sent to the device.
-		/// </summary>
-		/// <param name="command"></param>
-		[PublicAPI]
-		public void SendCommand(ISerialData command)
-		{
-			m_SerialQueue.Enqueue(command);
-		}
-
 		[PublicAPI]
 		public void SendCommand(string command)
 		{
 			if (!command.EndsWith(DELIMITER))
 				command += DELIMITER;
 
-			m_SerialQueue.Enqueue(command);
+			m_ConnectionStateManager.Send(command);
 		}
 
 		#endregion
 
 		#region Private Methods
-
-		/// <summary>
-		/// Sets the wrapped port for communication with the hardware.
-		/// </summary>
-		/// <param name="port"></param>
-		private void ConfigurePort(ISerialPort port)
-		{
-			if (m_SerialQueue != null && port == m_SerialQueue.Port)
-				return;
-
-			ISerialBuffer buffer = new DelimiterSerialBuffer(DELIMITER);
-			SerialQueue queue = new SerialQueue();
-			queue.SetPort(port);
-			queue.SetBuffer(buffer);
-			queue.Timeout = 3 * 1000;
-
-			SetSerialQueue(queue);
-
-			UpdateCachedOnlineStatus();
-		}
 
 		/// <summary>
 		/// Gets the current online status of the device.
@@ -272,39 +265,33 @@ namespace ICD.Connect.Cameras.Vaddio
 
 		#endregion
 
-		#region SerialQueue Callbacks
+		#region SerialBuffer Callbacks
 
-		private void SetSerialQueue(ISerialQueue serialQueue)
+		private void Subscribe(VaddioRoboshotSerialBuffer buffer)
 		{
-			Unsubscribe(m_SerialQueue);
-
-			if (m_SerialQueue != null)
-				m_SerialQueue.Dispose();
-
-			m_SerialQueue = serialQueue;
-
-			Subscribe(m_SerialQueue);
-
-			UpdateCachedOnlineStatus();
+			buffer.OnCompletedSerial += BufferOnCompletedSerial;
+			buffer.OnPasswordPrompt += BufferOnPasswordPrompt;
+			buffer.OnUsernamePrompt += BufferOnUsernamePrompt;
 		}
 
-		private void Subscribe(ISerialQueue queue)
+		private void Unsubscribe(VaddioRoboshotSerialBuffer buffer)
 		{
-			if (queue == null)
-				return;
-
-			queue.OnSerialResponse += SerialQueueOnSerialResponse;
+			buffer.OnCompletedSerial -= BufferOnCompletedSerial;
+			buffer.OnPasswordPrompt -= BufferOnPasswordPrompt;
+			buffer.OnUsernamePrompt -= BufferOnUsernamePrompt;
 		}
 
-		private void Unsubscribe(ISerialQueue queue)
+		private void BufferOnUsernamePrompt(object sender, EventArgs eventArgs)
 		{
-			if (queue == null)
-				return;
-
-			queue.OnSerialResponse -= SerialQueueOnSerialResponse;
+			SendCommand(Username ?? string.Empty);
 		}
 
-		private void SerialQueueOnSerialResponse(object sender, SerialResponseEventArgs args)
+		private void BufferOnPasswordPrompt(object sender, EventArgs eventArgs)
+		{
+			SendCommand(Password ?? string.Empty);
+		}
+
+		private void BufferOnCompletedSerial(object sender, StringEventArgs stringEventArgs)
 		{
 		}
 
@@ -369,7 +356,7 @@ namespace ICD.Connect.Cameras.Vaddio
 			{
 				port = factory.GetPortById((int)settings.Port) as ISerialPort;
 				if (port == null)
-					Log(eSeverity.Error, String.Format("No serial port with Id {0}", settings.Port));
+					Log(eSeverity.Error, string.Format("No serial port with Id {0}", settings.Port));
 			}
 
 			SetPort(port);
