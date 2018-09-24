@@ -8,7 +8,6 @@ using ICD.Connect.Cameras.Controls;
 using ICD.Connect.Cameras.Devices;
 using ICD.Connect.Devices;
 using ICD.Connect.Devices.Controls;
-using ICD.Connect.Devices.EventArguments;
 using ICD.Connect.Protocol;
 using ICD.Connect.Protocol.Data;
 using ICD.Connect.Protocol.EventArguments;
@@ -38,6 +37,9 @@ namespace ICD.Connect.Cameras.Visca
 		private int? m_PanTiltSpeed;
 		private int? m_ZoomSpeed;
 
+		/// <summary>
+		/// Constructor.
+		/// </summary>
 		public ViscaCameraDevice()
 		{
 			m_ConnectionStateManager = new ConnectionStateManager(this) { ConfigurePort = ConfigurePort };
@@ -193,12 +195,6 @@ namespace ICD.Connect.Cameras.Visca
 				return;
 
 			queue.OnSerialResponse += SerialQueueOnSerialResponse;
-			queue.OnTimeout += SerialQueueOnSerialTimeout;
-
-			if (queue.Port == null)
-				return;
-
-			queue.Port.OnIsOnlineStateChanged += SerialQueueOnIsOnlineStateChanged;
 		}
 
 		private void Unsubscribe(ISerialQueue queue)
@@ -207,12 +203,6 @@ namespace ICD.Connect.Cameras.Visca
 				return;
 
 			queue.OnSerialResponse -= SerialQueueOnSerialResponse;
-			queue.OnTimeout -= SerialQueueOnSerialTimeout;
-
-			if (queue.Port == null)
-				return;
-
-			queue.Port.OnIsOnlineStateChanged -= SerialQueueOnIsOnlineStateChanged;
 		}
 
 		private void SerialQueueOnSerialResponse(object sender, SerialResponseEventArgs args)
@@ -245,7 +235,7 @@ namespace ICD.Connect.Cameras.Visca
 			RetryCommand(data.Serialize());
 		}
 
-		private void RetryCommand(String command)
+		private void RetryCommand(string command)
 		{
 			IncrementRetryCount(command);
 			if (GetRetryCount(command) <= MAX_RETRY_ATTEMPTS)
@@ -258,7 +248,7 @@ namespace ICD.Connect.Cameras.Visca
 			}
 		}
 
-		private void IncrementRetryCount(String command)
+		private void IncrementRetryCount(string command)
 		{
 			m_RetryLock.Enter();
 
@@ -299,14 +289,6 @@ namespace ICD.Connect.Cameras.Visca
 			{
 				m_RetryLock.Leave();
 			}
-		}
-
-		private void SerialQueueOnSerialTimeout(object sender, SerialDataEventArgs args)
-		{
-		}
-
-		private void SerialQueueOnIsOnlineStateChanged(object sender, DeviceBaseOnlineStateApiEventArgs args)
-		{
 		}
 
 		#endregion
