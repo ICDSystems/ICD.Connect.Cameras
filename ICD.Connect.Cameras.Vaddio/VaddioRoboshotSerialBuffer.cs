@@ -123,7 +123,7 @@ namespace ICD.Connect.Cameras.Vaddio
 							case ':':
 								string prompt = m_RxData.ToString().Trim().ToLower();
 
-								if (prompt.EndsWith("login"))
+								if (prompt.EndsWith("login") && !prompt.EndsWith("last login"))
 								{
 									m_RxData.Clear();
 									OnUsernamePrompt.Raise(this);
