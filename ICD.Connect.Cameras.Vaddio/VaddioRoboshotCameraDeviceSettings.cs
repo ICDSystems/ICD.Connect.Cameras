@@ -55,7 +55,7 @@ namespace ICD.Connect.Cameras.Vaddio
 				}
 				else
 				{
-					m_TiltSpeed = MathUtils.Clamp(value.Value, 1, 24);
+					m_TiltSpeed = MathUtils.Clamp(value.Value, 1, 20);
 				}
 			}
 		}
