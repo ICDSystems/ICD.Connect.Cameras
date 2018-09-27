@@ -20,21 +20,33 @@ namespace ICD.Connect.Cameras.Controls
 
 		#region IZoomControl
 
+		/// <summary>
+		/// Stops the camera from moving.
+		/// </summary>
 		public void Stop()
 		{
 			Zoom(eCameraZoomAction.Stop);
 		}
 
+		/// <summary>
+		/// Begin zooming the camera in.
+		/// </summary>
 		public void ZoomIn()
 		{
 			Zoom(eCameraZoomAction.ZoomIn);
 		}
 
+		/// <summary>
+		/// Begin zooming the camera out.
+		/// </summary>
 		public void ZoomOut()
 		{
 			Zoom(eCameraZoomAction.ZoomOut);
 		}
 
+		/// <summary>
+		/// Performs the given zoom action.
+		/// </summary>
 		public void Zoom(eCameraZoomAction action)
 		{
 			Parent.Zoom(action);
