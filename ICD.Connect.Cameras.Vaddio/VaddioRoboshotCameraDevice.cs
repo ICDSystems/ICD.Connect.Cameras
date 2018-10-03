@@ -26,12 +26,19 @@ namespace ICD.Connect.Cameras.Vaddio
 
 		private const char DELIMITER = '\r';
 
+		private const int DEFAULT_PAN_SPEED = 12;
+		private const int DEFAULT_TILT_SPEED = 10;
+		private const int DEFAULT_ZOOM_SPEED = 3;
+
+		private const string DEFAULT_USERNAME = "admin";
+		private const string DEFAULT_PASSWORD = "password";
+
 		private readonly ConnectionStateManager m_ConnectionStateManager;
 		private readonly VaddioRoboshotSerialBuffer m_SerialBuffer;
 
-		private int? m_PanSpeed;
-		private int? m_TiltSpeed;
-		private int? m_ZoomSpeed;
+		private int m_PanSpeed;
+		private int m_TiltSpeed;
+		private int m_ZoomSpeed;
 
 		#region Properties
 
@@ -167,16 +174,16 @@ namespace ICD.Connect.Cameras.Vaddio
 			switch (action)
 			{
 				case eCameraPanTiltAction.Left:
-					command = string.Format("camera pan left {0}", m_PanSpeed ?? 12);
+					command = string.Format("camera pan left {0}", m_PanSpeed);
 					break;
 				case eCameraPanTiltAction.Right:
-					command = string.Format("camera pan right {0}", m_PanSpeed ?? 12);
+					command = string.Format("camera pan right {0}", m_PanSpeed);
 					break;
 				case eCameraPanTiltAction.Up:
-					command = string.Format("camera tilt up {0}", m_TiltSpeed ?? 10);
+					command = string.Format("camera tilt up {0}", m_TiltSpeed);
 					break;
 				case eCameraPanTiltAction.Down:
-					command = string.Format("camera tilt down {0}", m_TiltSpeed ?? 10);
+					command = string.Format("camera tilt down {0}", m_TiltSpeed);
 					break;
 
 				case eCameraPanTiltAction.Stop:
@@ -202,10 +209,10 @@ namespace ICD.Connect.Cameras.Vaddio
 			switch (action)
 			{
 				case eCameraZoomAction.ZoomIn:
-					command = string.Format("camera zoom in {0}", m_ZoomSpeed ?? 3);
+					command = string.Format("camera zoom in {0}", m_ZoomSpeed);
 					break;
 				case eCameraZoomAction.ZoomOut:
-					command = string.Format("camera zoom out {0}", m_ZoomSpeed ?? 3);
+					command = string.Format("camera zoom out {0}", m_ZoomSpeed);
 					break;
 				case eCameraZoomAction.Stop:
 					command = "camera zoom stop";
@@ -320,9 +327,9 @@ namespace ICD.Connect.Cameras.Vaddio
 			Username = null;
 			Password = null;
 
-			m_PanSpeed = null;
-			m_TiltSpeed = null;
-			m_ZoomSpeed = null;
+			m_PanSpeed = DEFAULT_PAN_SPEED;
+			m_TiltSpeed = DEFAULT_TILT_SPEED;
+			m_ZoomSpeed = DEFAULT_ZOOM_SPEED;
 
 			SetPort(null);
 		}
@@ -336,12 +343,12 @@ namespace ICD.Connect.Cameras.Vaddio
 		{
 			base.ApplySettingsFinal(settings, factory);
 
-			Username = settings.Username;
-			Password = settings.Password;
+			Username = settings.Username ?? DEFAULT_USERNAME;
+			Password = settings.Password ?? DEFAULT_PASSWORD;
 
-			m_PanSpeed = settings.PanSpeed;
-			m_TiltSpeed = settings.TiltSpeed;
-			m_ZoomSpeed = settings.ZoomSpeed;
+			m_PanSpeed = settings.PanSpeed ?? DEFAULT_PAN_SPEED;
+			m_TiltSpeed = settings.TiltSpeed ?? DEFAULT_TILT_SPEED;
+			m_ZoomSpeed = settings.ZoomSpeed ?? DEFAULT_ZOOM_SPEED;
 
 			ISerialPort port = null;
 
