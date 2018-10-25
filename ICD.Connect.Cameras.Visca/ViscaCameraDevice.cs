@@ -328,22 +328,30 @@ namespace ICD.Connect.Cameras.Visca
 		{
 			base.ApplySettingsFinal(settings, factory);
 
-			ISerialPort port = null;
-			if (settings.Port != null)
-				port = factory.GetPortById((int)settings.Port) as ISerialPort;
+			m_PanTiltSpeed = settings.PanTiltSpeed;
+			m_ZoomSpeed = settings.ZoomSpeed;
 
-			if (port == null)
-				Log(eSeverity.Error, String.Format("No serial port with Id {0}", settings.Port));
+			ISerialPort port = null;
+
+			if (settings.Port != null)
+			{
+				try
+				{
+					port = factory.GetPortById((int)settings.Port) as ISerialPort;
+				}
+				catch (KeyNotFoundException)
+				{
+					Log(eSeverity.Error, "No serial port with Id {0}", settings.Port);
+				}
+			}
 
 			m_ConnectionStateManager.SetPort(port);
+
 			if (port != null && port.IsOnline)
 			{
 				SendCommand(ViscaCommandBuilder.GetSetAddressCommand());
 				SendCommand(ViscaCommandBuilder.GetClearCommand());
 			}
-
-			m_PanTiltSpeed = settings.PanTiltSpeed;
-			m_ZoomSpeed = settings.ZoomSpeed;
 		}
 
 		#endregion
