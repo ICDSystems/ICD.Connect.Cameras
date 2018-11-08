@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [3.3.2] - 2018-11-08
+### Changed
+ - Fail gracefully when loading a device and the port is not available
+
 ## [3.3.1] - 2018-10-04
 ### Changed
  - Vaddio Roboshot has default username, password and ptz speeds
