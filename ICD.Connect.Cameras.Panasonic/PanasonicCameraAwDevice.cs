@@ -305,10 +305,16 @@ namespace ICD.Connect.Cameras.Panasonic
 			IWebPort port = null;
 
 			if (settings.Port != null)
-				port = factory.GetPortById((int)settings.Port) as IWebPort;
-
-			if (port == null)
-				Log(eSeverity.Error, "No Web Port with id {0}", settings.Port);
+			{
+				try
+				{
+					port = factory.GetPortById((int)settings.Port) as IWebPort;
+				}
+				catch (KeyNotFoundException)
+				{
+					Log(eSeverity.Error, "No Web Port with id {0}", settings.Port);
+				}
+			}
 
 			SetPort(port);
 
