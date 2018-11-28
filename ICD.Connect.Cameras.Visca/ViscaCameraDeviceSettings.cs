@@ -134,6 +134,14 @@ namespace ICD.Connect.Cameras.Visca
 			set { m_ComSpecProperties.ComSpecReportCtsChanges = value; }
 		}
 
+		/// <summary>
+		/// Clears the configured values.
+		/// </summary>
+		void IComSpecProperties.Clear()
+		{
+			m_ComSpecProperties.Clear();
+		}
+
 		#endregion
 
 		/// <summary>
