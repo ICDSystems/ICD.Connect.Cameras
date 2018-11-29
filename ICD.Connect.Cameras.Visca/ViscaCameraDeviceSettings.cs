@@ -151,13 +151,13 @@ namespace ICD.Connect.Cameras.Visca
 		{
 			m_ComSpecProperties = new ComSpecProperties
 			{
-				ComSpecBaudRate = eComBaudRates.ComspecBaudRate9600,
-				ComSpecNumberOfDataBits = eComDataBits.ComspecDataBits8,
-				ComSpecParityType = eComParityType.ComspecParityNone,
-				ComSpecNumberOfStopBits = eComStopBits.ComspecStopBits1,
-				ComSpecProtocolType = eComProtocolType.ComspecProtocolRS232,
-				ComSpecHardwareHandShake = eComHardwareHandshakeType.ComspecHardwareHandshakeNone,
-				ComSpecSoftwareHandshake = eComSoftwareHandshakeType.ComspecSoftwareHandshakeNone,
+				ComSpecBaudRate = eComBaudRates.BaudRate9600,
+				ComSpecNumberOfDataBits = eComDataBits.DataBits8,
+				ComSpecParityType = eComParityType.None,
+				ComSpecNumberOfStopBits = eComStopBits.StopBits1,
+				ComSpecProtocolType = eComProtocolType.Rs232,
+				ComSpecHardwareHandShake = eComHardwareHandshakeType.None,
+				ComSpecSoftwareHandshake = eComSoftwareHandshakeType.None,
 				ComSpecReportCtsChanges = false
 			};
 		}
