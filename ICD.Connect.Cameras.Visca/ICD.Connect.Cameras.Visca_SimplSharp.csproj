@@ -84,6 +84,10 @@
       <Project>{B0C0CA1C-FA55-4BEA-8A8B-EDB2141C523E}</Project>
       <Name>ICD.Connect.Routing_SimplSharp</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\ICD.Connect.Telemetry\ICD.Connect.Telemetry\ICD.Connect.Telemetry_SimplSharp.csproj">
+      <Project>{9512C0A5-F966-4AC6-9668-62C6F343B0CD}</Project>
+      <Name>ICD.Connect.Telemetry_SimplSharp</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ICD.Connect.Cameras\ICD.Connect.Cameras_SimplSharp.csproj">
       <Project>{B13D593D-8BBF-4E20-ABD8-47C6095E7D3E}</Project>
       <Name>ICD.Connect.Cameras_SimplSharp</Name>
