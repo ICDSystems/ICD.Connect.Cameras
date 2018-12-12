@@ -2,7 +2,8 @@
 
 namespace ICD.Connect.Cameras.Proxies.Devices
 {
-	public abstract class AbstractProxyCameraDevice : AbstractProxyDevice, IProxyCameraDevice
+	public abstract class AbstractProxyCameraDevice<TSettings> : AbstractProxyDevice<TSettings>, IProxyCameraDevice
+		where TSettings : IProxyCameraDeviceSettings
 	{
 	}
 }

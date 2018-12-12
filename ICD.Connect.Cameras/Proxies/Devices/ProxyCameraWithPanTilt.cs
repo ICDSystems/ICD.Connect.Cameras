@@ -2,7 +2,7 @@
 
 namespace ICD.Connect.Cameras.Proxies.Devices
 {
-	public sealed class ProxyCameraWithPanTilt : AbstractProxyCameraDevice, ICameraWithPanTilt
+	public sealed class ProxyCameraWithPanTilt : AbstractProxyCameraDevice<ProxyCameraWithPanTiltSettings>, ICameraWithPanTilt
 	{
 		/// <summary>
 		/// Starts rotating the camera with the given action.

@@ -2,7 +2,7 @@
 
 namespace ICD.Connect.Cameras.Proxies.Devices
 {
-	public sealed class ProxyCameraWithZoom : AbstractProxyCameraDevice, ICameraWithZoom
+	public sealed class ProxyCameraWithZoom : AbstractProxyCameraDevice<ProxyCameraWithZoomSettings>, ICameraWithZoom
 	{
 		/// <summary>
 		/// Starts zooming the camera with the given action.

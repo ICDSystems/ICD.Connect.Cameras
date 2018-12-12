@@ -92,12 +92,18 @@
     <Compile Include="Proxies\Controls\ProxyPresetControl.cs" />
     <Compile Include="Proxies\Controls\ProxyZoomControl.cs" />
     <Compile Include="Proxies\Devices\AbstractProxyCameraDevice.cs" />
+    <Compile Include="Proxies\Devices\AbstractProxyCameraDeviceSettings.cs" />
     <Compile Include="Proxies\Devices\CameraApi.cs" />
     <Compile Include="Proxies\Devices\IProxyCameraDevice.cs" />
+    <Compile Include="Proxies\Devices\IProxyCameraDeviceSettings.cs" />
     <Compile Include="Proxies\Devices\ProxyCameraDevice.cs" />
+    <Compile Include="Proxies\Devices\ProxyCameraDeviceSettings.cs" />
     <Compile Include="Proxies\Devices\ProxyCameraWithPanTilt.cs" />
+    <Compile Include="Proxies\Devices\ProxyCameraWithPanTiltSettings.cs" />
     <Compile Include="Proxies\Devices\ProxyCameraWithPresets.cs" />
+    <Compile Include="Proxies\Devices\ProxyCameraWithPresetsSettings.cs" />
     <Compile Include="Proxies\Devices\ProxyCameraWithZoom.cs" />
+    <Compile Include="Proxies\Devices\ProxyCameraWithZoomSettings.cs" />
     <None Include="Properties\ControlSystem.cfg" />
   </ItemGroup>
   <ItemGroup>

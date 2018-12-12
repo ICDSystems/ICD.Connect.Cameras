@@ -7,7 +7,7 @@ using ICD.Connect.Cameras.Devices;
 
 namespace ICD.Connect.Cameras.Proxies.Devices
 {
-	public sealed class ProxyCameraWithPresets : AbstractProxyCameraDevice, ICameraWithPresets
+	public sealed class ProxyCameraWithPresets : AbstractProxyCameraDevice<ProxyCameraWithPresetsSettings>, ICameraWithPresets
 	{
 		/// <summary>
 		/// Raised when the presets are changed.
