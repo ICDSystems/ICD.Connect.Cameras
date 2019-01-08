@@ -350,7 +350,7 @@ namespace ICD.Connect.Cameras.Vaddio
 			m_TiltSpeed = DEFAULT_TILT_SPEED;
 			m_ZoomSpeed = DEFAULT_ZOOM_SPEED;
 
-			m_NetworkProperties.Clear();
+			m_NetworkProperties.ClearNetworkProperties();
 
 			SetPort(null);
 		}

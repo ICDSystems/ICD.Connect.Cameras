@@ -137,9 +137,9 @@ namespace ICD.Connect.Cameras.Visca
 		/// <summary>
 		/// Clears the configured values.
 		/// </summary>
-		void IComSpecProperties.Clear()
+		void IComSpecProperties.ClearComSpecProperties()
 		{
-			m_ComSpecProperties.Clear();
+			m_ComSpecProperties.ClearComSpecProperties();
 		}
 
 		#endregion

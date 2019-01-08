@@ -330,7 +330,7 @@ namespace ICD.Connect.Cameras.Visca
 		{
 			base.ClearSettingsFinal();
 
-			m_ComSpecProperties.Clear();
+			m_ComSpecProperties.ClearComSpecProperties();
 
 			SetPort(null);
 		}
