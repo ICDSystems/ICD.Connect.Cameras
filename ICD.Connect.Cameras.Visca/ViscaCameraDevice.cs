@@ -14,6 +14,7 @@ using ICD.Connect.Protocol.EventArguments;
 using ICD.Connect.Protocol.Extensions;
 using ICD.Connect.Protocol.Ports;
 using ICD.Connect.Protocol.Ports.ComPort;
+using ICD.Connect.Protocol.SerialBuffers;
 using ICD.Connect.Protocol.SerialQueues;
 using ICD.Connect.Protocol.Settings;
 using ICD.Connect.Settings;
@@ -110,6 +111,16 @@ namespace ICD.Connect.Cameras.Visca
 			// Com
 			if (port is IComPort)
 				(port as IComPort).ApplyDeviceConfiguration(m_ComSpecProperties);
+
+			ISerialBuffer buffer = new DelimiterSerialBuffer(DELIMITER);
+			SerialQueue queue = new SerialQueue();
+			queue.SetPort(port);
+			queue.SetBuffer(buffer);
+			queue.Timeout = 3 * 1000;
+
+			SetSerialQueue(queue);
+
+			UpdateCachedOnlineStatus();
 		}
 
 		/// <summary>
