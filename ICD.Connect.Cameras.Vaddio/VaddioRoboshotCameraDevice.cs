@@ -11,6 +11,8 @@ using ICD.Connect.Devices;
 using ICD.Connect.Devices.Controls;
 using ICD.Connect.Protocol;
 using ICD.Connect.Protocol.Extensions;
+using ICD.Connect.Protocol.Network.Ports;
+using ICD.Connect.Protocol.Network.Settings;
 using ICD.Connect.Protocol.Ports;
 using ICD.Connect.Settings;
 
@@ -35,6 +37,8 @@ namespace ICD.Connect.Cameras.Vaddio
 
 		private readonly ConnectionStateManager m_ConnectionStateManager;
 		private readonly VaddioRoboshotSerialBuffer m_SerialBuffer;
+
+		private readonly NetworkProperties m_NetworkProperties;
 
 		private int m_PanSpeed;
 		private int m_TiltSpeed;
@@ -64,10 +68,12 @@ namespace ICD.Connect.Cameras.Vaddio
 		/// </summary>
 		public VaddioRoboshotCameraDevice()
 		{
+			m_NetworkProperties = new NetworkProperties();
+
 			m_SerialBuffer = new VaddioRoboshotSerialBuffer();
 			Subscribe(m_SerialBuffer);
 
-			m_ConnectionStateManager = new ConnectionStateManager(this);
+			m_ConnectionStateManager = new ConnectionStateManager(this) {ConfigurePort = ConfigurePort};
 			m_ConnectionStateManager.OnSerialDataReceived += PortOnSerialDataReceived;
 			m_ConnectionStateManager.OnIsOnlineStateChanged += PortOnIsOnlineStateChanged;
 			m_ConnectionStateManager.OnConnectedStateChanged += PortOnConnectedStateChanged;
@@ -133,6 +139,17 @@ namespace ICD.Connect.Cameras.Vaddio
 		public void SetPort(ISerialPort port)
 		{
 			m_ConnectionStateManager.SetPort(port);
+		}
+
+		/// <summary>
+		/// Configures the given port for communication with the device.
+		/// </summary>
+		/// <param name="port"></param>
+		private void ConfigurePort(ISerialPort port)
+		{
+			// TCP
+			if (port is INetworkPort)
+				(port as INetworkPort).ApplyDeviceConfiguration(m_NetworkProperties);
 		}
 
 		/// <summary>
@@ -315,6 +332,8 @@ namespace ICD.Connect.Cameras.Vaddio
 			settings.ZoomSpeed = m_ZoomSpeed;
 
 			settings.Port = m_ConnectionStateManager.PortNumber;
+
+			settings.Copy(m_NetworkProperties);
 		}
 
 		/// <summary>
@@ -331,6 +350,8 @@ namespace ICD.Connect.Cameras.Vaddio
 			m_TiltSpeed = DEFAULT_TILT_SPEED;
 			m_ZoomSpeed = DEFAULT_ZOOM_SPEED;
 
+			m_NetworkProperties.Clear();
+
 			SetPort(null);
 		}
 
@@ -342,6 +363,8 @@ namespace ICD.Connect.Cameras.Vaddio
 		protected override void ApplySettingsFinal(VaddioRoboshotCameraDeviceSettings settings, IDeviceFactory factory)
 		{
 			base.ApplySettingsFinal(settings, factory);
+
+			m_NetworkProperties.Copy(settings);
 
 			Username = settings.Username ?? DEFAULT_USERNAME;
 			Password = settings.Password ?? DEFAULT_PASSWORD;
