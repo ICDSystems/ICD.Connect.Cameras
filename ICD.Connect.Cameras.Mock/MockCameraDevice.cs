@@ -8,7 +8,7 @@ using ICD.Connect.Cameras.Controls;
 using ICD.Connect.Cameras.Devices;
 using ICD.Connect.Devices;
 using ICD.Connect.Devices.Controls;
-using ICD.Connect.Settings.Core;
+using ICD.Connect.Settings;
 
 namespace ICD.Connect.Cameras.Mock
 {
