@@ -1,6 +1,7 @@
 ﻿using ICD.Common.Utils;
 using ICD.Common.Utils.Xml;
 using ICD.Connect.Cameras.Devices;
+using ICD.Connect.Protocol.Network.Settings;
 using ICD.Connect.Protocol.Ports;
 using ICD.Connect.Settings.Attributes;
 using ICD.Connect.Settings.Attributes.SettingsProperties;
@@ -8,7 +9,7 @@ using ICD.Connect.Settings.Attributes.SettingsProperties;
 namespace ICD.Connect.Cameras.Vaddio
 {
 	[KrangSettings("VaddioRoboshot", typeof(VaddioRoboshotCameraDevice))]
-	public sealed class VaddioRoboshotCameraDeviceSettings : AbstractCameraDeviceSettings
+	public sealed class VaddioRoboshotCameraDeviceSettings : AbstractCameraDeviceSettings, INetworkSettings
 	{
 		private const string PORT_ELEMENT = "Port";
 		private const string USERNAME_ELEMENT = "Username";
@@ -17,9 +18,13 @@ namespace ICD.Connect.Cameras.Vaddio
 		private const string TILT_SPEED_ELEMENT = "TiltSpeed";
 		private const string ZOOM_SPEED_ELEMENT = "ZoomSpeed";
 
+		private readonly NetworkProperties m_NetworkProperties;
+
 		private int? m_PanSpeed;
 		private int? m_TiltSpeed;
 		private int? m_ZoomSpeed;
+
+		#region Properties
 
 		[OriginatorIdSettingsProperty(typeof(ISerialPort))]
 		public int? Port { get; set; }
@@ -76,6 +81,46 @@ namespace ICD.Connect.Cameras.Vaddio
 			}
 		}
 
+		#endregion
+
+		#region Network
+
+		/// <summary>
+		/// Gets/sets the configurable network address.
+		/// </summary>
+		public string NetworkAddress
+		{
+			get { return m_NetworkProperties.NetworkAddress; }
+			set { m_NetworkProperties.NetworkAddress = value; }
+		}
+
+		/// <summary>
+		/// Gets/sets the configurable network port.
+		/// </summary>
+		public ushort? NetworkPort
+		{
+			get { return m_NetworkProperties.NetworkPort; }
+			set { m_NetworkProperties.NetworkPort = value; }
+		}
+
+		/// <summary>
+		/// Clears the configured values.
+		/// </summary>
+		void INetworkProperties.ClearNetworkProperties()
+		{
+			m_NetworkProperties.ClearNetworkProperties();
+		}
+
+		#endregion
+
+		/// <summary>
+		/// Constructor.
+		/// </summary>
+		public VaddioRoboshotCameraDeviceSettings()
+		{
+			m_NetworkProperties = new NetworkProperties();
+		}
+
 		/// <summary>
 		/// Write settings elements to xml.
 		/// </summary>
@@ -90,6 +135,8 @@ namespace ICD.Connect.Cameras.Vaddio
 			writer.WriteElementString(PAN_SPEED_ELEMENT, IcdXmlConvert.ToString(PanSpeed));
 			writer.WriteElementString(TILT_SPEED_ELEMENT, IcdXmlConvert.ToString(TiltSpeed));
 			writer.WriteElementString(ZOOM_SPEED_ELEMENT, IcdXmlConvert.ToString(ZoomSpeed));
+
+			m_NetworkProperties.WriteElements(writer);
 		}
 
 		/// <summary>
@@ -106,6 +153,8 @@ namespace ICD.Connect.Cameras.Vaddio
 			PanSpeed = XmlUtils.TryReadChildElementContentAsInt(xml, PAN_SPEED_ELEMENT);
 			TiltSpeed = XmlUtils.TryReadChildElementContentAsInt(xml, TILT_SPEED_ELEMENT);
 			ZoomSpeed = XmlUtils.TryReadChildElementContentAsInt(xml, ZOOM_SPEED_ELEMENT);
+
+			m_NetworkProperties.ParseXml(xml);
 		}
 	}
 }

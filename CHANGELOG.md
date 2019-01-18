@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [4.0.0] - 2019-01-10
+### Added
+ - Added port configuration features to camera devices
+
 ## [3.3.2] - 2018-11-08
 ### Changed
  - Fail gracefully when loading a device and the port is not available

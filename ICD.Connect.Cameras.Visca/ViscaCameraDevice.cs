@@ -16,32 +16,36 @@ using ICD.Connect.Protocol.Ports;
 using ICD.Connect.Protocol.Ports.ComPort;
 using ICD.Connect.Protocol.SerialBuffers;
 using ICD.Connect.Protocol.SerialQueues;
-using ICD.Connect.Settings.Core;
+using ICD.Connect.Protocol.Settings;
+using ICD.Connect.Settings;
 
 namespace ICD.Connect.Cameras.Visca
 {
 	public sealed class ViscaCameraDevice : AbstractCameraDevice<ViscaCameraDeviceSettings>,
 		ICameraWithPanTilt, ICameraWithZoom, IDeviceWithPower
 	{
-		private ISerialQueue SerialQueue { get; set; }
-
-		private readonly Dictionary<string, int> m_RetryCounts = new Dictionary<string, int>();
-		private readonly SafeCriticalSection m_RetryLock = new SafeCriticalSection();
-
-		private readonly ConnectionStateManager m_ConnectionStateManager;
-
 		private const int MAX_RETRY_ATTEMPTS = 20;
 		private const int DEFAULT_ID = 1;
 		private const char DELIMITER = '\xFF';
 
+		private readonly Dictionary<string, int> m_RetryCounts = new Dictionary<string, int>();
+		private readonly SafeCriticalSection m_RetryLock = new SafeCriticalSection();
+
+		private readonly ComSpecProperties m_ComSpecProperties;
+
+		private readonly ConnectionStateManager m_ConnectionStateManager;
+
 		private int? m_PanTiltSpeed;
 		private int? m_ZoomSpeed;
+		private ISerialQueue SerialQueue { get; set; }
 
 		/// <summary>
 		/// Constructor.
 		/// </summary>
 		public ViscaCameraDevice()
 		{
+			m_ComSpecProperties = new ComSpecProperties();
+
 			m_ConnectionStateManager = new ConnectionStateManager(this) { ConfigurePort = ConfigurePort };
 			m_ConnectionStateManager.OnIsOnlineStateChanged += PortOnIsOnlineStateChanged;
 
@@ -81,6 +85,8 @@ namespace ICD.Connect.Cameras.Visca
 		/// </summary>
 		protected override void DisposeFinal(bool disposing)
 		{
+			SetPort(null);
+
 			m_ConnectionStateManager.OnIsOnlineStateChanged -= PortOnIsOnlineStateChanged;
 			m_ConnectionStateManager.Dispose();
 
@@ -91,13 +97,20 @@ namespace ICD.Connect.Cameras.Visca
 		/// Sets the wrapped port for communication with the hardware.
 		/// </summary>
 		/// <param name="port"></param>
+		public void SetPort(ISerialPort port)
+		{
+			m_ConnectionStateManager.SetPort(port);
+		}
+
+		/// <summary>
+		/// Configures the given port for communication with the device.
+		/// </summary>
+		/// <param name="port"></param>
 		private void ConfigurePort(ISerialPort port)
 		{
-			if (SerialQueue != null && port == SerialQueue.Port)
-				return;
-
+			// Com
 			if (port is IComPort)
-				ConfigureComPort(port as IComPort);
+				(port as IComPort).ApplyDeviceConfiguration(m_ComSpecProperties);
 
 			ISerialBuffer buffer = new DelimiterSerialBuffer(DELIMITER);
 			SerialQueue queue = new SerialQueue();
@@ -110,19 +123,6 @@ namespace ICD.Connect.Cameras.Visca
 			UpdateCachedOnlineStatus();
 		}
 
-		[PublicAPI]
-		public static void ConfigureComPort(IComPort port)
-		{
-			port.SetComPortSpec(eComBaudRates.ComspecBaudRate9600,
-								eComDataBits.ComspecDataBits8,
-								eComParityType.ComspecParityNone,
-								eComStopBits.ComspecStopBits1,
-								eComProtocolType.ComspecProtocolRS232,
-								eComHardwareHandshakeType.ComspecHardwareHandshakeNone,
-								eComSoftwareHandshakeType.ComspecSoftwareHandshakeNone,
-								false);
-		}
-
 		/// <summary>
 		/// Gets the current online status of the device.
 		/// </summary>
@@ -132,11 +132,17 @@ namespace ICD.Connect.Cameras.Visca
 			return m_ConnectionStateManager != null && m_ConnectionStateManager.IsOnline;
 		}
 
+		/// <summary>
+		/// Powers the device on.
+		/// </summary>
 		public void PowerOn()
 		{
 			SendCommand(ViscaCommandBuilder.GetPowerOnCommand(DEFAULT_ID));
 		}
 
+		/// <summary>
+		/// Powers the device off.
+		/// </summary>
 		public void PowerOff()
 		{
 			SendCommand(ViscaCommandBuilder.GetPowerOffCommand(DEFAULT_ID));
@@ -175,6 +181,10 @@ namespace ICD.Connect.Cameras.Visca
 
 		#region SerialQueue Callbacks
 
+		/// <summary>
+		/// Subscribe to the serial queue events.
+		/// </summary>
+		/// <param name="serialQueue"></param>
 		private void SetSerialQueue(ISerialQueue serialQueue)
 		{
 			Unsubscribe(SerialQueue);
@@ -197,6 +207,10 @@ namespace ICD.Connect.Cameras.Visca
 			queue.OnSerialResponse += SerialQueueOnSerialResponse;
 		}
 
+		/// <summary>
+		/// Unsubscribe from the serial queue events.
+		/// </summary>
+		/// <param name="queue"></param>
 		private void Unsubscribe(ISerialQueue queue)
 		{
 			if (queue == null)
@@ -209,10 +223,6 @@ namespace ICD.Connect.Cameras.Visca
 		{
 			if (args.Data == null)
 				return;
-
-			Log(eSeverity.Debug, string.Format("Serial Data {0} - Serial Response {1}",
-											   StringUtils.ToHexLiteral(args.Data.Serialize()),
-											   StringUtils.ToHexLiteral(args.Response)));
 
 			eViscaResponse response = ViscaResponseHandler.HandleResponse(args.Response);
 			if (!ViscaResponseHandler.ResponseIsError(response))
@@ -268,6 +278,7 @@ namespace ICD.Connect.Cameras.Visca
 		private int GetRetryCount(string command)
 		{
 			m_RetryLock.Enter();
+
 			try
 			{
 				return m_RetryCounts.ContainsKey(command) ? m_RetryCounts[command] : 0;
@@ -281,6 +292,7 @@ namespace ICD.Connect.Cameras.Visca
 		private void ResetRetryCount(string command)
 		{
 			m_RetryLock.Enter();
+
 			try
 			{
 				m_RetryCounts.Remove(command);
@@ -307,6 +319,8 @@ namespace ICD.Connect.Cameras.Visca
 
 			settings.PanTiltSpeed = m_PanTiltSpeed;
 			settings.ZoomSpeed = m_ZoomSpeed;
+
+			settings.Copy(m_ComSpecProperties);
 		}
 
 		/// <summary>
@@ -316,7 +330,9 @@ namespace ICD.Connect.Cameras.Visca
 		{
 			base.ClearSettingsFinal();
 
-			m_ConnectionStateManager.SetPort(null);
+			m_ComSpecProperties.ClearComSpecProperties();
+
+			SetPort(null);
 		}
 
 		/// <summary>
@@ -327,6 +343,8 @@ namespace ICD.Connect.Cameras.Visca
 		protected override void ApplySettingsFinal(ViscaCameraDeviceSettings settings, IDeviceFactory factory)
 		{
 			base.ApplySettingsFinal(settings, factory);
+
+			m_ComSpecProperties.Copy(settings);
 
 			m_PanTiltSpeed = settings.PanTiltSpeed;
 			m_ZoomSpeed = settings.ZoomSpeed;
@@ -345,7 +363,7 @@ namespace ICD.Connect.Cameras.Visca
 				}
 			}
 
-			m_ConnectionStateManager.SetPort(port);
+			SetPort(port);
 
 			if (port != null && port.IsOnline)
 			{

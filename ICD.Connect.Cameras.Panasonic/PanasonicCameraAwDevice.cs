@@ -11,16 +11,18 @@ using ICD.Connect.Devices;
 using ICD.Connect.Devices.Controls;
 using ICD.Connect.Devices.EventArguments;
 using ICD.Connect.Protocol.Extensions;
-using ICD.Connect.Protocol.Network.WebPorts;
-using ICD.Connect.Settings.Core;
+using ICD.Connect.Protocol.Network.Ports.Web;
+using ICD.Connect.Protocol.Network.Settings;
+using ICD.Connect.Settings;
 
 namespace ICD.Connect.Cameras.Panasonic
 {
 	public sealed class PanasonicCameraAwDevice : AbstractCameraDevice<PanasonicCameraAwDeviceSettings>,
-		ICameraWithPanTilt, ICameraWithZoom, IDeviceWithPower
+	                                              ICameraWithPanTilt, ICameraWithZoom, IDeviceWithPower
 
 	{
 		#region Properties
+
 		private const long RATE_LIMIT = 130;
 
 		private static readonly Dictionary<string, string> s_ErrorMap =
@@ -42,10 +44,17 @@ namespace ICD.Connect.Cameras.Panasonic
 		private int? m_PanTiltSpeed;
 		private int? m_ZoomSpeed;
 
+		private readonly UriProperties m_UriProperties;
+
 		#endregion
 
+		/// <summary>
+		/// Constructor.
+		/// </summary>
 		public PanasonicCameraAwDevice()
 		{
+			m_UriProperties = new UriProperties();
+
 			m_CommandList = new Queue<string>();
 			m_CommandSection = new SafeCriticalSection();
 
@@ -59,24 +68,29 @@ namespace ICD.Connect.Cameras.Panasonic
 		}
 
 		#region ICameraWithPanTilt
+
 		public void PanTilt(eCameraPanTiltAction action)
 		{
 			SendCommand(m_PanTiltSpeed == null
-							? PanasonicCommandBuilder.GetPanTiltCommand(action)
-							: PanasonicCommandBuilder.GetPanTiltCommand(action, m_PanTiltSpeed.Value));
+				            ? PanasonicCommandBuilder.GetPanTiltCommand(action)
+				            : PanasonicCommandBuilder.GetPanTiltCommand(action, m_PanTiltSpeed.Value));
 		}
+
 		#endregion
 
 		#region ICameraWithZoom
+
 		public void Zoom(eCameraZoomAction action)
 		{
 			SendCommand(m_ZoomSpeed == null
-							? PanasonicCommandBuilder.GetZoomCommand(action)
-							: PanasonicCommandBuilder.GetZoomCommand(action, m_ZoomSpeed.Value));
+				            ? PanasonicCommandBuilder.GetZoomCommand(action)
+				            : PanasonicCommandBuilder.GetZoomCommand(action, m_ZoomSpeed.Value));
 		}
+
 		#endregion
 
 		#region IDeviceWithPower
+
 		public void PowerOn()
 		{
 			SendCommand(PanasonicCommandBuilder.GetPowerOnCommand());
@@ -86,9 +100,11 @@ namespace ICD.Connect.Cameras.Panasonic
 		{
 			SendCommand(PanasonicCommandBuilder.GetPowerOffCommand());
 		}
+
 		#endregion
 
 		#region DeviceBase
+
 		/// <summary>
 		/// Gets the current online status of the device.
 		/// </summary>
@@ -97,9 +113,11 @@ namespace ICD.Connect.Cameras.Panasonic
 		{
 			return m_Port != null && m_Port.IsOnline;
 		}
+
 		#endregion
 
 		#region Public API
+
 		/// <summary>
 		/// Sets the port for communication with the device.
 		/// </summary>
@@ -110,15 +128,30 @@ namespace ICD.Connect.Cameras.Panasonic
 			if (port == m_Port)
 				return;
 
+			ConfigurePort(port);
+
 			Unsubscribe(m_Port);
 			m_Port = port;
 			Subscribe(m_Port);
 
 			UpdateCachedOnlineStatus();
 		}
+
+		/// <summary>
+		/// Configures the given port for communication with the device.
+		/// </summary>
+		/// <param name="port"></param>
+		private void ConfigurePort(IWebPort port)
+		{
+			// Web
+			if (port != null)
+				port.ApplyDeviceConfiguration(m_UriProperties);
+		}
+
 		#endregion
 
 		#region Private Methods
+
 		private void TimerElapsed(object sender, EventArgs args)
 		{
 			m_CommandSection.Enter();
@@ -242,6 +275,8 @@ namespace ICD.Connect.Cameras.Panasonic
 			settings.Port = m_Port == null ? (int?)null : m_Port.Id;
 			settings.PanTiltSpeed = m_PanTiltSpeed;
 			settings.ZoomSpeed = m_ZoomSpeed;
+
+			settings.Copy(m_UriProperties);
 		}
 
 		/// <summary>
@@ -252,6 +287,8 @@ namespace ICD.Connect.Cameras.Panasonic
 			base.ClearSettingsFinal();
 
 			SetPort(null);
+
+			m_UriProperties.Clear();
 		}
 
 		/// <summary>
@@ -262,6 +299,8 @@ namespace ICD.Connect.Cameras.Panasonic
 		protected override void ApplySettingsFinal(PanasonicCameraAwDeviceSettings settings, IDeviceFactory factory)
 		{
 			base.ApplySettingsFinal(settings, factory);
+
+			m_UriProperties.Copy(settings);
 
 			IWebPort port = null;
 
