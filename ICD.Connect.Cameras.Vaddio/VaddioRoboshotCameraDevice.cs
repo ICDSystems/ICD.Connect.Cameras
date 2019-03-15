@@ -5,6 +5,8 @@ using ICD.Common.Properties;
 using ICD.Common.Utils.EventArguments;
 using ICD.Common.Utils.Extensions;
 using ICD.Common.Utils.Services.Logging;
+using ICD.Connect.API.Commands;
+using ICD.Connect.API.Nodes;
 using ICD.Connect.Cameras.Controls;
 using ICD.Connect.Cameras.Devices;
 using ICD.Connect.Devices;
@@ -365,6 +367,82 @@ namespace ICD.Connect.Cameras.Vaddio
 			}
 
 			SetPort(port);
+		}
+
+		#endregion
+
+		#region Console
+
+		/// <summary>
+		/// Calls the delegate for each console status item.
+		/// </summary>
+		/// <param name="addRow"></param>
+		public override void BuildConsoleStatus(AddStatusRowDelegate addRow)
+		{
+			base.BuildConsoleStatus(addRow);
+
+			CameraWithPanTiltConsole.BuildConsoleStatus(this, addRow);
+			CameraWithZoomConsole.BuildConsoleStatus(this, addRow);
+			CameraWithPresetsConsole.BuildConsoleStatus(this, addRow);
+		}
+
+		/// <summary>
+		/// Gets the child console commands.
+		/// </summary>
+		/// <returns></returns>
+		public override IEnumerable<IConsoleCommand> GetConsoleCommands()
+		{
+			foreach (IConsoleCommand command in GetBaseConsoleCommands())
+				yield return command;
+
+			foreach (IConsoleCommand command in CameraWithPanTiltConsole.GetConsoleCommands(this))
+				yield return command;
+
+			foreach (IConsoleCommand command in CameraWithZoomConsole.GetConsoleCommands(this))
+				yield return command;
+
+			foreach (IConsoleCommand command in CameraWithPresetsConsole.GetConsoleCommands(this))
+				yield return command;
+
+			yield return new ConsoleCommand("PowerOn", "Powers the camera device", () => PowerOn());
+			yield return new ConsoleCommand("PowerOff", "Places the camera device on standby", () => PowerOff());
+		}
+
+		/// <summary>
+		/// Workaround for "unverifiable code" warning.
+		/// </summary>
+		/// <returns></returns>
+		private IEnumerable<IConsoleCommand> GetBaseConsoleCommands()
+		{
+			return base.GetConsoleCommands();
+		}
+
+		/// <summary>
+		/// Gets the child console nodes.
+		/// </summary>
+		/// <returns></returns>
+		public override IEnumerable<IConsoleNodeBase> GetConsoleNodes()
+		{
+			foreach (IConsoleNodeBase node in GetBaseConsoleNodes())
+				yield return node;
+
+			foreach (IConsoleNodeBase node in CameraWithPanTiltConsole.GetConsoleNodes(this))
+				yield return node;
+
+			foreach (IConsoleNodeBase node in CameraWithZoomConsole.GetConsoleNodes(this))
+				yield return node;
+
+			foreach (IConsoleNodeBase node in CameraWithPresetsConsole.GetConsoleNodes(this))
+				yield return node;
+		}
+
+		/// <summary>
+		/// Workaround for "unverifiable code" warning.
+		/// </summary>
+		/// <returns></returns>
+		private IEnumerable<IConsoleNodeBase> GetBaseConsoleNodes()
+		{
+			return base.GetConsoleNodes();
 		}
 
 		#endregion
