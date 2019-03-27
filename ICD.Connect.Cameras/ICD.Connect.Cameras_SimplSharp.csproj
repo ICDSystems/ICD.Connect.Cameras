@@ -75,6 +75,9 @@
     <Compile Include="Controls\IPresetControl.cs" />
     <Compile Include="Controls\IZoomControl.cs" />
     <Compile Include="Controls\PanTiltControl.cs" />
+    <Compile Include="Devices\CameraWithPanTiltConsole.cs" />
+    <Compile Include="Devices\CameraWithPresetsConsole.cs" />
+    <Compile Include="Devices\CameraWithZoomConsole.cs" />
     <Compile Include="eCameraActions.cs" />
     <Compile Include="Controls\GenericCameraRouteSourceControl.cs" />
     <Compile Include="Devices\ICameraDevice.cs" />
