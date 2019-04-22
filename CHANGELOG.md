@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+ - Added console command for printing stored camera presets
+
 ## [4.0.0] - 2019-01-10
 ### Added
  - Added port configuration features to camera devices
