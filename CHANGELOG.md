@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
  - Added console command for printing stored camera presets
+ 
+### Changed
+ - Panasonic AW - Better handling of null port, more helpful exception logging
 
 ## [4.0.0] - 2019-01-10
 ### Added
