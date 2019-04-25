@@ -182,6 +182,11 @@ namespace ICD.Connect.Cameras.Panasonic
 					m_CommandList.Enqueue(command);
 				else
 				{
+					if (m_Port == null)
+					{
+						Log(eSeverity.Error, "Failed to make request - port is null");
+						return;
+					}
 					try
 					{
 						string response;
@@ -190,8 +195,10 @@ namespace ICD.Connect.Cameras.Panasonic
 					}
 					catch (Exception ex)
 					{
-						Log(eSeverity.Error, "Failed to make request - {0}", ex.Message);
+						Log(eSeverity.Error, "Failed to make request{0}{1}{0}{2}", IcdEnvironment.NewLine,
+			                                         ex.Message, ex.StackTrace);
 						m_CommandList.Clear();
+
 						m_DelayTimer.Stop();
 					}
 				}
