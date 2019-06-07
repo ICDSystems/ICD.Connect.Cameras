@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using ICD.Common.Properties;
+using ICD.Common.Utils;
 using ICD.Common.Utils.EventArguments;
 using ICD.Common.Utils.Extensions;
 using ICD.Common.Utils.Services.Logging;
@@ -312,6 +314,15 @@ namespace ICD.Connect.Cameras.Vaddio
 
 		private void BufferOnCompletedSerial(object sender, StringEventArgs stringEventArgs)
 		{
+			const string responseRegex = @"(?'command'[^\r\n]+)\r\n((?'message'[^\r\n]+)\r\n)?(?'status'[^\r\n]+)\r\n";
+
+			Match match = Regex.Match(stringEventArgs.Data, responseRegex);
+
+			if (!match.Success)
+				return;
+
+			if(match.Groups["status"].Value.Equals("ERROR"))
+				Log(eSeverity.Error, "Error executing \"{0}\" - {1}", match.Groups["command"].Value, match.Groups["message"].Value);
 		}
 
 		#endregion

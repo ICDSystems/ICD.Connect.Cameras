@@ -33,8 +33,7 @@ namespace ICD.Connect.Cameras.Vaddio
 
 		private static readonly char[] s_Delimiters =
 		{
-			'\r',
-			'\n',
+			'>',
 			':' // Vaddio doesn't use CRLF after login prompts
 		};
 
