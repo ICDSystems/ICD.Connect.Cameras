@@ -305,7 +305,7 @@ namespace ICD.Connect.Cameras.Vaddio
 				return;
 
 			if(match.Groups["status"].Value.Equals("ERROR"))
-				Log(eSeverity.Error, "Error executing command");
+				Log(eSeverity.Error, "Error executing \"{0}\" - {1}", match.Groups["command"].Value, match.Groups["message"].Value);
 		}
 
 		#endregion
