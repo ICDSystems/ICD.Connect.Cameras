@@ -296,7 +296,7 @@ namespace ICD.Connect.Cameras.Panasonic
 
 			SetPort(null);
 
-			m_UriProperties.Clear();
+			m_UriProperties.ClearUriProperties();
 		}
 
 		/// <summary>
