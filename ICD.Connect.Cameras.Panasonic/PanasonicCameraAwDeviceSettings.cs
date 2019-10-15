@@ -1,4 +1,5 @@
-﻿using ICD.Common.Utils;
+﻿using System;
+using ICD.Common.Utils;
 using ICD.Common.Utils.Xml;
 using ICD.Connect.Cameras.Devices;
 using ICD.Connect.Protocol.Network.Ports.Web;
@@ -9,13 +10,14 @@ using ICD.Connect.Settings.Attributes.SettingsProperties;
 namespace ICD.Connect.Cameras.Panasonic
 {
 	[KrangSettings("PanasonicCamera", typeof(PanasonicCameraAwDevice))]
-	public sealed class PanasonicCameraAwDeviceSettings : AbstractCameraDeviceSettings, IUriSettings
+	public sealed class PanasonicCameraAwDeviceSettings : AbstractCameraDeviceSettings, IUriSettings, IWebProxySettings
 	{
 		private const string PORT_ELEMENT = "Port";
 		private const string PAN_TILT_SPEED_ELEMENT = "PanTiltSpeed";
 		private const string ZOOM_SPEED_ELEMENT = "ZoomSpeed";
 
 		private readonly UriProperties m_UriProperties;
+		private readonly WebProxyProperties m_WebProxyProperties;
 
 		private int? m_PanTiltSpeed;
 		private int? m_ZoomSpeed;
@@ -111,12 +113,61 @@ namespace ICD.Connect.Cameras.Panasonic
 
 		#endregion
 
+		#region Proxy
+
+		/// <summary>
+		/// Gets/sets the configurable proxy username.
+		/// </summary>
+		public string ProxyUsername { get { return m_WebProxyProperties.ProxyUsername; } set { m_WebProxyProperties.ProxyUsername = value; } }
+
+		/// <summary>
+		/// Gets/sets the configurable proxy password.
+		/// </summary>
+		public string ProxyPassword { get { return m_WebProxyProperties.ProxyPassword; } set { m_WebProxyProperties.ProxyPassword = value; } }
+
+		/// <summary>
+		/// Gets/sets the configurable proxy host.
+		/// </summary>
+		public string ProxyHost { get { return m_WebProxyProperties.ProxyHost; } set { m_WebProxyProperties.ProxyHost = value; } }
+
+		/// <summary>
+		/// Gets/sets the configurable proxy port.
+		/// </summary>
+		public ushort? ProxyPort { get { return m_WebProxyProperties.ProxyPort; } set { m_WebProxyProperties.ProxyPort = value; } }
+
+		/// <summary>
+		/// Gets/sets the configurable proxy scheme.
+		/// </summary>
+		public string ProxyScheme { get { return m_WebProxyProperties.ProxyScheme; } set { m_WebProxyProperties.ProxyScheme = value; } }
+
+		/// <summary>
+		/// Gets/sets the configurable proxy authentication method.
+		/// </summary>
+		public eProxyAuthenticationMethod? ProxyAuthenticationMethod
+		{
+			get { return m_WebProxyProperties.ProxyAuthenticationMethod; }
+			set { m_WebProxyProperties.ProxyAuthenticationMethod = value; }
+		}
+
+		/// <summary>
+		/// Clears the configured values.
+		/// </summary>
+		public void ClearProxyProperties()
+		{
+			m_WebProxyProperties.ClearProxyProperties();
+		}
+
+		#endregion
+
 		/// <summary>
 		/// Constructor.
 		/// </summary>
 		public PanasonicCameraAwDeviceSettings()
 		{
 			m_UriProperties = new UriProperties();
+			m_WebProxyProperties = new WebProxyProperties();
+
+			UpdateUriDefaults();
 		}
 
 		/// <summary>
@@ -132,6 +183,7 @@ namespace ICD.Connect.Cameras.Panasonic
 			writer.WriteElementString(ZOOM_SPEED_ELEMENT, IcdXmlConvert.ToString(ZoomSpeed));
 
 			m_UriProperties.WriteElements(writer);
+			m_WebProxyProperties.WriteElements(writer);
 		}
 
 		/// <summary>
@@ -147,6 +199,14 @@ namespace ICD.Connect.Cameras.Panasonic
 			ZoomSpeed = XmlUtils.TryReadChildElementContentAsInt(xml, ZOOM_SPEED_ELEMENT);
 
 			m_UriProperties.ParseXml(xml);
+			m_WebProxyProperties.ParseXml(xml);
+
+			UpdateUriDefaults();
+		}
+
+		private void UpdateUriDefaults()
+		{
+			m_UriProperties.ApplyDefaultValues(null, null, null, 80, Uri.UriSchemeHttp, null, null, null);
 		}
 	}
 }

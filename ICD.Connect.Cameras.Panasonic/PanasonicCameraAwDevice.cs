@@ -22,8 +22,6 @@ namespace ICD.Connect.Cameras.Panasonic
 	                                              ICameraWithPanTilt, ICameraWithZoom, IDeviceWithPower
 
 	{
-		#region Properties
-
 		private const long RATE_LIMIT = 130;
 
 		private static readonly Dictionary<string, string> s_ErrorMap =
@@ -35,19 +33,16 @@ namespace ICD.Connect.Cameras.Panasonic
 				{"er3", "Command is out of range"},
 			};
 
-		private IWebPort m_Port;
-
 		private readonly IcdTimer m_DelayTimer;
-
 		private readonly SafeCriticalSection m_CommandSection;
 		private readonly Queue<string> m_CommandList;
 
+		private readonly UriProperties m_UriProperties;
+		private readonly WebProxyProperties m_WebProxyProperties;
+
+		private IWebPort m_Port;
 		private int? m_PanTiltSpeed;
 		private int? m_ZoomSpeed;
-
-		private readonly UriProperties m_UriProperties;
-
-		#endregion
 
 		/// <summary>
 		/// Constructor.
@@ -55,6 +50,7 @@ namespace ICD.Connect.Cameras.Panasonic
 		public PanasonicCameraAwDevice()
 		{
 			m_UriProperties = new UriProperties();
+			m_WebProxyProperties = new WebProxyProperties();
 
 			m_CommandList = new Queue<string>();
 			m_CommandSection = new SafeCriticalSection();
@@ -146,7 +142,10 @@ namespace ICD.Connect.Cameras.Panasonic
 		{
 			// Web
 			if (port != null)
+			{
 				port.ApplyDeviceConfiguration(m_UriProperties);
+				port.ApplyDeviceConfiguration(m_WebProxyProperties);
+			}
 		}
 
 		#endregion
@@ -285,6 +284,7 @@ namespace ICD.Connect.Cameras.Panasonic
 			settings.ZoomSpeed = m_ZoomSpeed;
 
 			settings.Copy(m_UriProperties);
+			settings.Copy(m_WebProxyProperties);
 		}
 
 		/// <summary>
@@ -297,6 +297,7 @@ namespace ICD.Connect.Cameras.Panasonic
 			SetPort(null);
 
 			m_UriProperties.ClearUriProperties();
+			m_WebProxyProperties.ClearProxyProperties();
 		}
 
 		/// <summary>
@@ -309,6 +310,7 @@ namespace ICD.Connect.Cameras.Panasonic
 			base.ApplySettingsFinal(settings, factory);
 
 			m_UriProperties.Copy(settings);
+			m_WebProxyProperties.Copy(settings);
 
 			IWebPort port = null;
 
