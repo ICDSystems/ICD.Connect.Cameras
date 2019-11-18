@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [4.2.0] - 2019-11-18
+### Added
+ - Added web proxy settings to Panasonic camera driver
+
 ## [4.1.0] - 2019-10-07
 ### Added
  - Added console command for printing stored camera presets
