@@ -6,7 +6,7 @@ using ICD.Connect.Settings;
 
 namespace ICD.Connect.Cameras.Windows
 {
-	public sealed class WindowsUsbCameraDevice : AbstractCameraDevice<WindowsUsbCameraDeviceSettings>
+	public sealed class WindowsUsbCameraDevice : AbstractCameraDevice<WindowsUsbCameraDeviceSettings>, IWindowsDevice
 	{
 		/// <summary>
 		/// Gets the path to the device on windows.
