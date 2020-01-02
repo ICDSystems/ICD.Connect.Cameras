@@ -188,9 +188,8 @@ namespace ICD.Connect.Cameras.Panasonic
 					}
 					try
 					{
-						string response;
-						m_Port.Get(command, out response);
-						ParsePortData(command, response);
+						WebPortResponse response = m_Port.Get(command);
+						ParsePortData(command, response.DataAsString);
 					}
 					catch (Exception ex)
 					{

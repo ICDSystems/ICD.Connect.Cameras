@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
  - Initial commit of ICD.Connect.Cameras.Windows project
  - Added WindowsUsbCameraDevice for representing static USB cameras
 
+### Changed
+ - Fixed web requests to use new web port response.
+
 ## [4.2.0] - 2019-11-18
 ### Added
  - Added web proxy settings to Panasonic camera driver
