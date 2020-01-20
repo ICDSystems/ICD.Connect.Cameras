@@ -41,7 +41,7 @@ namespace ICD.Connect.Cameras.Controls
 			if (instance == null)
 				throw new ArgumentNullException("instance");
 
-			yield return new ConsoleCommand("Stop", "Sends the stop signal to the camera.", () => instance.Stop());
+			yield return new ConsoleCommand("StopPT", "Sends the stop signal to the camera.", () => instance.Stop());
 			yield return new ConsoleCommand("Up", "Sends the tilt up signal to the camera.", () => instance.TiltUp());
 			yield return new ConsoleCommand("Down", "Sends the tilt down signal to the camera.", () => instance.TiltDown());
 			yield return new ConsoleCommand("Left", "Sends the pan left signal to the camera.", () => instance.PanLeft());

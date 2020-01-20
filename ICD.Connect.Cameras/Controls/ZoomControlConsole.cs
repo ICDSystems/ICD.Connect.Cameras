@@ -41,7 +41,7 @@ namespace ICD.Connect.Cameras.Controls
 			if (instance == null)
 				throw new ArgumentNullException("instance");
 
-			yield return new ConsoleCommand("Stop", "Sends the stop signal to the camera.", () => instance.Stop());
+			yield return new ConsoleCommand("StopZ", "Sends the stop signal to the camera.", () => instance.Stop());
 			yield return new ConsoleCommand("ZoomIn", "Sends the zoom in signal to the camera.", () => instance.ZoomIn());
 			yield return new ConsoleCommand("ZoomOut", "Sends the zoom out signal to the camera.", () => instance.ZoomOut());
 		}
