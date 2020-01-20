@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
  - Fixed web requests to use new web port response.
+ - Differentiating between the stop methods in the pan-tilt and zoom camera control consoles.
+
 
 ## [4.2.0] - 2019-11-18
 ### Added
