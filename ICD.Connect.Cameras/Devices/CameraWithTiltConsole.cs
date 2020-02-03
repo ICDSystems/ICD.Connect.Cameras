@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using ICD.Common.Utils;
 using ICD.Connect.API.Commands;
 using ICD.Connect.API.Nodes;
 
-namespace ICD.Connect.Cameras.Controls
+namespace ICD.Connect.Cameras.Devices
 {
-	public static class PresetControlConsole
+	public static class CameraWithTiltConsole
 	{
 		/// <summary>
 		/// Gets the child console nodes.
 		/// </summary>
 		/// <param name="instance"></param>
 		/// <returns></returns>
-		public static IEnumerable<IConsoleNodeBase> GetConsoleNodes(IPresetControl instance)
+		public static IEnumerable<IConsoleNodeBase> GetConsoleNodes(ICameraDevice instance)
 		{
 			if (instance == null)
 				throw new ArgumentNullException("instance");
@@ -25,12 +26,10 @@ namespace ICD.Connect.Cameras.Controls
 		/// </summary>
 		/// <param name="instance"></param>
 		/// <param name="addRow"></param>
-		public static void BuildConsoleStatus(IPresetControl instance, AddStatusRowDelegate addRow)
+		public static void BuildConsoleStatus(ICameraDevice instance, AddStatusRowDelegate addRow)
 		{
 			if (instance == null)
 				throw new ArgumentNullException("instance");
-
-			addRow("Max Presets", instance.MaxPresets);
 		}
 
 		/// <summary>
@@ -38,17 +37,14 @@ namespace ICD.Connect.Cameras.Controls
 		/// </summary>
 		/// <param name="instance"></param>
 		/// <returns></returns>
-		public static IEnumerable<IConsoleCommand> GetConsoleCommands(IPresetControl instance)
+		public static IEnumerable<IConsoleCommand> GetConsoleCommands(ICameraDevice instance)
 		{
 			if (instance == null)
 				throw new ArgumentNullException("instance");
 
-			yield return
-				new GenericConsoleCommand<int>("ActivatePreset", "Activates the preset with the given index.",
-				                               preset => instance.ActivatePreset(preset));
-			yield return
-				new GenericConsoleCommand<int>("StorePreset", "Stores a preset with the given index.",
-				                               preset => instance.StorePreset(preset));
+			string tiltHelp = string.Format("PanTilt <{0}>", StringUtils.ArrayFormat(EnumUtils.GetValues<eCameraTiltAction>()));
+
+			yield return new GenericConsoleCommand<eCameraTiltAction>("PanTilt", tiltHelp, a => instance.Tilt(a));
 		}
 	}
 }

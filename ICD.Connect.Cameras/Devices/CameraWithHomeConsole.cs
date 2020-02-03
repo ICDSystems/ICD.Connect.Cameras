@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using ICD.Connect.API.Commands;
 using ICD.Connect.API.Nodes;
 
-namespace ICD.Connect.Cameras.Controls
+namespace ICD.Connect.Cameras.Devices
 {
-	public static class ZoomControlConsole
+	public static class CameraWithHomeConsole
 	{
 		/// <summary>
 		/// Gets the child console nodes.
 		/// </summary>
 		/// <param name="instance"></param>
 		/// <returns></returns>
-		public static IEnumerable<IConsoleNodeBase> GetConsoleNodes(IZoomControl instance)
+		public static IEnumerable<IConsoleNodeBase> GetConsoleNodes(ICameraDevice instance)
 		{
 			if (instance == null)
 				throw new ArgumentNullException("instance");
@@ -25,7 +25,7 @@ namespace ICD.Connect.Cameras.Controls
 		/// </summary>
 		/// <param name="instance"></param>
 		/// <param name="addRow"></param>
-		public static void BuildConsoleStatus(IZoomControl instance, AddStatusRowDelegate addRow)
+		public static void BuildConsoleStatus(ICameraDevice instance, AddStatusRowDelegate addRow)
 		{
 			if (instance == null)
 				throw new ArgumentNullException("instance");
@@ -36,14 +36,12 @@ namespace ICD.Connect.Cameras.Controls
 		/// </summary>
 		/// <param name="instance"></param>
 		/// <returns></returns>
-		public static IEnumerable<IConsoleCommand> GetConsoleCommands(IZoomControl instance)
+		public static IEnumerable<IConsoleCommand> GetConsoleCommands(ICameraDevice instance)
 		{
 			if (instance == null)
 				throw new ArgumentNullException("instance");
 
-			yield return new ConsoleCommand("Stop", "Sends the stop signal to the camera.", () => instance.Stop());
-			yield return new ConsoleCommand("ZoomIn", "Sends the zoom in signal to the camera.", () => instance.ZoomIn());
-			yield return new ConsoleCommand("ZoomOut", "Sends the zoom out signal to the camera.", () => instance.ZoomOut());
+			yield return new ConsoleCommand("SendCameraHome", "Sends the camera to its home position", () => instance.SendCameraHome());
 		}
 	}
 }

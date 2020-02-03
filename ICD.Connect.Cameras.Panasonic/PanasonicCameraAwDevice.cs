@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using ICD.Common.Properties;
 using ICD.Common.Utils;
+using ICD.Common.Utils.EventArguments;
 using ICD.Common.Utils.Services.Logging;
 using ICD.Common.Utils.Timers;
 using ICD.Connect.API.Commands;
-using ICD.Connect.API.Nodes;
 using ICD.Connect.Cameras.Controls;
 using ICD.Connect.Cameras.Devices;
 using ICD.Connect.Devices;
@@ -17,10 +17,15 @@ using ICD.Connect.Settings.Core;
 
 namespace ICD.Connect.Cameras.Panasonic
 {
-	public sealed class PanasonicCameraAwDevice : AbstractCameraDevice<PanasonicCameraAwDeviceSettings>,
-		ICameraWithPanTilt, ICameraWithZoom, IDeviceWithPower
-
+	public sealed class PanasonicCameraAwDevice : AbstractCameraDevice<PanasonicCameraAwDeviceSettings>, IDeviceWithPower
 	{
+		#region Events
+
+		public override event EventHandler<GenericEventArgs<IEnumerable<CameraPreset>>> OnPresetsChanged;
+		public override event EventHandler<BoolEventArgs> OnCameraMuteStateChanged;
+
+		#endregion
+
 		#region Properties
 		private const long RATE_LIMIT = 130;
 
@@ -43,6 +48,16 @@ namespace ICD.Connect.Cameras.Panasonic
 		private int? m_PanTiltSpeed;
 		private int? m_ZoomSpeed;
 
+		/// <summary>
+		/// Gets the maximum number of presets this camera can support
+		/// </summary>
+		public override int MaxPresets { get { throw new NotSupportedException(); } }
+
+		/// <summary>
+		/// Gets whether the camera is currently muted
+		/// </summary>
+		public override bool IsCameraMuted { get { throw new NotSupportedException(); } }
+
 		#endregion
 
 		public PanasonicCameraAwDevice()
@@ -54,27 +69,76 @@ namespace ICD.Connect.Cameras.Panasonic
 			m_DelayTimer.OnElapsed += TimerElapsed;
 
 			Controls.Add(new GenericCameraRouteSourceControl<PanasonicCameraAwDevice>(this, 0));
-			Controls.Add(new PanTiltControl<PanasonicCameraAwDevice>(this, 1));
-			Controls.Add(new ZoomControl<PanasonicCameraAwDevice>(this, 2));
-			Controls.Add(new PowerDeviceControl<PanasonicCameraAwDevice>(this, 3));
+			Controls.Add(new CameraDeviceControl(this, 1));
+			Controls.Add(new PowerDeviceControl<PanasonicCameraAwDevice>(this, 2));
 		}
 
-		#region ICameraWithPanTilt
-		public void PanTilt(eCameraPanTiltAction action)
+		#region Camera Control Methods
+
+		public override void Pan(eCameraPanAction action)
 		{
 			SendCommand(m_PanTiltSpeed == null
-							? PanasonicCommandBuilder.GetPanTiltCommand(action)
-							: PanasonicCommandBuilder.GetPanTiltCommand(action, m_PanTiltSpeed.Value));
+							? PanasonicCommandBuilder.GetPanCommand(action)
+							: PanasonicCommandBuilder.GetPanCommand(action, m_PanTiltSpeed.Value));
 		}
-		#endregion
 
-		#region ICameraWithZoom
-		public void Zoom(eCameraZoomAction action)
+		public override void Tilt(eCameraTiltAction action)
+		{
+			SendCommand(m_PanTiltSpeed == null
+							? PanasonicCommandBuilder.GetTiltCommand(action)
+							: PanasonicCommandBuilder.GetTiltCommand(action, m_PanTiltSpeed.Value));
+		}
+		
+		public override void Zoom(eCameraZoomAction action)
 		{
 			SendCommand(m_ZoomSpeed == null
 							? PanasonicCommandBuilder.GetZoomCommand(action)
 							: PanasonicCommandBuilder.GetZoomCommand(action, m_ZoomSpeed.Value));
 		}
+
+		/// <summary>
+		/// Gets the stored camera presets.
+		/// </summary>
+		public override IEnumerable<CameraPreset> GetPresets()
+		{
+			throw new NotSupportedException();
+		}
+
+		/// <summary>
+		/// Tells the camera to change its position to the given preset.
+		/// </summary>
+		/// <param name="presetId">The id of the preset to position to.</param>
+		public override void ActivatePreset(int presetId)
+		{
+			throw new NotSupportedException();
+		}
+
+		/// <summary>
+		/// Stores the cameras current position in the given preset index.
+		/// </summary>
+		/// <param name="presetId">The index to store the preset at.</param>
+		public override void StorePreset(int presetId)
+		{
+			throw new NotSupportedException();
+		}
+
+		/// <summary>
+		/// Sets if the camera mute state should be active
+		/// </summary>
+		/// <param name="enable"></param>
+		public override void MuteCamera(bool enable)
+		{
+			throw new NotSupportedException();
+		}
+
+		/// <summary>
+		/// Resets camera to its predefined home position
+		/// </summary>
+		public override void SendCameraHome()
+		{
+			throw new NotSupportedException();
+		}
+
 		#endregion
 
 		#region IDeviceWithPower
@@ -252,6 +316,8 @@ namespace ICD.Connect.Cameras.Panasonic
 		{
 			base.ClearSettingsFinal();
 
+			SupportedCameraFeatures = eCameraFeatures.None;
+
 			SetPort(null);
 		}
 
@@ -280,6 +346,8 @@ namespace ICD.Connect.Cameras.Panasonic
 
 			SetPort(port);
 
+			SupportedCameraFeatures = eCameraFeatures.PanTiltZoom;
+
 			m_PanTiltSpeed = settings.PanTiltSpeed;
 			m_ZoomSpeed = settings.ZoomSpeed;
 		}
@@ -289,30 +357,12 @@ namespace ICD.Connect.Cameras.Panasonic
 		#region Console
 
 		/// <summary>
-		/// Calls the delegate for each console status item.
-		/// </summary>
-		/// <param name="addRow"></param>
-		public override void BuildConsoleStatus(AddStatusRowDelegate addRow)
-		{
-			base.BuildConsoleStatus(addRow);
-
-			CameraWithPanTiltConsole.BuildConsoleStatus(this, addRow);
-			CameraWithZoomConsole.BuildConsoleStatus(this, addRow);
-		}
-
-		/// <summary>
 		/// Gets the child console commands.
 		/// </summary>
 		/// <returns></returns>
 		public override IEnumerable<IConsoleCommand> GetConsoleCommands()
 		{
 			foreach (IConsoleCommand command in GetBaseConsoleCommands())
-				yield return command;
-
-			foreach (IConsoleCommand command in CameraWithPanTiltConsole.GetConsoleCommands(this))
-				yield return command;
-
-			foreach (IConsoleCommand command in CameraWithZoomConsole.GetConsoleCommands(this))
 				yield return command;
 
 			yield return new ConsoleCommand("PowerOn", "Powers the camera device", () => PowerOn());
@@ -326,31 +376,6 @@ namespace ICD.Connect.Cameras.Panasonic
 		private IEnumerable<IConsoleCommand> GetBaseConsoleCommands()
 		{
 			return base.GetConsoleCommands();
-		}
-
-		/// <summary>
-		/// Gets the child console nodes.
-		/// </summary>
-		/// <returns></returns>
-		public override IEnumerable<IConsoleNodeBase> GetConsoleNodes()
-		{
-			foreach (IConsoleNodeBase node in GetBaseConsoleNodes())
-				yield return node;
-
-			foreach (IConsoleNodeBase node in CameraWithPanTiltConsole.GetConsoleNodes(this))
-				yield return node;
-
-			foreach (IConsoleNodeBase node in CameraWithZoomConsole.GetConsoleNodes(this))
-				yield return node;
-		}
-
-		/// <summary>
-		/// Workaround for "unverifiable code" warning.
-		/// </summary>
-		/// <returns></returns>
-		private IEnumerable<IConsoleNodeBase> GetBaseConsoleNodes()
-		{
-			return base.GetConsoleNodes();
 		}
 
 		#endregion

@@ -14,7 +14,7 @@ namespace ICD.Connect.Cameras.Devices
 		/// </summary>
 		/// <param name="instance"></param>
 		/// <returns></returns>
-		public static IEnumerable<IConsoleNodeBase> GetConsoleNodes(ICameraWithPresets instance)
+		public static IEnumerable<IConsoleNodeBase> GetConsoleNodes(ICameraDevice instance)
 		{
 			if (instance == null)
 				throw new ArgumentNullException("instance");
@@ -27,7 +27,7 @@ namespace ICD.Connect.Cameras.Devices
 		/// </summary>
 		/// <param name="instance"></param>
 		/// <param name="addRow"></param>
-		public static void BuildConsoleStatus(ICameraWithPresets instance, AddStatusRowDelegate addRow)
+		public static void BuildConsoleStatus(ICameraDevice instance, AddStatusRowDelegate addRow)
 		{
 			if (instance == null)
 				throw new ArgumentNullException("instance");
@@ -40,7 +40,7 @@ namespace ICD.Connect.Cameras.Devices
 		/// </summary>
 		/// <param name="instance"></param>
 		/// <returns></returns>
-		public static IEnumerable<IConsoleCommand> GetConsoleCommands(ICameraWithPresets instance)
+		public static IEnumerable<IConsoleCommand> GetConsoleCommands(ICameraDevice instance)
 		{
 			if (instance == null)
 				throw new ArgumentNullException("instance");
@@ -50,7 +50,7 @@ namespace ICD.Connect.Cameras.Devices
 			yield return new ConsoleCommand("PrintPresets", "Prints a table of the stored presets", () => PrintPresets(instance));
 		}
 
-		private static string PrintPresets(ICameraWithPresets instance)
+		private static string PrintPresets(ICameraDevice instance)
 		{
 			if (instance == null)
 				throw new ArgumentNullException("instance");

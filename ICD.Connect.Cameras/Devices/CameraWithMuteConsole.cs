@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using ICD.Common.Utils;
 using ICD.Connect.API.Commands;
 using ICD.Connect.API.Nodes;
 
 namespace ICD.Connect.Cameras.Devices
 {
-	public static class CameraWithPanTiltConsole
+	public static class CameraWithMuteConsole
 	{
 		/// <summary>
 		/// Gets the child console nodes.
 		/// </summary>
 		/// <param name="instance"></param>
 		/// <returns></returns>
-		public static IEnumerable<IConsoleNodeBase> GetConsoleNodes(ICameraWithPanTilt instance)
+		public static IEnumerable<IConsoleNodeBase> GetConsoleNodes(ICameraDevice instance)
 		{
 			if (instance == null)
 				throw new ArgumentNullException("instance");
@@ -26,10 +25,12 @@ namespace ICD.Connect.Cameras.Devices
 		/// </summary>
 		/// <param name="instance"></param>
 		/// <param name="addRow"></param>
-		public static void BuildConsoleStatus(ICameraWithPanTilt instance, AddStatusRowDelegate addRow)
+		public static void BuildConsoleStatus(ICameraDevice instance, AddStatusRowDelegate addRow)
 		{
 			if (instance == null)
 				throw new ArgumentNullException("instance");
+
+			addRow("Camera Mute", instance.IsCameraMuted ? "Enabled" : "Disabled");
 		}
 
 		/// <summary>
@@ -37,14 +38,12 @@ namespace ICD.Connect.Cameras.Devices
 		/// </summary>
 		/// <param name="instance"></param>
 		/// <returns></returns>
-		public static IEnumerable<IConsoleCommand> GetConsoleCommands(ICameraWithPanTilt instance)
+		public static IEnumerable<IConsoleCommand> GetConsoleCommands(ICameraDevice instance)
 		{
 			if (instance == null)
 				throw new ArgumentNullException("instance");
 
-			string panTiltHelp = string.Format("PanTilt <{0}>", StringUtils.ArrayFormat(EnumUtils.GetValues<eCameraPanTiltAction>()));
-
-			yield return new GenericConsoleCommand<eCameraPanTiltAction>("PanTilt", panTiltHelp, a => instance.PanTilt(a));
+			yield return new GenericConsoleCommand<bool>("Mute", "Enables or Disables Camera Mute", a => instance.MuteCamera(a));
 		}
 	}
 }

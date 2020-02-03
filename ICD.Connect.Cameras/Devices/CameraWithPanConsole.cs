@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using ICD.Common.Utils;
 using ICD.Connect.API.Commands;
 using ICD.Connect.API.Nodes;
+using ICD.Connect.Cameras.Controls;
 
 namespace ICD.Connect.Cameras.Devices
 {
-	public static class CameraWithZoomConsole
+	public static class CameraWithPanConsole
 	{
 		/// <summary>
 		/// Gets the child console nodes.
@@ -42,9 +43,9 @@ namespace ICD.Connect.Cameras.Devices
 			if (instance == null)
 				throw new ArgumentNullException("instance");
 
-			string zoomHelp = string.Format("Zoom <{0}>", StringUtils.ArrayFormat(EnumUtils.GetValues<eCameraZoomAction>()));
+			string panHelp = string.Format("Pan <{0}>", StringUtils.ArrayFormat(EnumUtils.GetValues<eCameraPanAction>()));
 
-			yield return new GenericConsoleCommand<eCameraZoomAction>("Zoom", zoomHelp, a => instance.Zoom(a));
+			yield return new GenericConsoleCommand<eCameraPanAction>("Pan", panHelp, a => instance.Pan(a));
 		}
 	}
 }
