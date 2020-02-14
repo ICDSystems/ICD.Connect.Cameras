@@ -8,16 +8,14 @@ namespace ICD.Connect.Cameras.Panasonic.Tests
 		[TestCase("/cgi-bin/aw_ptz?cmd=%23PTS5050&res=1")]
 		public void TestStop(string expected)
 		{
-			Assert.AreEqual(expected, PanasonicCommandBuilder.GetPanTiltCommand(eCameraPanTiltAction.Stop));
+			Assert.AreEqual(expected, PanasonicCommandBuilder.GetPanCommand(eCameraPanAction.Stop));
 		}
 
-		[TestCase(eCameraPanTiltAction.Up, 24, "/cgi-bin/aw_ptz?cmd=%23PTS5074&res=1")]
-		[TestCase(eCameraPanTiltAction.Down, 24, "/cgi-bin/aw_ptz?cmd=%23PTS5026&res=1")]
-		[TestCase(eCameraPanTiltAction.Left, 24, "/cgi-bin/aw_ptz?cmd=%23PTS2650&res=1")]
-		[TestCase(eCameraPanTiltAction.Right, 24, "/cgi-bin/aw_ptz?cmd=%23PTS7450&res=1")]
-		public void TestMove(eCameraPanTiltAction action, int panTiltSpeed, string expected)
+		[TestCase(eCameraPanAction.Left, 24, "/cgi-bin/aw_ptz?cmd=%23PTS2650&res=1")]
+		[TestCase(eCameraPanAction.Right, 24, "/cgi-bin/aw_ptz?cmd=%23PTS7450&res=1")]
+		public void TestMove(eCameraPanAction action, int panTiltSpeed, string expected)
 		{
-			string result = PanasonicCommandBuilder.GetPanTiltCommand(action, panTiltSpeed);
+			string result = PanasonicCommandBuilder.GetPanCommand(action, panTiltSpeed);
 			Assert.AreEqual(expected, result);
 		}
 		
@@ -36,7 +34,5 @@ namespace ICD.Connect.Cameras.Panasonic.Tests
 			Assert.AreEqual("/cgi-bin/aw_ptz?cmd=%23O0&res=1", PanasonicCommandBuilder.GetPowerOffCommand());
 			Assert.AreEqual("/cgi-bin/aw_ptz?cmd=%23O&res=1", PanasonicCommandBuilder.GetPowerQueryCommand());
 		}
-
-
 	}
 }

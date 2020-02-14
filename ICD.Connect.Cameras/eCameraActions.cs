@@ -1,9 +1,14 @@
 ﻿namespace ICD.Connect.Cameras
 {
-	public enum eCameraPanTiltAction
+	public enum eCameraPanAction
 	{
 		Left,
 		Right,
+		Stop
+	}
+
+	public enum eCameraTiltAction
+	{
 		Up,
 		Down,
 		Stop
