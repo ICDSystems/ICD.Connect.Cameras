@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using ICD.Common.Properties;
 using ICD.Common.Utils;
 using ICD.Common.Utils.EventArguments;
@@ -23,13 +24,6 @@ namespace ICD.Connect.Cameras.Visca
 {
 	public sealed class ViscaCameraDevice : AbstractCameraDevice<ViscaCameraDeviceSettings>, IDeviceWithPower
 	{
-		#region Events
-
-		public override event EventHandler<GenericEventArgs<IEnumerable<CameraPreset>>> OnPresetsChanged;
-		public override event EventHandler<BoolEventArgs> OnCameraMuteStateChanged;
-
-		#endregion
-
 		#region Private Members
 
 		private ISerialQueue SerialQueue { get; set; }
@@ -54,11 +48,6 @@ namespace ICD.Connect.Cameras.Visca
 		/// Gets the maximum number of presets this camera can support
 		/// </summary>
 		public override int MaxPresets { get { throw new NotSupportedException(); } }
-
-		/// <summary>
-		/// Gets whether the camera is currently muted
-		/// </summary>
-		public override bool IsCameraMuted { get { throw new NotSupportedException(); } }
 
 		#endregion
 
@@ -119,7 +108,7 @@ namespace ICD.Connect.Cameras.Visca
 		/// </summary>
 		public override IEnumerable<CameraPreset> GetPresets()
 		{
-			throw new NotSupportedException();
+			return Enumerable.Empty<CameraPreset>();
 		}
 
 		/// <summary>

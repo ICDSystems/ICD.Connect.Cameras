@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using ICD.Common.Properties;
 using ICD.Common.Utils;
-using ICD.Common.Utils.EventArguments;
 using ICD.Common.Utils.Services.Logging;
 using ICD.Common.Utils.Timers;
 using ICD.Connect.API.Commands;
@@ -19,13 +19,6 @@ namespace ICD.Connect.Cameras.Panasonic
 {
 	public sealed class PanasonicCameraAwDevice : AbstractCameraDevice<PanasonicCameraAwDeviceSettings>, IDeviceWithPower
 	{
-		#region Events
-
-		public override event EventHandler<GenericEventArgs<IEnumerable<CameraPreset>>> OnPresetsChanged;
-		public override event EventHandler<BoolEventArgs> OnCameraMuteStateChanged;
-
-		#endregion
-
 		#region Properties
 		private const long RATE_LIMIT = 130;
 
@@ -52,11 +45,6 @@ namespace ICD.Connect.Cameras.Panasonic
 		/// Gets the maximum number of presets this camera can support
 		/// </summary>
 		public override int MaxPresets { get { throw new NotSupportedException(); } }
-
-		/// <summary>
-		/// Gets whether the camera is currently muted
-		/// </summary>
-		public override bool IsCameraMuted { get { throw new NotSupportedException(); } }
 
 		#endregion
 
@@ -101,7 +89,7 @@ namespace ICD.Connect.Cameras.Panasonic
 		/// </summary>
 		public override IEnumerable<CameraPreset> GetPresets()
 		{
-			throw new NotSupportedException();
+			return Enumerable.Empty<CameraPreset>();
 		}
 
 		/// <summary>

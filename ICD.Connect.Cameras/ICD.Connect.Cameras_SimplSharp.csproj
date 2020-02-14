@@ -72,12 +72,7 @@
     <Compile Include="CameraPreset.cs" />
     <Compile Include="Controls\AbstractCameraDeviceControl.cs" />
     <Compile Include="Controls\ICameraDeviceControl.cs" />
-    <Compile Include="Devices\CameraWithHomeConsole.cs" />
-    <Compile Include="Devices\CameraWithMuteConsole.cs" />
-    <Compile Include="Devices\CameraWithPanConsole.cs" />
-    <Compile Include="Devices\CameraWithPresetsConsole.cs" />
-    <Compile Include="Devices\CameraWithTiltConsole.cs" />
-    <Compile Include="Devices\CameraWithZoomConsole.cs" />
+    <Compile Include="Devices\CameraDeviceConsole.cs" />
     <Compile Include="eCameraActions.cs" />
     <Compile Include="Controls\GenericCameraRouteSourceControl.cs" />
     <Compile Include="Devices\ICameraDevice.cs" />

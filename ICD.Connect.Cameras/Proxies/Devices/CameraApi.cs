@@ -13,7 +13,7 @@
 
 		public const string HELP_PROPERTY_MAX_PRESETS = "Gets the maximum number of presets this camera can support.";
 
-		public const string HELP_METHOD_PAN = "Starts paning the camera with the given action.";
+		public const string HELP_METHOD_PAN = "Starts panning the camera with the given action.";
 		public const string HELP_METHOD_TILT = "Starts tilting the camera with the given action.";
 		public const string HELP_METHOD_ZOOM = "Starts zooming the camera with the given action.";
 		public const string HELP_METHOD_GET_PRESETS = "Gets the stored camera presets.";

@@ -41,12 +41,12 @@ namespace ICD.Connect.Cameras.Controls
 		Home = 32,
 
 		/// <summary>
-		/// The control supports paning and tilting
+		/// The control supports panning and tilting
 		/// </summary>
 		PanTilt = Pan | Tilt,
 
 		/// <summary>
-		/// The control supports paning, tilting, and zooming
+		/// The control supports panning, tilting, and zooming
 		/// </summary>
 		PanTiltZoom = PanTilt | Zoom
 	}

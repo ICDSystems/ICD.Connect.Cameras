@@ -12,10 +12,14 @@ namespace ICD.Connect.Cameras.Devices
 	public abstract class AbstractCameraDevice<TSettings> : AbstractDevice<TSettings>, ICameraDevice
 		where TSettings : ICameraDeviceSettings, new()
 	{
-		private eCameraFeatures m_SupportedCameraFeatures;
-		public abstract event EventHandler<GenericEventArgs<IEnumerable<CameraPreset>>> OnPresetsChanged;
+		public event EventHandler<GenericEventArgs<IEnumerable<CameraPreset>>> OnPresetsChanged;
 		public event EventHandler<GenericEventArgs<eCameraFeatures>> OnSupportedCameraFeaturesChanged;
-		public abstract event EventHandler<BoolEventArgs> OnCameraMuteStateChanged;
+		public event EventHandler<BoolEventArgs> OnCameraMuteStateChanged;
+
+		private eCameraFeatures m_SupportedCameraFeatures;
+		private bool m_IsCameraMuted;
+
+		#region Properties
 
 		/// <summary>
 		/// Flags which indicate which features this camera can support
@@ -42,7 +46,35 @@ namespace ICD.Connect.Cameras.Devices
 		/// <summary>
 		/// Gets whether the camera is currently muted
 		/// </summary>
-		public abstract bool IsCameraMuted { get; }
+		public bool IsCameraMuted
+		{
+			get { return m_IsCameraMuted; }
+			protected set
+			{
+				if (value == m_IsCameraMuted)
+					return;
+
+				m_IsCameraMuted = value;
+
+				OnCameraMuteStateChanged.Raise(this, new BoolEventArgs(m_IsCameraMuted));
+			}
+		}
+
+		#endregion
+
+		#region Methods
+
+		/// <summary>
+		/// Release resources.
+		/// </summary>
+		protected override void DisposeFinal(bool disposing)
+		{
+			OnPresetsChanged = null;
+			OnSupportedCameraFeaturesChanged = null;
+			OnCameraMuteStateChanged = null;
+
+			base.DisposeFinal(disposing);
+		}
 
 		/// <summary>
 		/// Begins panning the camera
@@ -88,6 +120,21 @@ namespace ICD.Connect.Cameras.Devices
 		/// </summary>
 		public abstract void SendCameraHome();
 
+		#endregion
+
+		#region Private Methods
+
+		/// <summary>
+		/// Raised the presets changed event.
+		/// </summary>
+		protected void RaisePresetsChanged()
+		{
+			IEnumerable<CameraPreset> data = GetPresets();
+			OnPresetsChanged.Raise(this, new GenericEventArgs<IEnumerable<CameraPreset>>(data));
+		}
+
+		#endregion
+
 		#region Console
 
 		/// <summary>
@@ -98,18 +145,7 @@ namespace ICD.Connect.Cameras.Devices
 		{
 			base.BuildConsoleStatus(addRow);
 
-			if(SupportedCameraFeatures.HasFlag(eCameraFeatures.Pan))
-				CameraWithPanConsole.BuildConsoleStatus(this, addRow);
-			if(SupportedCameraFeatures.HasFlag(eCameraFeatures.Tilt))
-				CameraWithTiltConsole.BuildConsoleStatus(this, addRow);
-			if(SupportedCameraFeatures.HasFlag(eCameraFeatures.Zoom))
-				CameraWithZoomConsole.BuildConsoleStatus(this, addRow);
-			if(SupportedCameraFeatures.HasFlag(eCameraFeatures.Presets))
-				CameraWithPresetsConsole.BuildConsoleStatus(this, addRow);
-			if(SupportedCameraFeatures.HasFlag(eCameraFeatures.Mute))
-				CameraWithMuteConsole.BuildConsoleStatus(this, addRow);
-			if(SupportedCameraFeatures.HasFlag(eCameraFeatures.Home))
-				CameraWithHomeConsole.BuildConsoleStatus(this, addRow);
+			CameraDeviceConsole.BuildConsoleStatus(this, addRow);
 		}
 
 		/// <summary>
@@ -121,29 +157,8 @@ namespace ICD.Connect.Cameras.Devices
 			foreach (IConsoleCommand command in GetBaseConsoleCommands())
 				yield return command;
 
-			if(SupportedCameraFeatures.HasFlag(eCameraFeatures.Pan))
-				foreach (IConsoleCommand command in CameraWithPanConsole.GetConsoleCommands(this))
-					yield return command;
-
-			if (SupportedCameraFeatures.HasFlag(eCameraFeatures.Tilt))
-				foreach (IConsoleCommand command in CameraWithTiltConsole.GetConsoleCommands(this))
-					yield return command;
-
-			if(SupportedCameraFeatures.HasFlag(eCameraFeatures.Zoom))
-				foreach (IConsoleCommand command in CameraWithZoomConsole.GetConsoleCommands(this))
-					yield return command;
-
-			if(SupportedCameraFeatures.HasFlag(eCameraFeatures.Presets))
-				foreach (IConsoleCommand command in CameraWithPresetsConsole.GetConsoleCommands(this))
-					yield return command;
-
-			if (SupportedCameraFeatures.HasFlag(eCameraFeatures.Mute))
-				foreach (IConsoleCommand command in CameraWithMuteConsole.GetConsoleCommands(this))
-					yield return command;
-
-			if (SupportedCameraFeatures.HasFlag(eCameraFeatures.Home))
-				foreach (IConsoleCommand command in CameraWithHomeConsole.GetConsoleCommands(this))
-					yield return command;
+			foreach (IConsoleCommand command in CameraDeviceConsole.GetConsoleCommands(this))
+				yield return command;
 		}
 
 		/// <summary>
@@ -164,29 +179,8 @@ namespace ICD.Connect.Cameras.Devices
 			foreach (IConsoleNodeBase node in GetBaseConsoleNodes())
 				yield return node;
 
-			if (SupportedCameraFeatures.HasFlag(eCameraFeatures.Pan))
-				foreach (IConsoleNodeBase node in CameraWithPanConsole.GetConsoleNodes(this))
-					yield return node;
-
-			if (SupportedCameraFeatures.HasFlag(eCameraFeatures.Tilt))
-				foreach (IConsoleNodeBase node in CameraWithTiltConsole.GetConsoleNodes(this))
-					yield return node;
-
-			if (SupportedCameraFeatures.HasFlag(eCameraFeatures.Zoom))
-				foreach (IConsoleNodeBase node in CameraWithZoomConsole.GetConsoleNodes(this))
-					yield return node;
-
-			if (SupportedCameraFeatures.HasFlag(eCameraFeatures.Presets))
-				foreach (IConsoleNodeBase node in CameraWithPresetsConsole.GetConsoleNodes(this))
-					yield return node;
-
-			if (SupportedCameraFeatures.HasFlag(eCameraFeatures.Mute))
-				foreach (IConsoleNodeBase node in CameraWithMuteConsole.GetConsoleNodes(this))
-					yield return node;
-
-			if (SupportedCameraFeatures.HasFlag(eCameraFeatures.Home))
-				foreach (IConsoleNodeBase node in CameraWithHomeConsole.GetConsoleNodes(this))
-					yield return node;
+			foreach (IConsoleNodeBase node in CameraDeviceConsole.GetConsoleNodes(this))
+				yield return node;
 		}
 
 		/// <summary>

@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using ICD.Common.Properties;
-using ICD.Common.Utils;
 using ICD.Common.Utils.EventArguments;
 using ICD.Common.Utils.Extensions;
 using ICD.Common.Utils.Services.Logging;
 using ICD.Connect.API.Commands;
-using ICD.Connect.API.Nodes;
 using ICD.Connect.Cameras.Controls;
 using ICD.Connect.Cameras.Devices;
 using ICD.Connect.Devices;
@@ -22,13 +20,6 @@ namespace ICD.Connect.Cameras.Vaddio
 {
 	public sealed class VaddioRoboshotCameraDevice : AbstractCameraDevice<VaddioRoboshotCameraDeviceSettings>, IDeviceWithPower
 	{
-		#region Events
-
-		public override event EventHandler<GenericEventArgs<IEnumerable<CameraPreset>>> OnPresetsChanged;
-		public override event EventHandler<BoolEventArgs> OnCameraMuteStateChanged;
-
-		#endregion
-
 		#region Constants
 
 		private const char DELIMITER = '\r';
@@ -70,11 +61,6 @@ namespace ICD.Connect.Cameras.Vaddio
 		/// </summary>
 		public override int MaxPresets { get { return 16; } }
 
-		/// <summary>
-		/// Gets whether the camera is currently muted
-		/// </summary>
-		public override bool IsCameraMuted { get { throw new NotSupportedException(); } }
-
 		#endregion
 
 		/// <summary>
@@ -100,8 +86,6 @@ namespace ICD.Connect.Cameras.Vaddio
 		/// </summary>
 		protected override void DisposeFinal(bool disposing)
 		{
-			OnPresetsChanged = null;
-
 			m_ConnectionStateManager.OnIsOnlineStateChanged -= PortOnIsOnlineStateChanged;
 			m_ConnectionStateManager.Dispose();
 
