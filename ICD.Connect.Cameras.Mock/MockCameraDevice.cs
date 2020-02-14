@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using ICD.Common.Utils;
-using ICD.Common.Utils.Extensions;
 using ICD.Common.Utils.Services.Logging;
 using ICD.Connect.API.Commands;
-using ICD.Connect.API.Nodes;
 using ICD.Connect.Cameras.Controls;
 using ICD.Connect.Cameras.Devices;
 using ICD.Connect.Devices;
@@ -13,18 +11,26 @@ using ICD.Connect.Settings;
 
 namespace ICD.Connect.Cameras.Mock
 {
-	public sealed class MockCameraDevice : AbstractCameraDevice<MockCameraDeviceSettings>,
-	                                       ICameraWithPanTilt, ICameraWithZoom, ICameraWithPresets, IDeviceWithPower
+	public sealed class MockCameraDevice : AbstractCameraDevice<MockCameraDeviceSettings>, IDeviceWithPower
 	{
-		#region Properties
+		private readonly Dictionary<int, CameraPosition> m_PresetPositions;
+		private readonly Dictionary<int, CameraPreset> m_Presets;
 
 		private bool m_Powered;
+
 		private int m_VPosition;
 		private int m_HPosition;
 		private int m_ZPosition;
-		private readonly Dictionary<int, CameraPosition> m_PresetPositions;
+
 		private int? m_PanTiltSpeed;
 		private int? m_ZoomSpeed;
+
+		#region Properties
+
+		/// <summary>
+		/// Gets the maximum number of presets this camera can support
+		/// </summary>
+		public override int MaxPresets { get { return 4; } }
 
 		#endregion
 
@@ -36,43 +42,35 @@ namespace ICD.Connect.Cameras.Mock
 			m_Presets = new Dictionary<int, CameraPreset>();
 			m_PresetPositions = new Dictionary<int, CameraPosition>();
 
+			SupportedCameraFeatures =
+				eCameraFeatures.PanTiltZoom |
+				eCameraFeatures.Presets |
+				eCameraFeatures.Mute |
+				eCameraFeatures.Home;
+
 			Controls.Add(new GenericCameraRouteSourceControl<MockCameraDevice>(this, 0));
-			Controls.Add(new PanTiltControl<MockCameraDevice>(this, 1));
-			Controls.Add(new ZoomControl<MockCameraDevice>(this, 2));
+			Controls.Add(new CameraDeviceControl(this, 1));
 			Controls.Add(new PowerDeviceControl<MockCameraDevice>(this, 3));
-			Controls.Add(new PresetControl<MockCameraDevice>(this, 4));
 		}
+
+		#region PTZ
 
 		/// <summary>
-		/// Release resources.
+		/// Begins panning the camera
 		/// </summary>
-		protected override void DisposeFinal(bool disposing)
-		{
-			OnPresetsChanged = null;
-
-			base.DisposeFinal(disposing);
-		}
-
-		#region ICameraWithPanTilt
-
-		public void PanTilt(eCameraPanTiltAction action)
+		/// <param name="action"></param>
+		public override void Pan(eCameraPanAction action)
 		{
 			int speed = m_PanTiltSpeed == null ? 1 : m_PanTiltSpeed.Value;
 			switch (action)
 			{
-				case eCameraPanTiltAction.Left:
+				case eCameraPanAction.Left:
 					m_HPosition = MathUtils.Clamp(m_HPosition - speed, int.MinValue, int.MaxValue);
 					break;
-				case eCameraPanTiltAction.Right:
+				case eCameraPanAction.Right:
 					m_HPosition = MathUtils.Clamp(m_HPosition + speed, int.MinValue, int.MaxValue);
 					break;
-				case eCameraPanTiltAction.Up:
-					m_VPosition = MathUtils.Clamp(m_VPosition + speed, int.MinValue, int.MaxValue);
-					break;
-				case eCameraPanTiltAction.Down:
-					m_VPosition = MathUtils.Clamp(m_VPosition - speed, int.MinValue, int.MaxValue);
-					break;
-				case eCameraPanTiltAction.Stop:
+				case eCameraPanAction.Stop:
 					break;
 				default:
 					throw new ArgumentOutOfRangeException("action");
@@ -80,11 +78,29 @@ namespace ICD.Connect.Cameras.Mock
 			LogCameraMovement(action.ToString());
 		}
 
-		#endregion
+		/// <summary>
+		/// Begin tilting the camera.
+		/// </summary>
+		public override void Tilt(eCameraTiltAction action)
+		{
+			int speed = m_PanTiltSpeed == null ? 1 : m_PanTiltSpeed.Value;
+			switch (action)
+			{
+				case eCameraTiltAction.Up:
+					m_VPosition = MathUtils.Clamp(m_VPosition + speed, int.MinValue, int.MaxValue);
+					break;
+				case eCameraTiltAction.Down:
+					m_VPosition = MathUtils.Clamp(m_VPosition - speed, int.MinValue, int.MaxValue);
+					break;
+				case eCameraTiltAction.Stop:
+					break;
+				default:
+					throw new ArgumentOutOfRangeException("action");
+			}
+			LogCameraMovement(action.ToString());
+		}
 
-		#region ICameraWithZoom
-
-		public void Zoom(eCameraZoomAction action)
+		public override void Zoom(eCameraZoomAction action)
 		{
 			int speed = m_ZoomSpeed == null ? 1 : m_ZoomSpeed.Value;
 			switch (action)
@@ -105,19 +121,14 @@ namespace ICD.Connect.Cameras.Mock
 
 		#endregion
 
-		#region ICameraWithPresets
+		#region Presets
 
-		public event EventHandler OnPresetsChanged;
-
-		public int MaxPresets { get { return 4; } }
-		private readonly Dictionary<int, CameraPreset> m_Presets;
-
-		public IEnumerable<CameraPreset> GetPresets()
+		public override IEnumerable<CameraPreset> GetPresets()
 		{
 			return m_Presets.Values;
 		}
 
-		public void ActivatePreset(int presetId)
+		public override void ActivatePreset(int presetId)
 		{
 			if (presetId < 1 || presetId > MaxPresets)
 			{
@@ -131,7 +142,7 @@ namespace ICD.Connect.Cameras.Mock
 			LogCameraMovement(string.Format("Loaded Preset {0}", presetId));
 		}
 
-		public void StorePreset(int presetId)
+		public override void StorePreset(int presetId)
 		{
 			if (presetId < 1 || presetId > MaxPresets)
 			{
@@ -143,7 +154,26 @@ namespace ICD.Connect.Cameras.Mock
 			m_PresetPositions.Add(presetId,
 			                      new CameraPosition {HPosition = m_HPosition, VPosition = m_VPosition, ZPosition = m_ZPosition});
 
-			OnPresetsChanged.Raise(this);
+			RaisePresetsChanged();
+		}
+
+		/// <summary>
+		/// Sets if the camera mute state should be active
+		/// </summary>
+		/// <param name="enable"></param>
+		public override void MuteCamera(bool enable)
+		{
+			IsCameraMuted = enable;
+		}
+
+		/// <summary>
+		/// Resets camera to its predefined home position
+		/// </summary>
+		public override void SendCameraHome()
+		{
+			m_HPosition = 0;
+			m_VPosition = 0;
+			m_ZPosition = 0;
 		}
 
 		#endregion
@@ -221,34 +251,12 @@ namespace ICD.Connect.Cameras.Mock
 		#region Console
 
 		/// <summary>
-		/// Calls the delegate for each console status item.
-		/// </summary>
-		/// <param name="addRow"></param>
-		public override void BuildConsoleStatus(AddStatusRowDelegate addRow)
-		{
-			base.BuildConsoleStatus(addRow);
-
-			CameraWithPanTiltConsole.BuildConsoleStatus(this, addRow);
-			CameraWithZoomConsole.BuildConsoleStatus(this, addRow);
-			CameraWithPresetsConsole.BuildConsoleStatus(this, addRow);
-		}
-
-		/// <summary>
 		/// Gets the child console commands.
 		/// </summary>
 		/// <returns></returns>
 		public override IEnumerable<IConsoleCommand> GetConsoleCommands()
 		{
 			foreach (IConsoleCommand command in GetBaseConsoleCommands())
-				yield return command;
-
-			foreach (IConsoleCommand command in CameraWithPanTiltConsole.GetConsoleCommands(this))
-				yield return command;
-
-			foreach (IConsoleCommand command in CameraWithZoomConsole.GetConsoleCommands(this))
-				yield return command;
-
-			foreach (IConsoleCommand command in CameraWithPresetsConsole.GetConsoleCommands(this))
 				yield return command;
 
 			yield return new ConsoleCommand("PowerOn", "Powers the camera device", () => PowerOn());
@@ -264,34 +272,6 @@ namespace ICD.Connect.Cameras.Mock
 		private IEnumerable<IConsoleCommand> GetBaseConsoleCommands()
 		{
 			return base.GetConsoleCommands();
-		}
-
-		/// <summary>
-		/// Gets the child console nodes.
-		/// </summary>
-		/// <returns></returns>
-		public override IEnumerable<IConsoleNodeBase> GetConsoleNodes()
-		{
-			foreach (IConsoleNodeBase node in GetBaseConsoleNodes())
-				yield return node;
-
-			foreach (IConsoleNodeBase node in CameraWithPanTiltConsole.GetConsoleNodes(this))
-				yield return node;
-
-			foreach (IConsoleNodeBase node in CameraWithZoomConsole.GetConsoleNodes(this))
-				yield return node;
-
-			foreach (IConsoleNodeBase node in CameraWithPresetsConsole.GetConsoleNodes(this))
-				yield return node;
-		}
-
-		/// <summary>
-		/// Workaround for "unverifiable code" warning.
-		/// </summary>
-		/// <returns></returns>
-		private IEnumerable<IConsoleNodeBase> GetBaseConsoleNodes()
-		{
-			return base.GetConsoleNodes();
 		}
 
 		#endregion
