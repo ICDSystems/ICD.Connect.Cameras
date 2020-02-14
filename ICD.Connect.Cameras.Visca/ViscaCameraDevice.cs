@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using ICD.Common.Properties;
 using ICD.Common.Utils;
 using ICD.Common.Utils.EventArguments;
 using ICD.Common.Utils.Services.Logging;
 using ICD.Connect.API.Commands;
-using ICD.Connect.API.Nodes;
 using ICD.Connect.Cameras.Controls;
 using ICD.Connect.Cameras.Devices;
 using ICD.Connect.Devices;
@@ -23,12 +23,13 @@ using ICD.Connect.Settings;
 
 namespace ICD.Connect.Cameras.Visca
 {
-	public sealed class ViscaCameraDevice : AbstractCameraDevice<ViscaCameraDeviceSettings>,
-		ICameraWithPanTilt, ICameraWithZoom, IDeviceWithPower
+	public sealed class ViscaCameraDevice : AbstractCameraDevice<ViscaCameraDeviceSettings>, IDeviceWithPower
 	{
 		private const int MAX_RETRY_ATTEMPTS = 20;
 		private const int DEFAULT_ID = 1;
 		private const char DELIMITER = '\xFF';
+
+		#region Private Members
 
 		private readonly Dictionary<string, int> m_RetryCounts = new Dictionary<string, int>();
 		private readonly SafeCriticalSection m_RetryLock = new SafeCriticalSection();
@@ -41,6 +42,17 @@ namespace ICD.Connect.Cameras.Visca
 		private int? m_ZoomSpeed;
 		private ISerialQueue SerialQueue { get; set; }
 
+		#endregion
+
+		#region Public Properties
+
+		/// <summary>
+		/// Gets the maximum number of presets this camera can support
+		/// </summary>
+		public override int MaxPresets { get { throw new NotSupportedException(); } }
+
+		#endregion
+
 		/// <summary>
 		/// Constructor.
 		/// </summary>
@@ -52,9 +64,8 @@ namespace ICD.Connect.Cameras.Visca
 			m_ConnectionStateManager.OnIsOnlineStateChanged += PortOnIsOnlineStateChanged;
 
 			Controls.Add(new GenericCameraRouteSourceControl<ViscaCameraDevice>(this, 0));
-			Controls.Add(new PanTiltControl<ViscaCameraDevice>(this, 1));
-			Controls.Add(new ZoomControl<ViscaCameraDevice>(this, 2));
-			Controls.Add(new PowerDeviceControl<ViscaCameraDevice>(this, 3));
+			Controls.Add(new CameraDeviceControl(this, 1));
+			Controls.Add(new PowerDeviceControl<ViscaCameraDevice>(this, 2));
 		}
 
 		private void PortOnIsOnlineStateChanged(object sender, BoolEventArgs e)
@@ -64,18 +75,79 @@ namespace ICD.Connect.Cameras.Visca
 
 		#region PTZ
 
-		public void PanTilt(eCameraPanTiltAction action)
+		/// <summary>
+		/// Begins panning the camera
+		/// </summary>
+		/// <param name="action"></param>
+		public override void Pan(eCameraPanAction action)
 		{
 			SendCommand(m_PanTiltSpeed == null
-							? ViscaCommandBuilder.GetPanTiltCommand(DEFAULT_ID, action)
-							: ViscaCommandBuilder.GetPanTiltCommand(DEFAULT_ID, action, m_PanTiltSpeed.Value, m_PanTiltSpeed.Value));
+							? ViscaCommandBuilder.GetPanCommand(DEFAULT_ID, action)
+							: ViscaCommandBuilder.GetPanCommand(DEFAULT_ID, action, m_PanTiltSpeed.Value));
 		}
 
-		public void Zoom(eCameraZoomAction action)
+		/// <summary>
+		/// Begin tilting the camera.
+		/// </summary>
+		public override void Tilt(eCameraTiltAction action)
+		{
+			SendCommand(m_PanTiltSpeed == null
+							? ViscaCommandBuilder.GetTiltCommand(DEFAULT_ID, action)
+							: ViscaCommandBuilder.GetTiltCommand(DEFAULT_ID, action, m_PanTiltSpeed.Value));
+		}
+
+		/// <summary>
+		/// Begin zooming the camera
+		/// </summary>
+		/// <param name="action"></param>
+		public override void Zoom(eCameraZoomAction action)
 		{
 			SendCommand(m_ZoomSpeed == null
 							? ViscaCommandBuilder.GetZoomCommand(DEFAULT_ID, action)
 							: ViscaCommandBuilder.GetZoomCommand(DEFAULT_ID, action, m_ZoomSpeed.Value));
+		}
+
+		/// <summary>
+		/// Gets the stored camera presets.
+		/// </summary>
+		public override IEnumerable<CameraPreset> GetPresets()
+		{
+			return Enumerable.Empty<CameraPreset>();
+		}
+
+		/// <summary>
+		/// Tells the camera to change its position to the given preset.
+		/// </summary>
+		/// <param name="presetId">The id of the preset to position to.</param>
+		public override void ActivatePreset(int presetId)
+		{
+			throw new NotSupportedException();
+		}
+
+		/// <summary>
+		/// Stores the cameras current position in the given preset index.
+		/// </summary>
+		/// <param name="presetId">The index to store the preset at.</param>
+		public override void StorePreset(int presetId)
+		{
+			throw new NotSupportedException();
+		}
+
+		/// <summary>
+		/// Sets if the camera mute state should be active
+		/// </summary>
+		/// <param name="enable"></param>
+		public override void MuteCamera(bool enable)
+		{
+			throw new NotSupportedException();
+		}
+
+		/// <summary>
+		/// Resets camera to its predefined home position
+		/// </summary>
+		public override void SendCameraHome()
+		{
+			throw new NotSupportedException();
 		}
 
 		#endregion
@@ -335,6 +407,10 @@ namespace ICD.Connect.Cameras.Visca
 			m_ComSpecProperties.ClearComSpecProperties();
 
 			SetPort(null);
+
+			SupportedCameraFeatures = eCameraFeatures.None;
+
+			m_ConnectionStateManager.SetPort(null);
 		}
 
 		/// <summary>
@@ -367,6 +443,8 @@ namespace ICD.Connect.Cameras.Visca
 
 			SetPort(port);
 
+			SupportedCameraFeatures = eCameraFeatures.PanTiltZoom;
+
 			if (port != null && port.IsOnline)
 			{
 				SendCommand(ViscaCommandBuilder.GetSetAddressCommand());
@@ -379,30 +457,12 @@ namespace ICD.Connect.Cameras.Visca
 		#region Console
 
 		/// <summary>
-		/// Calls the delegate for each console status item.
-		/// </summary>
-		/// <param name="addRow"></param>
-		public override void BuildConsoleStatus(AddStatusRowDelegate addRow)
-		{
-			base.BuildConsoleStatus(addRow);
-
-			CameraWithPanTiltConsole.BuildConsoleStatus(this, addRow);
-			CameraWithZoomConsole.BuildConsoleStatus(this, addRow);
-		}
-
-		/// <summary>
 		/// Gets the child console commands.
 		/// </summary>
 		/// <returns></returns>
 		public override IEnumerable<IConsoleCommand> GetConsoleCommands()
 		{
 			foreach (IConsoleCommand command in GetBaseConsoleCommands())
-				yield return command;
-
-			foreach (IConsoleCommand command in CameraWithPanTiltConsole.GetConsoleCommands(this))
-				yield return command;
-
-			foreach (IConsoleCommand command in CameraWithZoomConsole.GetConsoleCommands(this))
 				yield return command;
 
 			yield return new ConsoleCommand("PowerOn", "Powers the camera device", () => PowerOn());
@@ -416,31 +476,6 @@ namespace ICD.Connect.Cameras.Visca
 		private IEnumerable<IConsoleCommand> GetBaseConsoleCommands()
 		{
 			return base.GetConsoleCommands();
-		}
-
-		/// <summary>
-		/// Gets the child console nodes.
-		/// </summary>
-		/// <returns></returns>
-		public override IEnumerable<IConsoleNodeBase> GetConsoleNodes()
-		{
-			foreach (IConsoleNodeBase node in GetBaseConsoleNodes())
-				yield return node;
-
-			foreach (IConsoleNodeBase node in CameraWithPanTiltConsole.GetConsoleNodes(this))
-				yield return node;
-
-			foreach (IConsoleNodeBase node in CameraWithZoomConsole.GetConsoleNodes(this))
-				yield return node;
-		}
-
-		/// <summary>
-		/// Workaround for "unverifiable code" warning.
-		/// </summary>
-		/// <returns></returns>
-		private IEnumerable<IConsoleNodeBase> GetBaseConsoleNodes()
-		{
-			return base.GetConsoleNodes();
 		}
 
 		#endregion

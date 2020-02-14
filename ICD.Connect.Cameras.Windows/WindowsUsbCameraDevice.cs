@@ -1,4 +1,6 @@
-﻿using ICD.Connect.API.Nodes;
+﻿using System;
+using System.Collections.Generic;
+using ICD.Connect.API.Nodes;
 using ICD.Connect.Cameras.Controls;
 using ICD.Connect.Cameras.Devices;
 using ICD.Connect.Devices.Windows;
@@ -68,6 +70,79 @@ namespace ICD.Connect.Cameras.Windows
 		#endregion
 
 		#region Console
+
+		/// <summary>
+		/// Gets the maximum number of presets this camera can support
+		/// </summary>
+		public override int MaxPresets { get { return 0; } }
+
+		/// <summary>
+		/// Begins panning the camera
+		/// </summary>
+		/// <param name="action"></param>
+		public override void Pan(eCameraPanAction action)
+		{
+			throw new NotSupportedException();
+		}
+
+		/// <summary>
+		/// Begin tilting the camera.
+		/// </summary>
+		public override void Tilt(eCameraTiltAction action)
+		{
+			throw new NotSupportedException();
+		}
+
+		/// <summary>
+		/// Zooms the camera.
+		/// </summary>
+		public override void Zoom(eCameraZoomAction action)
+		{
+			throw new NotSupportedException();
+		}
+
+		/// <summary>
+		/// Gets the stored camera presets.
+		/// </summary>
+		public override IEnumerable<CameraPreset> GetPresets()
+		{
+			yield break;
+		}
+
+		/// <summary>
+		/// Tells the camera to change its position to the given preset.
+		/// </summary>
+		/// <param name="presetId">The id of the preset to position to.</param>
+		public override void ActivatePreset(int presetId)
+		{
+			throw new NotSupportedException();
+		}
+
+		/// <summary>
+		/// Stores the cameras current position in the given preset index.
+		/// </summary>
+		/// <param name="presetId">The index to store the preset at.</param>
+		public override void StorePreset(int presetId)
+		{
+			throw new NotSupportedException();
+		}
+
+		/// <summary>
+		/// Sets if the camera mute state should be active
+		/// </summary>
+		/// <param name="enable"></param>
+		public override void MuteCamera(bool enable)
+		{
+			throw new NotSupportedException();
+		}
+
+		/// <summary>
+		/// Resets camera to its predefined home position
+		/// </summary>
+		public override void SendCameraHome()
+		{
+			throw new NotSupportedException();
+		}
 
 		/// <summary>
 		/// Calls the delegate for each console status item.
