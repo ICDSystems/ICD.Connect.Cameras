@@ -9,18 +9,14 @@ namespace ICD.Connect.Cameras.Visca.Tests
 		[Test]
 		public static void GetPanTiltCommandTest()
 		{
-			string expectedTiltUpCommand = StringUtils.ToString(new byte[] { 0x81, 0x01, 0x06, 0x01, 0x01, 0x01, 0x03, 0x01, 0xFF });
-			string expectedtiltDownCommand = StringUtils.ToString(new byte[] { 0x81, 0x01, 0x06, 0x01, 0x01, 0x01, 0x03, 0x02, 0xFF });
-			string expectedpanLeftCommand = StringUtils.ToString(new byte[] { 0x81, 0x01, 0x06, 0x01, 0x01, 0x01, 0x01, 0x03, 0xFF });
-			string expectedpanRightCommand = StringUtils.ToString(new byte[] { 0x81, 0x01, 0x06, 0x01, 0x01, 0x01, 0x02, 0x03, 0xFF });
-			string tiltUpCommand = ViscaCommandBuilder.GetPanTiltCommand(0, eCameraPanTiltAction.Up, 1, 1);
-			string tiltDownCommand = ViscaCommandBuilder.GetPanTiltCommand(0, eCameraPanTiltAction.Down, 1, 1);
-			string panLeftCommand = ViscaCommandBuilder.GetPanTiltCommand(0, eCameraPanTiltAction.Left, 1, 1);
-			string panRightCommand = ViscaCommandBuilder.GetPanTiltCommand(0, eCameraPanTiltAction.Right, 1, 1);
-			Assert.AreEqual(expectedTiltUpCommand, tiltUpCommand);
-			Assert.AreEqual(expectedtiltDownCommand, tiltDownCommand);
-			Assert.AreEqual(expectedpanLeftCommand, panLeftCommand);
-			Assert.AreEqual(expectedpanRightCommand, panRightCommand);
+			string expectedPanLeftCommand = StringUtils.ToString(new byte[] { 0x81, 0x01, 0x06, 0x01, 0x01, 0x01, 0x01, 0x03, 0xFF });
+			string expectedPanRightCommand = StringUtils.ToString(new byte[] { 0x81, 0x01, 0x06, 0x01, 0x01, 0x01, 0x02, 0x03, 0xFF });
+
+			string panLeftCommand = ViscaCommandBuilder.GetPanCommand(0, eCameraPanAction.Left);
+			string panRightCommand = ViscaCommandBuilder.GetPanCommand(0, eCameraPanAction.Right);
+
+			Assert.AreEqual(expectedPanLeftCommand, panLeftCommand);
+			Assert.AreEqual(expectedPanRightCommand, panRightCommand);
 		}
 
 		[Test]

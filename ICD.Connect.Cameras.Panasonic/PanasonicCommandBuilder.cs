@@ -50,9 +50,9 @@ namespace ICD.Connect.Cameras.Panasonic
 		/// </summary>
 		/// <param name="action">The Pan/Tilt action desired.</param>
 		[PublicAPI]
-		public static string GetPanTiltCommand(eCameraPanTiltAction action)
+		public static string GetPanCommand(eCameraPanAction action)
 		{
-			return GetPanTiltCommand(action, DEFAULT_SPEED);
+			return GetPanCommand(action, DEFAULT_SPEED);
 		}
 
 		/// <summary>
@@ -61,18 +61,46 @@ namespace ICD.Connect.Cameras.Panasonic
 		/// <param name="action">The Pan/Tilt action desired.</param>
 		/// <param name="speed">The desired speed, where 0 is still and 50 is fastest possible</param>
 		[PublicAPI]
-		public static string GetPanTiltCommand(eCameraPanTiltAction action, int speed)
+		public static string GetPanCommand(eCameraPanAction action, int speed)
 		{
 			string speedString = GetSpeedStringBasedOnDirection(action, speed);
 			switch (action)
 			{
-				case eCameraPanTiltAction.Left:
-				case eCameraPanTiltAction.Right:
+				case eCameraPanAction.Left:
+				case eCameraPanAction.Right:
 					return GetCommandUrl(PTS, speedString, STOP_SPEED);
-				case eCameraPanTiltAction.Up:
-				case eCameraPanTiltAction.Down:
+				case eCameraPanAction.Stop:
+					return GetPanTiltStopCommand();
+				default:
+					throw new ArgumentOutOfRangeException("action");
+			}
+		}
+
+		/// <summary>
+		/// Gets the Pan/Tilt Command URL, using the default speed
+		/// </summary>
+		/// <param name="action">The Pan/Tilt action desired.</param>
+		[PublicAPI]
+		public static string GetTiltCommand(eCameraTiltAction action)
+		{
+			return GetTiltCommand(action, DEFAULT_SPEED);
+		}
+
+		/// <summary>
+		/// Gets the Pan/Tilt Command URL, using the speed provided.
+		/// </summary>
+		/// <param name="action">The Pan/Tilt action desired.</param>
+		/// <param name="speed">The desired speed, where 0 is still and 50 is fastest possible</param>
+		[PublicAPI]
+		public static string GetTiltCommand(eCameraTiltAction action, int speed)
+		{
+			string speedString = GetSpeedStringBasedOnDirection(action, speed);
+			switch (action)
+			{
+				case eCameraTiltAction.Up:
+				case eCameraTiltAction.Down:
 					return GetCommandUrl(PTS, STOP_SPEED, speedString);
-				case eCameraPanTiltAction.Stop:
+				case eCameraTiltAction.Stop:
 					return GetPanTiltStopCommand();
 				default:
 					throw new ArgumentOutOfRangeException("action");
@@ -136,25 +164,41 @@ namespace ICD.Connect.Cameras.Panasonic
 			return GetCommandUrl(builder.ToString());
 		}
 
-		private static string GetSpeedStringBasedOnDirection(eCameraPanTiltAction action, int speed)
+		private static string GetSpeedStringBasedOnDirection(eCameraPanAction action, int speed)
 		{
 			int returnSpeed;
 
 			switch (action)
 			{
-				case eCameraPanTiltAction.Down:
+				case eCameraPanAction.Left:
 					returnSpeed = STOP_SPEED - speed;
 					break;
-				case eCameraPanTiltAction.Up:
+				case eCameraPanAction.Right:
 					returnSpeed = STOP_SPEED + speed;
 					break;
-				case eCameraPanTiltAction.Left:
+				case eCameraPanAction.Stop:
+					returnSpeed = STOP_SPEED;
+					break;
+				default:
+					throw new ArgumentOutOfRangeException("action");
+			}
+
+			return string.Format("{0:00}", returnSpeed);
+		}
+
+		private static string GetSpeedStringBasedOnDirection(eCameraTiltAction action, int speed)
+		{
+			int returnSpeed;
+
+			switch (action)
+			{
+				case eCameraTiltAction.Down:
 					returnSpeed = STOP_SPEED - speed;
 					break;
-				case eCameraPanTiltAction.Right:
+				case eCameraTiltAction.Up:
 					returnSpeed = STOP_SPEED + speed;
 					break;
-				case eCameraPanTiltAction.Stop:
+				case eCameraTiltAction.Stop:
 					returnSpeed = STOP_SPEED;
 					break;
 				default:

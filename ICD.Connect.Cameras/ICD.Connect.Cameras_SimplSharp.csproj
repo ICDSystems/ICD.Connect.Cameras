@@ -61,39 +61,28 @@
     <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controls\PanTiltControlConsole.cs" />
-    <Compile Include="Controls\PresetControlConsole.cs" />
-    <Compile Include="Controls\ZoomControlConsole.cs" />
+    <Compile Include="Controls\CameraControlFeaturesChangedApiEventArgs.cs" />
+    <Compile Include="Controls\CameraControlMuteChangedApiEventArgs.cs" />
+    <Compile Include="Controls\CameraControlPresetsChangedApiEventArgs.cs" />
+    <Compile Include="Controls\CameraDeviceControl.cs" />
+    <Compile Include="Controls\CameraDeviceControlConsole.cs" />
+    <Compile Include="Controls\eCameraFeatures.cs" />
     <Compile Include="Devices\AbstractCameraDevice.cs" />
     <Compile Include="Devices\AbstractCameraDeviceSettings.cs" />
     <Compile Include="CameraPreset.cs" />
     <Compile Include="Controls\AbstractCameraDeviceControl.cs" />
     <Compile Include="Controls\ICameraDeviceControl.cs" />
-    <Compile Include="Controls\PresetControl.cs" />
-    <Compile Include="Controls\ZoomControl.cs" />
-    <Compile Include="Controls\IPanTiltControl.cs" />
-    <Compile Include="Controls\IPresetControl.cs" />
-    <Compile Include="Controls\IZoomControl.cs" />
-    <Compile Include="Controls\PanTiltControl.cs" />
-    <Compile Include="Devices\CameraWithPanTiltConsole.cs" />
-    <Compile Include="Devices\CameraWithPresetsConsole.cs" />
-    <Compile Include="Devices\CameraWithZoomConsole.cs" />
+    <Compile Include="Devices\CameraDeviceConsole.cs" />
     <Compile Include="eCameraActions.cs" />
     <Compile Include="Controls\GenericCameraRouteSourceControl.cs" />
     <Compile Include="Devices\ICameraDevice.cs" />
     <Compile Include="Devices\ICameraDeviceSettings.cs" />
-    <Compile Include="Devices\ICameraWithPanTilt.cs" />
-    <Compile Include="Devices\ICameraWithPresets.cs" />
-    <Compile Include="Devices\ICameraWithZoom.cs" />
     <None Include="ObfuscationSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Proxies\Controls\AbstractProxyCameraDeviceControl.cs" />
     <Compile Include="Proxies\Controls\CameraControlApi.cs" />
     <Compile Include="Proxies\Controls\IProxyCameraDeviceControl.cs" />
     <Compile Include="Proxies\Controls\ProxyCameraDeviceControl.cs" />
-    <Compile Include="Proxies\Controls\ProxyPanTiltControl.cs" />
-    <Compile Include="Proxies\Controls\ProxyPresetControl.cs" />
-    <Compile Include="Proxies\Controls\ProxyZoomControl.cs" />
     <Compile Include="Proxies\Devices\AbstractProxyCameraDevice.cs" />
     <Compile Include="Proxies\Devices\AbstractProxyCameraDeviceSettings.cs" />
     <Compile Include="Proxies\Devices\CameraApi.cs" />
@@ -101,12 +90,6 @@
     <Compile Include="Proxies\Devices\IProxyCameraDeviceSettings.cs" />
     <Compile Include="Proxies\Devices\ProxyCameraDevice.cs" />
     <Compile Include="Proxies\Devices\ProxyCameraDeviceSettings.cs" />
-    <Compile Include="Proxies\Devices\ProxyCameraWithPanTilt.cs" />
-    <Compile Include="Proxies\Devices\ProxyCameraWithPanTiltSettings.cs" />
-    <Compile Include="Proxies\Devices\ProxyCameraWithPresets.cs" />
-    <Compile Include="Proxies\Devices\ProxyCameraWithPresetsSettings.cs" />
-    <Compile Include="Proxies\Devices\ProxyCameraWithZoom.cs" />
-    <Compile Include="Proxies\Devices\ProxyCameraWithZoomSettings.cs" />
     <None Include="Properties\ControlSystem.cfg" />
   </ItemGroup>
   <ItemGroup>
