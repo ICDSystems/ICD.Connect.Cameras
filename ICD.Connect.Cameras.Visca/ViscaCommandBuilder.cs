@@ -20,14 +20,25 @@ namespace ICD.Connect.Cameras.Visca
 
 		#region Public Commands
 		/// <summary>
-		/// Gets the Pan/Tilt Command, using the default speed
+		/// Gets the Pan Command, using the default speed
 		/// </summary>
 		/// <param name="id">The sequential Id of the camera to perform the operation on.</param>
-		/// <param name="action">The Pan/Tilt action desired.</param>
+		/// <param name="action">The Pan action desired.</param>
 		[PublicAPI]
-		public static string GetPanTiltCommand(int id, eCameraPanTiltAction action)
+		public static string GetPanCommand(int id, eCameraPanAction action)
 		{
-			return GetPanTiltCommand(id, action, DEFAULT_PAN_SPEED, DEFAULT_TILT_SPEED);
+			return GetPanCommand(id, action, DEFAULT_PAN_SPEED);
+		}
+
+		/// <summary>
+		/// Gets the Tilt Command, using the default speed
+		/// </summary>
+		/// <param name="id">The sequential Id of the camera to perform the operation on.</param>
+		/// <param name="action">The Tilt action desired.</param>
+		[PublicAPI]
+		public static string GetTiltCommand(int id, eCameraTiltAction action)
+		{
+			return GetTiltCommand(id, action, DEFAULT_TILT_SPEED);
 		}
 
 		/// <summary>
@@ -42,26 +53,43 @@ namespace ICD.Connect.Cameras.Visca
 		}
 
 		/// <summary>
-		/// Gets the Pan/Tilt Command, using the speed provided.
+		/// Gets the Pan Command, using the speed provided.
 		/// </summary>
 		/// <param name="id">The sequential Id of the camera to perform the operation on.</param>
-		/// <param name="action">The Pan/Tilt action desired.</param>
+		/// <param name="action">The Pan action desired.</param>
 		/// <param name="panSpeed">The desired speed for panning.</param>
-		/// <param name="tiltSpeed">The desired speed for tilting.</param>
 		[PublicAPI]
-		public static string GetPanTiltCommand(int id, eCameraPanTiltAction action, int panSpeed, int tiltSpeed)
+		public static string GetPanCommand(int id, eCameraPanAction action, int panSpeed)
 		{
 			switch (action)
 			{
-				case eCameraPanTiltAction.Up:
-					return BuildUpCommand(id, panSpeed, tiltSpeed);
-				case eCameraPanTiltAction.Down:
-					return BuildDownCommand(id, panSpeed, tiltSpeed);
-				case eCameraPanTiltAction.Left:
-					return BuildLeftCommand(id, panSpeed, tiltSpeed);
-				case eCameraPanTiltAction.Right:
-					return BuildRightCommand(id, panSpeed, tiltSpeed);
-				case eCameraPanTiltAction.Stop:
+				case eCameraPanAction.Left:
+					return BuildLeftCommand(id, panSpeed);
+				case eCameraPanAction.Right:
+					return BuildRightCommand(id, panSpeed);
+				case eCameraPanAction.Stop:
+					return BuildStopPanTiltCommand(id);
+				default:
+					throw new ArgumentOutOfRangeException("action");
+			}
+		}
+
+		/// <summary>
+		/// Gets the Tilt Command, using the speed provided.
+		/// </summary>
+		/// <param name="id">The sequential Id of the camera to perform the operation on.</param>
+		/// <param name="action">The Tilt action desired.</param>
+		/// <param name="tiltSpeed">The desired speed for tilting.</param>
+		[PublicAPI]
+		public static string GetTiltCommand(int id, eCameraTiltAction action, int tiltSpeed)
+		{
+			switch (action)
+			{
+				case eCameraTiltAction.Up:
+					return BuildUpCommand(id, tiltSpeed);
+				case eCameraTiltAction.Down:
+					return BuildDownCommand(id, tiltSpeed);
+				case eCameraTiltAction.Stop:
 					return BuildStopPanTiltCommand(id);
 				default:
 					throw new ArgumentOutOfRangeException("action");
@@ -184,7 +212,7 @@ namespace ICD.Connect.Cameras.Visca
 
 		}
 
-		private static string BuildUpCommand(int id, int panSpeed, int tiltSpeed)
+		private static string BuildUpCommand(int id, int tiltSpeed)
 		{
 			return StringUtils.ToString(new byte[]
 			{
@@ -192,7 +220,7 @@ namespace ICD.Connect.Cameras.Visca
 				MESSAGE_START_BYTE,
 				0x06,
 				0x01,
-				GetPanSpeedByte(panSpeed),
+				GetPanSpeedByte(0),
 				GetTiltSpeedByte(tiltSpeed),
 				0x03,
 				0x01,
@@ -200,7 +228,7 @@ namespace ICD.Connect.Cameras.Visca
 			});
 		}
 
-		private static string BuildDownCommand(int id, int panSpeed, int tiltSpeed)
+		private static string BuildDownCommand(int id, int tiltSpeed)
 		{
 			return StringUtils.ToString(new byte[]
 			{
@@ -208,7 +236,7 @@ namespace ICD.Connect.Cameras.Visca
 				MESSAGE_START_BYTE,
 				0x06,
 				0x01,
-				GetPanSpeedByte(panSpeed),
+				GetPanSpeedByte(0),
 				GetTiltSpeedByte(tiltSpeed),
 				0x03,
 				0x02,
@@ -217,7 +245,7 @@ namespace ICD.Connect.Cameras.Visca
 
 		}
 
-		private static string BuildLeftCommand(int id, int panSpeed, int tiltSpeed)
+		private static string BuildLeftCommand(int id, int panSpeed)
 		{
 			return StringUtils.ToString(new byte[]
 			{
@@ -226,7 +254,7 @@ namespace ICD.Connect.Cameras.Visca
 				0x06,
 				0x01,
 				GetPanSpeedByte(panSpeed),
-				GetTiltSpeedByte(tiltSpeed),
+				GetTiltSpeedByte(0),
 				0x01,
 				0x03,
 				MESSAGE_END_BYTE
@@ -234,7 +262,7 @@ namespace ICD.Connect.Cameras.Visca
 
 		}
 
-		private static string BuildRightCommand(int id, int panSpeed, int tiltSpeed)
+		private static string BuildRightCommand(int id, int panSpeed)
 		{
 			return StringUtils.ToString(new byte[]
 			{
@@ -243,7 +271,7 @@ namespace ICD.Connect.Cameras.Visca
 				0x06,
 				0x01,
 				GetPanSpeedByte(panSpeed),
-				GetTiltSpeedByte(tiltSpeed),
+				GetTiltSpeedByte(0),
 				0x02,
 				0x03,
 				MESSAGE_END_BYTE

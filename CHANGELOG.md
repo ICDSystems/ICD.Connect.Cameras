@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
  - Added port configuration features to camera devices
 
+## [3.5.0] - 2020-02-14
+### Changed
+ - Substantial refactoring of cameras into a single interface
+
 ## [3.4.1] - 2019-06-07
 ### Changed
  - Vaddio Roboshot cameras now log errors 

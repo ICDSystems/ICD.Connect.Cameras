@@ -7,7 +7,6 @@ using ICD.Common.Utils.EventArguments;
 using ICD.Common.Utils.Extensions;
 using ICD.Common.Utils.Services.Logging;
 using ICD.Connect.API.Commands;
-using ICD.Connect.API.Nodes;
 using ICD.Connect.Cameras.Controls;
 using ICD.Connect.Cameras.Devices;
 using ICD.Connect.Devices;
@@ -21,13 +20,9 @@ using ICD.Connect.Settings;
 
 namespace ICD.Connect.Cameras.Vaddio
 {
-	public sealed class VaddioRoboshotCameraDevice : AbstractCameraDevice<VaddioRoboshotCameraDeviceSettings>,
-		ICameraWithPanTilt, ICameraWithZoom, ICameraWithPresets, IDeviceWithPower
+	public sealed class VaddioRoboshotCameraDevice : AbstractCameraDevice<VaddioRoboshotCameraDeviceSettings>, IDeviceWithPower
 	{
-		/// <summary>
-		/// Raised when the presets are changed.
-		/// </summary>
-		public event EventHandler OnPresetsChanged;
+		#region Constants
 
 		private const char DELIMITER = '\r';
 
@@ -38,6 +33,10 @@ namespace ICD.Connect.Cameras.Vaddio
 		private const string DEFAULT_USERNAME = "admin";
 		private const string DEFAULT_PASSWORD = "password";
 
+		#endregion
+
+		#region Private Members
+
 		private readonly ConnectionStateManager m_ConnectionStateManager;
 		private readonly VaddioRoboshotSerialBuffer m_SerialBuffer;
 
@@ -46,6 +45,8 @@ namespace ICD.Connect.Cameras.Vaddio
 		private int m_PanSpeed;
 		private int m_TiltSpeed;
 		private int m_ZoomSpeed;
+
+		#endregion
 
 		#region Properties
 
@@ -62,7 +63,7 @@ namespace ICD.Connect.Cameras.Vaddio
 		/// <summary>
 		/// Gets the maximum number of presets this camera can support.
 		/// </summary>
-		public int MaxPresets { get { return 16; } }
+		public override int MaxPresets { get { return 16; } }
 
 		#endregion
 
@@ -82,10 +83,8 @@ namespace ICD.Connect.Cameras.Vaddio
 			m_ConnectionStateManager.OnConnectedStateChanged += PortOnConnectedStateChanged;
 
 			Controls.Add(new GenericCameraRouteSourceControl<VaddioRoboshotCameraDevice>(this, 0));
-			Controls.Add(new PanTiltControl<VaddioRoboshotCameraDevice>(this, 1));
-			Controls.Add(new ZoomControl<VaddioRoboshotCameraDevice>(this, 2));
-			Controls.Add(new PresetControl<VaddioRoboshotCameraDevice>(this, 3));
-			Controls.Add(new PowerDeviceControl<VaddioRoboshotCameraDevice>(this, 4));
+			Controls.Add(new CameraDeviceControl(this, 1));
+			Controls.Add(new PowerDeviceControl<VaddioRoboshotCameraDevice>(this, 2));
 		}
 
 		/// <summary>
@@ -93,8 +92,6 @@ namespace ICD.Connect.Cameras.Vaddio
 		/// </summary>
 		protected override void DisposeFinal(bool disposing)
 		{
-			OnPresetsChanged = null;
-
 			m_ConnectionStateManager.OnIsOnlineStateChanged -= PortOnIsOnlineStateChanged;
 			m_ConnectionStateManager.Dispose();
 
@@ -156,60 +153,50 @@ namespace ICD.Connect.Cameras.Vaddio
 		}
 
 		/// <summary>
-		/// Gets the stored camera presets.
-		/// </summary>
-		public IEnumerable<CameraPreset> GetPresets()
-		{
-			return Enumerable.Range(1, 16).Select(i => new CameraPreset(i, string.Format("Preset {0}", i)));
-		}
-
-		/// <summary>
-		/// Tells the camera to change its position to the given preset.
-		/// </summary>
-		/// <param name="presetId">The id of the preset to position to.</param>
-		public void ActivatePreset(int presetId)
-		{
-			string command = string.Format("camera preset recall {0}", presetId);
-			SendCommand(command);
-		}
-
-		/// <summary>
-		/// Stores the cameras current position in the given preset index.
-		/// </summary>
-		/// <param name="presetId">The index to store the preset at.</param>
-		public void StorePreset(int presetId)
-		{
-			string command = string.Format("camera preset store {0}", presetId);
-			SendCommand(command);
-		}
-
-		/// <summary>
-		/// Starts rotating the camera with the given action.
+		/// Begins panning the camera
 		/// </summary>
 		/// <param name="action"></param>
-		public void PanTilt(eCameraPanTiltAction action)
+		public override void Pan(eCameraPanAction action)
 		{
 			string command;
 
 			switch (action)
 			{
-				case eCameraPanTiltAction.Left:
+				case eCameraPanAction.Left:
 					command = string.Format("camera pan left {0}", m_PanSpeed);
 					break;
-				case eCameraPanTiltAction.Right:
+				case eCameraPanAction.Right:
 					command = string.Format("camera pan right {0}", m_PanSpeed);
 					break;
-				case eCameraPanTiltAction.Up:
-					command = string.Format("camera tilt up {0}", m_TiltSpeed);
-					break;
-				case eCameraPanTiltAction.Down:
-					command = string.Format("camera tilt down {0}", m_TiltSpeed);
+				case eCameraPanAction.Stop:
+					command = "camera pan stop";
 					break;
 
-				case eCameraPanTiltAction.Stop:
-					SendCommand("camera pan stop");
-					SendCommand("camera tilt stop");
-					return;
+				default:
+					throw new ArgumentOutOfRangeException("action");
+			}
+
+			SendCommand(command);
+		}
+
+		/// <summary>
+		/// Begin tilting the camera.
+		/// </summary>
+		public override void Tilt(eCameraTiltAction action)
+		{
+			string command;
+
+			switch (action)
+			{
+				case eCameraTiltAction.Up:
+					command = string.Format("camera tilt up {0}", m_TiltSpeed);
+					break;
+				case eCameraTiltAction.Down:
+					command = string.Format("camera tilt down {0}", m_TiltSpeed);
+					break;
+				case eCameraTiltAction.Stop:
+					command = "camera tilt stop";
+					break;
 
 				default:
 					throw new ArgumentOutOfRangeException("action");
@@ -222,7 +209,7 @@ namespace ICD.Connect.Cameras.Vaddio
 		/// Starts zooming the camera with the given action.
 		/// </summary>
 		/// <param name="action"></param>
-		public void Zoom(eCameraZoomAction action)
+		public override void Zoom(eCameraZoomAction action)
 		{
 			string command;
 
@@ -243,6 +230,51 @@ namespace ICD.Connect.Cameras.Vaddio
 			}
 
 			SendCommand(command);
+		}
+
+		/// <summary>
+		/// Gets the stored camera presets.
+		/// </summary>
+		public override IEnumerable<CameraPreset> GetPresets()
+		{
+			return Enumerable.Range(1, 16).Select(i => new CameraPreset(i, string.Format("Preset {0}", i)));
+		}
+
+		/// <summary>
+		/// Tells the camera to change its position to the given preset.
+		/// </summary>
+		/// <param name="presetId">The id of the preset to position to.</param>
+		public override void ActivatePreset(int presetId)
+		{
+			string command = string.Format("camera preset recall {0}", presetId);
+			SendCommand(command);
+		}
+
+		/// <summary>
+		/// Stores the cameras current position in the given preset index.
+		/// </summary>
+		/// <param name="presetId">The index to store the preset at.</param>
+		public override void StorePreset(int presetId)
+		{
+			string command = string.Format("camera preset store {0}", presetId);
+			SendCommand(command);
+		}
+
+		/// <summary>
+		/// Sets if the camera mute state should be active
+		/// </summary>
+		/// <param name="enable"></param>
+		public override void MuteCamera(bool enable)
+		{
+			throw new NotSupportedException();
+		}
+
+		/// <summary>
+		/// Resets camera to its predefined home position
+		/// </summary>
+		public override void SendCameraHome()
+		{
+			throw new NotSupportedException();
 		}
 
 		/// <summary>
@@ -364,6 +396,8 @@ namespace ICD.Connect.Cameras.Vaddio
 
 			m_NetworkProperties.ClearNetworkProperties();
 
+			SupportedCameraFeatures = eCameraFeatures.None;
+
 			SetPort(null);
 		}
 
@@ -400,24 +434,13 @@ namespace ICD.Connect.Cameras.Vaddio
 			}
 
 			SetPort(port);
+
+			SupportedCameraFeatures = eCameraFeatures.PanTiltZoom | eCameraFeatures.Presets;
 		}
 
 		#endregion
 
 		#region Console
-
-		/// <summary>
-		/// Calls the delegate for each console status item.
-		/// </summary>
-		/// <param name="addRow"></param>
-		public override void BuildConsoleStatus(AddStatusRowDelegate addRow)
-		{
-			base.BuildConsoleStatus(addRow);
-
-			CameraWithPanTiltConsole.BuildConsoleStatus(this, addRow);
-			CameraWithZoomConsole.BuildConsoleStatus(this, addRow);
-			CameraWithPresetsConsole.BuildConsoleStatus(this, addRow);
-		}
 
 		/// <summary>
 		/// Gets the child console commands.
@@ -426,15 +449,6 @@ namespace ICD.Connect.Cameras.Vaddio
 		public override IEnumerable<IConsoleCommand> GetConsoleCommands()
 		{
 			foreach (IConsoleCommand command in GetBaseConsoleCommands())
-				yield return command;
-
-			foreach (IConsoleCommand command in CameraWithPanTiltConsole.GetConsoleCommands(this))
-				yield return command;
-
-			foreach (IConsoleCommand command in CameraWithZoomConsole.GetConsoleCommands(this))
-				yield return command;
-
-			foreach (IConsoleCommand command in CameraWithPresetsConsole.GetConsoleCommands(this))
 				yield return command;
 
 			yield return new ConsoleCommand("PowerOn", "Powers the camera device", () => PowerOn());
@@ -448,34 +462,6 @@ namespace ICD.Connect.Cameras.Vaddio
 		private IEnumerable<IConsoleCommand> GetBaseConsoleCommands()
 		{
 			return base.GetConsoleCommands();
-		}
-
-		/// <summary>
-		/// Gets the child console nodes.
-		/// </summary>
-		/// <returns></returns>
-		public override IEnumerable<IConsoleNodeBase> GetConsoleNodes()
-		{
-			foreach (IConsoleNodeBase node in GetBaseConsoleNodes())
-				yield return node;
-
-			foreach (IConsoleNodeBase node in CameraWithPanTiltConsole.GetConsoleNodes(this))
-				yield return node;
-
-			foreach (IConsoleNodeBase node in CameraWithZoomConsole.GetConsoleNodes(this))
-				yield return node;
-
-			foreach (IConsoleNodeBase node in CameraWithPresetsConsole.GetConsoleNodes(this))
-				yield return node;
-		}
-
-		/// <summary>
-		/// Workaround for "unverifiable code" warning.
-		/// </summary>
-		/// <returns></returns>
-		private IEnumerable<IConsoleNodeBase> GetBaseConsoleNodes()
-		{
-			return base.GetConsoleNodes();
 		}
 
 		#endregion
