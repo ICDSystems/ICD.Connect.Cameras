@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
  - Added port configuration features to camera devices
 
+## [3.5.1] - 2020-02-18
+### Changed
+ - Fixed a bug where cameras would not stop tilting up
+
 ## [3.5.0] - 2020-02-14
 ### Changed
  - Substantial refactoring of cameras into a single interface
