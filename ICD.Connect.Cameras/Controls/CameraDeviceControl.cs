@@ -82,7 +82,7 @@ namespace ICD.Connect.Cameras.Controls
 		public override void TiltStop()
 		{
 			if (SupportedCameraFeatures.HasFlag(eCameraFeatures.Tilt))
-				Parent.Tilt(eCameraTiltAction.Up);
+				Parent.Tilt(eCameraTiltAction.Stop);
 		}
 
 		public override void TiltUp()
