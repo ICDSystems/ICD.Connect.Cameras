@@ -36,7 +36,6 @@ namespace ICD.Connect.Cameras.Controls
 		/// <param name="id"></param>
 		public CameraDeviceControl(ICameraDevice parent, int id) : base(parent, id)
 		{
-			Subscribe(parent);
 		}
 
 		/// <summary>
@@ -45,11 +44,11 @@ namespace ICD.Connect.Cameras.Controls
 		/// <param name="disposing"></param>
 		protected override void DisposeFinal(bool disposing)
 		{
-			base.DisposeFinal(disposing);
-
 			OnPresetsChanged = null;
+			OnSupportedCameraFeaturesChanged = null;
+			OnCameraMuteStateChanged = null;
 
-			Unsubscribe(Parent);
+			base.DisposeFinal(disposing);
 		}
 
 		#region Pan
@@ -189,8 +188,10 @@ namespace ICD.Connect.Cameras.Controls
 		/// Subscribe to the parent events.
 		/// </summary>
 		/// <param name="parent"></param>
-		private void Subscribe(ICameraDevice parent)
+		protected override void Subscribe(ICameraDevice parent)
 		{
+			base.Subscribe(parent);
+
 			parent.OnPresetsChanged += ParentOnPresetsChanged;
 			parent.OnCameraMuteStateChanged += ParentOnCameraMuteStateChanged;
 			parent.OnSupportedCameraFeaturesChanged += ParentOnSupportedCameraFeaturesChanged;
@@ -200,8 +201,10 @@ namespace ICD.Connect.Cameras.Controls
 		/// Unsubscribe from the parent events.
 		/// </summary>
 		/// <param name="parent"></param>
-		private void Unsubscribe(ICameraDevice parent)
+		protected override void Unsubscribe(ICameraDevice parent)
 		{
+			base.Unsubscribe(parent);
+
 			parent.OnPresetsChanged -= ParentOnPresetsChanged;
 			parent.OnCameraMuteStateChanged -= ParentOnCameraMuteStateChanged;
 			parent.OnSupportedCameraFeaturesChanged -= ParentOnSupportedCameraFeaturesChanged;
