@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using ICD.Common.Utils.EventArguments;
 using ICD.Common.Utils.Extensions;
+using ICD.Common.Utils.Services.Logging;
 using ICD.Connect.API.Commands;
 using ICD.Connect.API.Nodes;
 using ICD.Connect.Cameras.Controls;
@@ -34,6 +35,8 @@ namespace ICD.Connect.Cameras.Devices
 
 				m_SupportedCameraFeatures = value;
 
+				Log(eSeverity.Informational, "Supported volume features changed to {0}", m_SupportedCameraFeatures);
+
 				OnSupportedCameraFeaturesChanged.Raise(this, new GenericEventArgs<eCameraFeatures>(m_SupportedCameraFeatures));
 			}
 		}
@@ -55,6 +58,8 @@ namespace ICD.Connect.Cameras.Devices
 					return;
 
 				m_IsCameraMuted = value;
+
+				Log(eSeverity.Informational, "IsCameraMuted changed to {0}", m_IsCameraMuted);
 
 				OnCameraMuteStateChanged.Raise(this, new BoolEventArgs(m_IsCameraMuted));
 			}

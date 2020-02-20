@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
  - Fixed web requests to use new web port response.
  - Differentiating between the stop methods in the pan-tilt and zoom camera control consoles.
 
+## [4.3.0] - 2020-02-20
+### Added
+ - Vaddio driver supports returning to home position
 
 ## [4.2.0] - 2019-11-18
 ### Added
