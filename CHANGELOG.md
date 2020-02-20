@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+ - Vaddio driver supports returning to home position
+
 ## [4.2.0] - 2019-11-18
 ### Added
  - Added web proxy settings to Panasonic camera driver

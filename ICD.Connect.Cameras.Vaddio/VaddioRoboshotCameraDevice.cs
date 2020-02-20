@@ -274,7 +274,7 @@ namespace ICD.Connect.Cameras.Vaddio
 		/// </summary>
 		public override void SendCameraHome()
 		{
-			throw new NotSupportedException();
+			SendCommand("camera home");
 		}
 
 		/// <summary>
@@ -435,7 +435,7 @@ namespace ICD.Connect.Cameras.Vaddio
 
 			SetPort(port);
 
-			SupportedCameraFeatures = eCameraFeatures.PanTiltZoom | eCameraFeatures.Presets;
+			SupportedCameraFeatures = eCameraFeatures.PanTiltZoom | eCameraFeatures.Presets | eCameraFeatures.Home;
 		}
 
 		#endregion
