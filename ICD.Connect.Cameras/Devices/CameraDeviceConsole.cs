@@ -49,7 +49,10 @@ namespace ICD.Connect.Cameras.Devices
 				throw new ArgumentNullException("instance");
 
 			if (instance.SupportedCameraFeatures.HasFlag(eCameraFeatures.Home))
-				yield return new ConsoleCommand("SendCameraHome", "Sends the camera to its home position", () => instance.SendCameraHome());
+			{
+				yield return new ConsoleCommand("ActivateHome", "Sends the camera to its home position", () => instance.ActivateHome());
+				yield return new ConsoleCommand("StoreHome", "Stores the current position as the home position", () => instance.StoreHome());
+			}
 
 			if (instance.SupportedCameraFeatures.HasFlag(eCameraFeatures.Mute))
 				yield return new GenericConsoleCommand<bool>("Mute", "Enables or Disables Camera Mute", a => instance.MuteCamera(a));

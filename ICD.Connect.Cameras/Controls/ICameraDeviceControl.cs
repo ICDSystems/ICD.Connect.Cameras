@@ -157,8 +157,14 @@ namespace ICD.Connect.Cameras.Controls
 		/// <summary>
 		/// Resets camera to its predefined home position
 		/// </summary>
-		[ApiMethod(CameraControlApi.METHOD_SEND_HOME, CameraControlApi.HELP_METHOD_SEND_HOME)]
-		void SendCameraHome();
+		[ApiMethod(CameraControlApi.METHOD_ACTIVATE_HOME, CameraControlApi.HELP_METHOD_ACTIVATE_HOME)]
+		void ActivateHome();
+
+		/// <summary>
+		/// Stores the current position as the home position.
+		/// </summary>
+		[ApiMethod(CameraControlApi.METHOD_STORE_HOME, CameraControlApi.HELP_METHOD_STORE_HOME)]
+		void StoreHome();
 
 		#endregion
 

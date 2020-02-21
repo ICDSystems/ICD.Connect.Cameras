@@ -91,7 +91,15 @@ namespace ICD.Connect.Cameras.Proxies.Devices
 		/// <summary>
 		/// Resets camera to its predefined home position
 		/// </summary>
-		public void SendCameraHome()
+		public void ActivateHome()
+		{
+			throw new NotImplementedException();
+		}
+
+		/// <summary>
+		/// Stores the current position as the home position.
+		/// </summary>
+		public void StoreHome()
 		{
 			throw new NotImplementedException();
 		}

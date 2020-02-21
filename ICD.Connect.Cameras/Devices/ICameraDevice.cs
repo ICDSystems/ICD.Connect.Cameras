@@ -107,7 +107,12 @@ namespace ICD.Connect.Cameras.Devices
 		/// <summary>
 		/// Resets camera to its predefined home position
 		/// </summary>
-		void SendCameraHome();
+		void ActivateHome();
+
+		/// <summary>
+		/// Stores the current position as the home position.
+		/// </summary>
+		void StoreHome();
 
 		#endregion
 
