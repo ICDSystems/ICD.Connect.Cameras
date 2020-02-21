@@ -63,7 +63,15 @@ namespace ICD.Connect.Cameras.Vaddio
 		/// <summary>
 		/// Gets the maximum number of presets this camera can support.
 		/// </summary>
-		public override int MaxPresets { get { return 16; } }
+		public override int MaxPresets
+		{
+			get
+			{
+				// Hack - There is no way to store the home position, so we are using preset 16 as our home
+				// return 16;
+				return 15;
+			}
+		}
 
 		#endregion
 
@@ -272,9 +280,20 @@ namespace ICD.Connect.Cameras.Vaddio
 		/// <summary>
 		/// Resets camera to its predefined home position
 		/// </summary>
-		public override void SendCameraHome()
+		public override void ActivateHome()
 		{
-			SendCommand("camera home");
+			// Hack - There is no way to store the home position, so we are using preset 16 as our home
+			//SendCommand("camera home");
+			ActivatePreset(16);
+		}
+
+		/// <summary>
+		/// Stores the current position as the home position.
+		/// </summary>
+		public override void StoreHome()
+		{
+			// Hack - There is no way to store the home position, so we are using preset 16 as our home
+			StorePreset(16);
 		}
 
 		/// <summary>

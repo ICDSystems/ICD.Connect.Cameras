@@ -176,9 +176,17 @@ namespace ICD.Connect.Cameras.Controls
 		/// <summary>
 		/// Resets camera to its predefined home position
 		/// </summary>
-		public override void SendCameraHome()
+		public override void ActivateHome()
 		{
-			Parent.SendCameraHome();
+			Parent.ActivateHome();
+		}
+
+		/// <summary>
+		/// Stores the current position as the home position.
+		/// </summary>
+		public override void StoreHome()
+		{
+			Parent.StoreHome();
 		}
 
 		#endregion

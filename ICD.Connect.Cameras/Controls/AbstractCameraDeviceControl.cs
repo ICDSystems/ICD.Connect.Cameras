@@ -14,6 +14,8 @@ namespace ICD.Connect.Cameras.Controls
 		
 		public abstract event EventHandler<CameraControlMuteChangedApiEventArgs> OnCameraMuteStateChanged;
 
+		#region Properties
+
 		/// <summary>
 		/// Gets the maximum number of presets this camera can support.
 		/// </summary>
@@ -26,6 +28,8 @@ namespace ICD.Connect.Cameras.Controls
 
 		public abstract eCameraFeatures SupportedCameraFeatures { get; }
 
+		#endregion
+
 		/// <summary>
 		/// Constructor.
 		/// </summary>
@@ -35,6 +39,8 @@ namespace ICD.Connect.Cameras.Controls
 			: base(parent, id)
 		{
 		}
+
+		#region Methods
 
 		/// <summary>
 		/// Stops the camera from moving.
@@ -107,6 +113,13 @@ namespace ICD.Connect.Cameras.Controls
 		/// <summary>
 		/// Resets camera to its predefined home position
 		/// </summary>
-		public abstract void SendCameraHome();
+		public abstract void ActivateHome();
+
+		/// <summary>
+		/// Stores the current position as the home position.
+		/// </summary>
+		public abstract void StoreHome();
+
+		#endregion
 	}
 }

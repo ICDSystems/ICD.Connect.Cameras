@@ -22,6 +22,10 @@ namespace ICD.Connect.Cameras.Mock
 		private int m_HPosition;
 		private int m_ZPosition;
 
+		private int m_HomeHPosition;
+		private int m_HomeVPosition;
+		private int m_HomeZPosition;
+
 		private int? m_PanTiltSpeed;
 		private int? m_ZoomSpeed;
 
@@ -169,11 +173,21 @@ namespace ICD.Connect.Cameras.Mock
 		/// <summary>
 		/// Resets camera to its predefined home position
 		/// </summary>
-		public override void SendCameraHome()
+		public override void ActivateHome()
 		{
-			m_HPosition = 0;
-			m_VPosition = 0;
-			m_ZPosition = 0;
+			m_HPosition = m_HomeHPosition;
+			m_VPosition = m_HomeVPosition;
+			m_ZPosition = m_HomeZPosition;
+		}
+
+		/// <summary>
+		/// Stores the current position as the home position.
+		/// </summary>
+		public override void StoreHome()
+		{
+			m_HomeHPosition = m_HPosition;
+			m_HomeVPosition = m_VPosition;
+			m_HomeZPosition = m_ZPosition;
 		}
 
 		#endregion

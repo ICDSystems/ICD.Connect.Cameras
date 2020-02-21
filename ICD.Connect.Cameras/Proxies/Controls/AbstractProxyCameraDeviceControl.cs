@@ -207,9 +207,17 @@ namespace ICD.Connect.Cameras.Proxies.Controls
 		/// <summary>
 		/// Resets camera to its predefined home position
 		/// </summary>
-		public void SendCameraHome()
+		public void ActivateHome()
 		{
-			CallMethod(CameraControlApi.METHOD_SEND_HOME, CameraControlApi.HELP_METHOD_SEND_HOME);
+			CallMethod(CameraControlApi.METHOD_ACTIVATE_HOME, CameraControlApi.HELP_METHOD_ACTIVATE_HOME);
+		}
+
+		/// <summary>
+		/// Stores the current position as the home position.
+		/// </summary>
+		public void StoreHome()
+		{
+			CallMethod(CameraControlApi.METHOD_STORE_HOME, CameraControlApi.HELP_METHOD_STORE_HOME);
 		}
 	}
 }
