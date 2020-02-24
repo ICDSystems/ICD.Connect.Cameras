@@ -139,7 +139,15 @@ namespace ICD.Connect.Cameras.Windows
 		/// <summary>
 		/// Resets camera to its predefined home position
 		/// </summary>
-		public override void SendCameraHome()
+		public override void ActivateHome()
+		{
+			throw new NotSupportedException();
+		}
+
+		/// <summary>
+		/// Stores the current position as the home position.
+		/// </summary>
+		public override void StoreHome()
 		{
 			throw new NotSupportedException();
 		}
