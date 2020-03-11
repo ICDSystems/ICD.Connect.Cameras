@@ -7,8 +7,10 @@ namespace ICD.Connect.Cameras.Visca
 	public static class ViscaCommandBuilder
 	{
 		#region Byte Constants
+
 		private const byte MESSAGE_START_BYTE = 0x01;
 		private const byte MESSAGE_END_BYTE = 0xFF;
+
 		#endregion
 
 		#region Default Speeds
@@ -16,9 +18,11 @@ namespace ICD.Connect.Cameras.Visca
 		private const int DEFAULT_PAN_SPEED = 8;
 		private const int DEFAULT_TILT_SPEED = 8;
 		private const int DEFAULT_ZOOM_SPEED = 4;
+
 		#endregion
 
 		#region Public Commands
+
 		/// <summary>
 		/// Gets the Pan Command, using the default speed
 		/// </summary>
@@ -147,7 +151,6 @@ namespace ICD.Connect.Cameras.Visca
 			return BuildPowerOnCommand(id);
 		}
 
-
 		/// <summary>
 		/// Gets the command to park the camera facing the wall and disable video.
 		/// </summary>
@@ -162,7 +165,8 @@ namespace ICD.Connect.Cameras.Visca
 		#endregion
 
 		#region Byte Builders
-		private static byte GetIdsByte( int recipient)
+
+		private static byte GetIdByte(int recipient)
 		{
 			recipient = MathUtils.Clamp(recipient, 1, 7);
 			return (byte)(0x80 + recipient);
@@ -191,6 +195,7 @@ namespace ICD.Connect.Cameras.Visca
 			speed = MathUtils.Clamp(speed, 0, 7);
 			return (byte)(speed + 48);
 		}
+
 		#endregion
 
 		#region Command Builders
@@ -199,7 +204,7 @@ namespace ICD.Connect.Cameras.Visca
 		{
 			return StringUtils.ToString(new byte[]
 			{
-				GetIdsByte(id),
+				GetIdByte(id),
 				MESSAGE_START_BYTE,
 				0x06,
 				0x01,
@@ -209,18 +214,17 @@ namespace ICD.Connect.Cameras.Visca
 				0x03,
 				MESSAGE_END_BYTE
 			});
-
 		}
 
 		private static string BuildUpCommand(int id, int tiltSpeed)
 		{
 			return StringUtils.ToString(new byte[]
 			{
-				GetIdsByte(id),
+				GetIdByte(id),
 				MESSAGE_START_BYTE,
 				0x06,
 				0x01,
-				GetPanSpeedByte(0),
+				GetPanSpeedByte(DEFAULT_PAN_SPEED),
 				GetTiltSpeedByte(tiltSpeed),
 				0x03,
 				0x01,
@@ -232,58 +236,55 @@ namespace ICD.Connect.Cameras.Visca
 		{
 			return StringUtils.ToString(new byte[]
 			{
-				GetIdsByte(id),
+				GetIdByte(id),
 				MESSAGE_START_BYTE,
 				0x06,
 				0x01,
-				GetPanSpeedByte(0),
+				GetPanSpeedByte(DEFAULT_PAN_SPEED),
 				GetTiltSpeedByte(tiltSpeed),
 				0x03,
 				0x02,
 				MESSAGE_END_BYTE
 			});
-
 		}
 
 		private static string BuildLeftCommand(int id, int panSpeed)
 		{
 			return StringUtils.ToString(new byte[]
 			{
-				GetIdsByte(id),
+				GetIdByte(id),
 				MESSAGE_START_BYTE,
 				0x06,
 				0x01,
 				GetPanSpeedByte(panSpeed),
-				GetTiltSpeedByte(0),
+				GetTiltSpeedByte(DEFAULT_TILT_SPEED),
 				0x01,
 				0x03,
 				MESSAGE_END_BYTE
 			});
-
 		}
 
 		private static string BuildRightCommand(int id, int panSpeed)
 		{
 			return StringUtils.ToString(new byte[]
 			{
-				GetIdsByte(id),
+				GetIdByte(id),
 				MESSAGE_START_BYTE,
 				0x06,
 				0x01,
 				GetPanSpeedByte(panSpeed),
-				GetTiltSpeedByte(0),
+				GetTiltSpeedByte(DEFAULT_TILT_SPEED),
 				0x02,
 				0x03,
 				MESSAGE_END_BYTE
 			});
-
 		}
 
 		private static string BuildStopZoomCommand(int id)
 		{
 			return StringUtils.ToString(new byte[]
 			{
-				GetIdsByte(id),
+				GetIdByte(id),
 				MESSAGE_START_BYTE,
 				0x04,
 				0x07,
@@ -296,7 +297,7 @@ namespace ICD.Connect.Cameras.Visca
 		{
 			return StringUtils.ToString(new byte[]
 			{
-				GetIdsByte(id),
+				GetIdByte(id),
 				MESSAGE_START_BYTE,
 				0x04,
 				0x07,
@@ -309,7 +310,7 @@ namespace ICD.Connect.Cameras.Visca
 		{
 			return StringUtils.ToString(new byte[]
 			{
-				GetIdsByte(id),
+				GetIdByte(id),
 				MESSAGE_START_BYTE,
 				0x04,
 				0x07,
@@ -345,7 +346,7 @@ namespace ICD.Connect.Cameras.Visca
 		{
 			return StringUtils.ToString(new byte[]
 			{
-				GetIdsByte(id),
+				GetIdByte(id),
 				MESSAGE_START_BYTE,
 				0x04,
 				0x00,
@@ -358,7 +359,7 @@ namespace ICD.Connect.Cameras.Visca
 		{
 			return StringUtils.ToString(new byte[]
 			{
-				GetIdsByte(id),
+				GetIdByte(id),
 				MESSAGE_START_BYTE,
 				0x04,
 				0x00,
@@ -366,6 +367,7 @@ namespace ICD.Connect.Cameras.Visca
 				MESSAGE_END_BYTE
 			});
 		}
+
 		#endregion
 	}
 }
