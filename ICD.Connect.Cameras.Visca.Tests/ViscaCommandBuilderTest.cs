@@ -7,10 +7,10 @@ namespace ICD.Connect.Cameras.Visca.Tests
 	public sealed class ViscaCommandBuilderTest
 	{
 		[Test]
-		public static void GetPanTiltCommandTest()
+		public static void GetPanCommandTest()
 		{
-			string expectedPanLeftCommand = StringUtils.ToString(new byte[] { 0x81, 0x01, 0x06, 0x01, 0x01, 0x01, 0x01, 0x03, 0xFF });
-			string expectedPanRightCommand = StringUtils.ToString(new byte[] { 0x81, 0x01, 0x06, 0x01, 0x01, 0x01, 0x02, 0x03, 0xFF });
+			string expectedPanLeftCommand = StringUtils.ToString(new byte[] { 0x81, 0x01, 0x06, 0x01, 0x08, 0x08, 0x01, 0x03, 0xFF });
+			string expectedPanRightCommand = StringUtils.ToString(new byte[] { 0x81, 0x01, 0x06, 0x01, 0x08, 0x08, 0x02, 0x03, 0xFF });
 
 			string panLeftCommand = ViscaCommandBuilder.GetPanCommand(0, eCameraPanAction.Left);
 			string panRightCommand = ViscaCommandBuilder.GetPanCommand(0, eCameraPanAction.Right);
@@ -20,12 +20,27 @@ namespace ICD.Connect.Cameras.Visca.Tests
 		}
 
 		[Test]
+		public static void GetTiltCommandTest()
+		{
+			string expectedTiltUpCommand = StringUtils.ToString(new byte[] { 0x81, 0x01, 0x06, 0x01, 0x08, 0x08, 0x03, 0x01, 0xFF });
+			string expectedTiltDownCommand = StringUtils.ToString(new byte[] { 0x81, 0x01, 0x06, 0x01, 0x08, 0x08, 0x03, 0x02, 0xFF });
+
+			string tiltUpCommand = ViscaCommandBuilder.GetTiltCommand(0, eCameraTiltAction.Up);
+			string tiltDownCommand = ViscaCommandBuilder.GetTiltCommand(0, eCameraTiltAction.Down);
+
+			Assert.AreEqual(expectedTiltUpCommand, tiltUpCommand);
+			Assert.AreEqual(expectedTiltDownCommand, tiltDownCommand);
+		}
+
+		[Test]
 		public static void GetZoomCommandTest()
 		{
 			string expectedZoomInCommand = StringUtils.ToString(new byte[] { 0x81, 0x01, 0x04, 0x07, 0x21, 0xFF });
 			string expectedZoomOutCommand = StringUtils.ToString(new byte[] { 0x81, 0x01, 0x04, 0x07, 0x31, 0xFF });
+
 			string zoomInCommand = ViscaCommandBuilder.GetZoomCommand(0, eCameraZoomAction.ZoomIn, 1);
 			string zoomOutCommand = ViscaCommandBuilder.GetZoomCommand(0, eCameraZoomAction.ZoomOut, 1);
+
 			Assert.AreEqual(expectedZoomInCommand, zoomInCommand);
 			Assert.AreEqual(expectedZoomOutCommand, zoomOutCommand);
 		}
@@ -35,6 +50,7 @@ namespace ICD.Connect.Cameras.Visca.Tests
 		{
 			string expectedGetAddressCommand = StringUtils.ToString(new byte[] { 0x88, 0x30, 0x01, 0xFF });
 			string getAddressCommand = ViscaCommandBuilder.GetSetAddressCommand();
+
 			Assert.AreEqual(expectedGetAddressCommand, getAddressCommand);
 		}
 
@@ -43,15 +59,16 @@ namespace ICD.Connect.Cameras.Visca.Tests
 		{
 			string expectedClearCommand = StringUtils.ToString(new byte[] { 0x88, 0x01, 0x00, 0x01, 0xFF });
 			string clearCommand = ViscaCommandBuilder.GetClearCommand();
+
 			Assert.AreEqual(expectedClearCommand, clearCommand);
 		}
-
 
 		[Test]
 		public static void GetPowerOnCommandTest()
 		{
 			string expectedPowerOnCommand = StringUtils.ToString(new byte[] {0x81, 0x01, 0x04, 0x00, 0x02, 0xFF});
 			string powerOnCommand = ViscaCommandBuilder.GetPowerOnCommand(1);
+
 			Assert.AreEqual(expectedPowerOnCommand, powerOnCommand);
 		}
 
@@ -60,6 +77,7 @@ namespace ICD.Connect.Cameras.Visca.Tests
 		{
 			string expectedPowerOffCommand = StringUtils.ToString(new byte[] { 0x81, 0x01, 0x04, 0x00, 0x03, 0xFF });
 			string powerOffCommand = ViscaCommandBuilder.GetPowerOffCommand(1);
+
 			Assert.AreEqual(expectedPowerOffCommand, powerOffCommand);
 		}
 	}
