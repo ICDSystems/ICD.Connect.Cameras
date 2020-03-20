@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [4.5.0] - 2020-03-20
 ### Added
  - Initial commit of ICD.Connect.Cameras.Windows project
  - Added WindowsUsbCameraDevice for representing static USB cameras
