@@ -3,19 +3,22 @@ using System.Collections.Generic;
 using ICD.Common.Utils;
 using ICD.Common.Utils.Services.Logging;
 using ICD.Connect.API.Commands;
+using ICD.Connect.API.Nodes;
 using ICD.Connect.Cameras.Controls;
 using ICD.Connect.Cameras.Devices;
 using ICD.Connect.Devices;
 using ICD.Connect.Devices.Controls;
+using ICD.Connect.Devices.Mock;
 using ICD.Connect.Settings;
 
 namespace ICD.Connect.Cameras.Mock
 {
-	public sealed class MockCameraDevice : AbstractCameraDevice<MockCameraDeviceSettings>, IDeviceWithPower
+	public sealed class MockCameraDevice : AbstractCameraDevice<MockCameraDeviceSettings>, IDeviceWithPower, IMockDevice
 	{
 		private readonly Dictionary<int, CameraPosition> m_PresetPositions;
 		private readonly Dictionary<int, CameraPreset> m_Presets;
 
+		private bool m_IsOnline;
 		private bool m_Powered;
 
 		private int m_VPosition;
@@ -36,6 +39,8 @@ namespace ICD.Connect.Cameras.Mock
 		/// </summary>
 		public override int MaxPresets { get { return 4; } }
 
+		public bool DefaultOffline { get; set; }
+
 		#endregion
 
 		/// <summary>
@@ -55,6 +60,12 @@ namespace ICD.Connect.Cameras.Mock
 			Controls.Add(new GenericCameraRouteSourceControl<MockCameraDevice>(this, 0));
 			Controls.Add(new CameraDeviceControl(this, 1));
 			Controls.Add(new PowerDeviceControl<MockCameraDevice>(this, 3));
+		}
+
+		public void SetIsOnlineState(bool isOnline)
+		{
+			m_IsOnline = isOnline;
+			UpdateCachedOnlineStatus();
 		}
 
 		#region PTZ
@@ -206,15 +217,6 @@ namespace ICD.Connect.Cameras.Mock
 
 		#endregion
 
-		#region DeviceBase
-
-		protected override bool GetIsOnlineStatus()
-		{
-			return true;
-		}
-
-		#endregion
-
 		#region Private Methods
 
 		private void LogCameraMovement(string action)
@@ -242,9 +244,21 @@ namespace ICD.Connect.Cameras.Mock
 
 		#region Settings
 
+		/// <summary>
+		/// Gets the current online status of the device.
+		/// </summary>
+		/// <returns></returns>
+		protected override bool GetIsOnlineStatus()
+		{
+			return m_IsOnline;
+		}
+
 		protected override void ApplySettingsFinal(MockCameraDeviceSettings settings, IDeviceFactory factory)
 		{
 			base.ApplySettingsFinal(settings, factory);
+
+			MockDeviceHelper.ApplySettings(this, settings);
+
 			m_PanTiltSpeed = settings.PanTiltSpeed;
 			m_ZoomSpeed = settings.ZoomSpeed;
 		}
@@ -256,8 +270,24 @@ namespace ICD.Connect.Cameras.Mock
 		protected override void CopySettingsFinal(MockCameraDeviceSettings settings)
 		{
 			base.CopySettingsFinal(settings);
+
+			MockDeviceHelper.CopySettings(this, settings);
+
 			settings.PanTiltSpeed = m_PanTiltSpeed;
 			settings.ZoomSpeed = m_ZoomSpeed;
+		}
+
+		/// <summary>
+		/// Override to clear the instance settings.
+		/// </summary>
+		protected override void ClearSettingsFinal()
+		{
+			base.ClearSettingsFinal();
+
+			MockDeviceHelper.ClearSettings(this);
+
+			m_PanTiltSpeed = null;
+			m_ZoomSpeed = null;
 		}
 
 		#endregion
@@ -273,6 +303,9 @@ namespace ICD.Connect.Cameras.Mock
 			foreach (IConsoleCommand command in GetBaseConsoleCommands())
 				yield return command;
 
+			foreach (IConsoleCommand command in MockDeviceHelper.GetConsoleCommands(this))
+				yield return command;
+
 			yield return new ConsoleCommand("PowerOn", "Powers the camera device", () => PowerOn());
 			yield return new ConsoleCommand("PowerOff", "Places the camera device on standby", () => PowerOff());
 			yield return new ConsoleCommand("PowerQuery", "Returns the Powered State of the device", () => QueryPowerState());
@@ -286,6 +319,20 @@ namespace ICD.Connect.Cameras.Mock
 		private IEnumerable<IConsoleCommand> GetBaseConsoleCommands()
 		{
 			return base.GetConsoleCommands();
+		}
+
+		/// <summary>
+		/// Calls the delegate for each console status item.
+		/// </summary>
+		/// <param name="addRow"></param>
+		public override void BuildConsoleStatus(AddStatusRowDelegate addRow)
+		{
+			base.BuildConsoleStatus(addRow);
+
+			MockDeviceHelper.BuildConsoleStatus(this, addRow);
+
+			addRow("Pan/Tilt Speed", m_PanTiltSpeed);
+			addRow("Zoom Speed", m_ZoomSpeed);
 		}
 
 		#endregion
