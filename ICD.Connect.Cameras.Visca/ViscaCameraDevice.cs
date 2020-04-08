@@ -312,7 +312,7 @@ namespace ICD.Connect.Cameras.Visca
 				ParseQuery(args.Response);
 			else
 			{
-				Log(eSeverity.Error, ViscaResponseHandler.HandleResponse(args.Response).ToString(), args);
+				Logger.Log(eSeverity.Error, ViscaResponseHandler.HandleResponse(args.Response).ToString(), args);
 				ParseError(args.Data);
 			}
 		}
@@ -320,7 +320,7 @@ namespace ICD.Connect.Cameras.Visca
 		private void ParseQuery(string data)
 		{
 			string response = data;
-			Log(eSeverity.Debug, response);
+			Logger.Log(eSeverity.Debug, response);
 		}
 
 		private void ParseError(ISerialData data)
@@ -335,7 +335,7 @@ namespace ICD.Connect.Cameras.Visca
 				SerialQueue.EnqueuePriority(new SerialData(command));
 			else
 			{
-				Log(eSeverity.Error, "Command {0} failed too many times and hit the retry limit.",
+				Logger.Log(eSeverity.Error, "Command {0} failed too many times and hit the retry limit.",
 					StringUtils.ToMixedReadableHexLiteral(command));
 				ResetRetryCount(command);
 			}
@@ -446,7 +446,7 @@ namespace ICD.Connect.Cameras.Visca
 				}
 				catch (KeyNotFoundException)
 				{
-					Log(eSeverity.Error, "No serial port with Id {0}", settings.Port);
+					Logger.Log(eSeverity.Error, "No serial port with Id {0}", settings.Port);
 				}
 			}
 

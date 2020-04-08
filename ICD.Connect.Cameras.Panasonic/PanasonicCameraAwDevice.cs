@@ -239,7 +239,7 @@ namespace ICD.Connect.Cameras.Panasonic
 				{
 					if (m_Port == null)
 					{
-						Log(eSeverity.Error, "Failed to make request - port is null");
+						Logger.Log(eSeverity.Error, "Failed to make request - port is null");
 						return;
 					}
 					try
@@ -249,7 +249,7 @@ namespace ICD.Connect.Cameras.Panasonic
 					}
 					catch (Exception ex)
 					{
-						Log(eSeverity.Error, "Failed to make request{0}{1}{0}{2}", IcdEnvironment.NewLine,
+						Logger.Log(eSeverity.Error, "Failed to make request{0}{1}{0}{2}", IcdEnvironment.NewLine,
 			                                         ex.Message, ex.StackTrace);
 						m_CommandList.Clear();
 
@@ -281,7 +281,7 @@ namespace ICD.Connect.Cameras.Panasonic
 			if (!s_ErrorMap.TryGetValue(code, out message))
 				message = "Unexpected error code";
 
-			Log(eSeverity.Error, "{0} - {1}", response, message);
+			Logger.Log(eSeverity.Error, "{0} - {1}", response, message);
 		}
 
 		#endregion
@@ -379,7 +379,7 @@ namespace ICD.Connect.Cameras.Panasonic
 				}
 				catch (KeyNotFoundException)
 				{
-					Log(eSeverity.Error, "No Web Port with id {0}", settings.Port);
+					Logger.Log(eSeverity.Error, "No Web Port with id {0}", settings.Port);
 				}
 			}
 

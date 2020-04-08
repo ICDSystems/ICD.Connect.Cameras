@@ -373,7 +373,7 @@ namespace ICD.Connect.Cameras.Vaddio
 				return;
 
 			if(match.Groups["status"].Value.Equals("ERROR"))
-				Log(eSeverity.Error, "Error executing \"{0}\" - {1}", match.Groups["command"].Value, match.Groups["message"].Value);
+				Logger.Log(eSeverity.Error, "Error executing \"{0}\" - {1}", match.Groups["command"].Value, match.Groups["message"].Value);
 		}
 
 		#endregion
@@ -449,7 +449,7 @@ namespace ICD.Connect.Cameras.Vaddio
 				}
 				catch (KeyNotFoundException)
 				{
-					Log(eSeverity.Error, "No serial port with Id {0}", settings.Port);
+					Logger.Log(eSeverity.Error, "No serial port with Id {0}", settings.Port);
 				}
 			}
 

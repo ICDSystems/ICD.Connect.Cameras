@@ -35,7 +35,7 @@ namespace ICD.Connect.Cameras.Devices
 
 				m_SupportedCameraFeatures = value;
 
-				Log(eSeverity.Informational, "Supported volume features changed to {0}", m_SupportedCameraFeatures);
+				Logger.Set("Supported Camera Features", eSeverity.Informational, m_SupportedCameraFeatures);
 
 				OnSupportedCameraFeaturesChanged.Raise(this, new GenericEventArgs<eCameraFeatures>(m_SupportedCameraFeatures));
 			}
@@ -59,7 +59,7 @@ namespace ICD.Connect.Cameras.Devices
 
 				m_IsCameraMuted = value;
 
-				Log(eSeverity.Informational, "IsCameraMuted changed to {0}", m_IsCameraMuted);
+				Logger.Set("Camera Muted", eSeverity.Informational, m_IsCameraMuted);
 
 				OnCameraMuteStateChanged.Raise(this, new BoolEventArgs(m_IsCameraMuted));
 			}
