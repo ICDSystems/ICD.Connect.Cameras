@@ -28,7 +28,8 @@ namespace ICD.Connect.Cameras.Proxies.Controls
 		/// </summary>
 		/// <param name="parent"></param>
 		/// <param name="id"></param>
-		protected AbstractProxyCameraDeviceControl(IProxyDeviceBase parent, int id) : base(parent, id)
+		protected AbstractProxyCameraDeviceControl(IProxyDevice parent, int id)
+			: base(parent, id)
 		{
 			m_CachedPresets = new List<CameraPreset>();
 		}

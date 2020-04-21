@@ -6,7 +6,7 @@ using ICD.Connect.Devices.Controls;
 namespace ICD.Connect.Cameras.Controls
 {
 	public abstract class AbstractCameraDeviceControl<TParent> : AbstractDeviceControl<TParent>, ICameraDeviceControl
-		where TParent : IDeviceBase
+		where TParent : IDevice
 	{
 		public abstract event EventHandler<CameraControlPresetsChangedApiEventArgs> OnPresetsChanged;
 		

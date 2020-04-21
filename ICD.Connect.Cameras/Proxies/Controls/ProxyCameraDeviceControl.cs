@@ -9,7 +9,7 @@ namespace ICD.Connect.Cameras.Proxies.Controls
 		/// </summary>
 		/// <param name="parent"></param>
 		/// <param name="id"></param>
-		public ProxyCameraDeviceControl(IProxyDeviceBase parent, int id)
+		public ProxyCameraDeviceControl(IProxyDevice parent, int id)
 			: base(parent, id)
 		{
 		}
