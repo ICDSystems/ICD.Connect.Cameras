@@ -189,7 +189,7 @@ namespace ICD.Connect.Cameras.Visca
 		/// Configures the given port for communication with the device.
 		/// </summary>
 		/// <param name="port"></param>
-		private void ConfigurePort(ISerialPort port)
+		private void ConfigurePort(IPort port)
 		{
 			// Com
 			if (port is IComPort)
@@ -197,7 +197,7 @@ namespace ICD.Connect.Cameras.Visca
 
 			ISerialBuffer buffer = new DelimiterSerialBuffer(DELIMITER);
 			SerialQueue queue = new SerialQueue();
-			queue.SetPort(port);
+			queue.SetPort(port as ISerialPort);
 			queue.SetBuffer(buffer);
 			queue.Timeout = 3 * 1000;
 
