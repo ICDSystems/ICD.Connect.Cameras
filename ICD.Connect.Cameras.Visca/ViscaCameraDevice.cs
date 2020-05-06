@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ICD.Common.Properties;
 using ICD.Common.Utils;
 using ICD.Common.Utils.EventArguments;
 using ICD.Common.Utils.Services.Logging;
@@ -235,29 +234,9 @@ namespace ICD.Connect.Cameras.Visca
 		/// Queues the command to be sent to the device.
 		/// </summary>
 		/// <param name="command"></param>
-		[PublicAPI]
-		public void SendCommand(ISerialData command)
-		{
-			SerialQueue.Enqueue(command);
-		}
-
-		/// <summary>
-		/// Queues the command to be sent to the device.
-		/// Replaces an existing command if it matches the comparer.
-		/// </summary>
-		/// <param name="command"></param>
-		/// <param name="comparer"></param>
-		[PublicAPI]
-		public void SendCommand<TData>(TData command, Func<TData, TData, bool> comparer)
-			where TData : class, ISerialData
-		{
-			SerialQueue.Enqueue(command, comparer);
-		}
-
-		[PublicAPI]
 		public void SendCommand(string command)
 		{
-			SendCommand(new SerialData(command));
+			SerialQueue.Enqueue(new SerialData(command));
 		}
 
 		#endregion
