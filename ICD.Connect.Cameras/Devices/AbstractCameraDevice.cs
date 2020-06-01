@@ -7,6 +7,7 @@ using ICD.Connect.API.Commands;
 using ICD.Connect.API.Nodes;
 using ICD.Connect.Cameras.Controls;
 using ICD.Connect.Devices;
+using ICD.Common.Logging.LoggingContexts;
 
 namespace ICD.Connect.Cameras.Devices
 {
@@ -35,7 +36,7 @@ namespace ICD.Connect.Cameras.Devices
 
 				m_SupportedCameraFeatures = value;
 
-				Logger.Set("Supported Camera Features", eSeverity.Informational, m_SupportedCameraFeatures);
+				Logger.LogSetTo(eSeverity.Informational, "SupportedCameraFeatures", m_SupportedCameraFeatures);
 
 				OnSupportedCameraFeaturesChanged.Raise(this, new GenericEventArgs<eCameraFeatures>(m_SupportedCameraFeatures));
 			}
@@ -59,7 +60,12 @@ namespace ICD.Connect.Cameras.Devices
 
 				m_IsCameraMuted = value;
 
-				Logger.Set("Camera Muted", eSeverity.Informational, m_IsCameraMuted);
+				Logger.LogSetTo(eSeverity.Informational, "IsCameraMuted", m_IsCameraMuted);
+				Activities.LogActivity(m_IsCameraMuted
+					                   ? new Activity(Activity.ePriority.Medium, "Camera Muted", "Camera Muted",
+					                                  eSeverity.Informational)
+					                   : new Activity(Activity.ePriority.Low, "Camera Unmuted", "Camera Unmuted",
+					                                  eSeverity.Informational));
 
 				OnCameraMuteStateChanged.Raise(this, new BoolEventArgs(m_IsCameraMuted));
 			}
