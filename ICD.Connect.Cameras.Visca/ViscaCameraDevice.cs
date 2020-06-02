@@ -62,10 +62,6 @@ namespace ICD.Connect.Cameras.Visca
 
 			m_ConnectionStateManager = new ConnectionStateManager(this) { ConfigurePort = ConfigurePort };
 			m_ConnectionStateManager.OnIsOnlineStateChanged += PortOnIsOnlineStateChanged;
-
-			Controls.Add(new GenericCameraRouteSourceControl<ViscaCameraDevice>(this, 0));
-			Controls.Add(new CameraDeviceControl(this, 1));
-			Controls.Add(new PowerDeviceControl<ViscaCameraDevice>(this, 2));
 		}
 
 		private void PortOnIsOnlineStateChanged(object sender, BoolEventArgs e)
@@ -438,6 +434,21 @@ namespace ICD.Connect.Cameras.Visca
 				SendCommand(ViscaCommandBuilder.GetSetAddressCommand());
 				SendCommand(ViscaCommandBuilder.GetClearCommand());
 			}
+		}
+
+		/// <summary>
+		/// Override to add controls to the device.
+		/// </summary>
+		/// <param name="settings"></param>
+		/// <param name="factory"></param>
+		/// <param name="addControl"></param>
+		protected override void AddControls(ViscaCameraDeviceSettings settings, IDeviceFactory factory, Action<IDeviceControl> addControl)
+		{
+			base.AddControls(settings, factory, addControl);
+
+			addControl(new GenericCameraRouteSourceControl<ViscaCameraDevice>(this, 0));
+			addControl(new CameraDeviceControl(this, 1));
+			addControl(new PowerDeviceControl<ViscaCameraDevice>(this, 2));
 		}
 
 		#endregion

@@ -56,10 +56,6 @@ namespace ICD.Connect.Cameras.Mock
 				eCameraFeatures.Presets |
 				eCameraFeatures.Mute |
 				eCameraFeatures.Home;
-
-			Controls.Add(new GenericCameraRouteSourceControl<MockCameraDevice>(this, 0));
-			Controls.Add(new CameraDeviceControl(this, 1));
-			Controls.Add(new PowerDeviceControl<MockCameraDevice>(this, 3));
 		}
 
 		public void SetIsOnlineState(bool isOnline)
@@ -288,6 +284,21 @@ namespace ICD.Connect.Cameras.Mock
 
 			m_PanTiltSpeed = null;
 			m_ZoomSpeed = null;
+		}
+
+		/// <summary>
+		/// Override to add controls to the device.
+		/// </summary>
+		/// <param name="settings"></param>
+		/// <param name="factory"></param>
+		/// <param name="addControl"></param>
+		protected override void AddControls(MockCameraDeviceSettings settings, IDeviceFactory factory, Action<IDeviceControl> addControl)
+		{
+			base.AddControls(settings, factory, addControl);
+
+			addControl(new GenericCameraRouteSourceControl<MockCameraDevice>(this, 0));
+			addControl(new CameraDeviceControl(this, 1));
+			addControl(new PowerDeviceControl<MockCameraDevice>(this, 3));
 		}
 
 		#endregion

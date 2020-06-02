@@ -60,10 +60,6 @@ namespace ICD.Connect.Cameras.Panasonic
 
 			m_DelayTimer = new IcdTimer();
 			m_DelayTimer.OnElapsed += TimerElapsed;
-
-			Controls.Add(new GenericCameraRouteSourceControl<PanasonicCameraAwDevice>(this, 0));
-			Controls.Add(new CameraDeviceControl(this, 1));
-			Controls.Add(new PowerDeviceControl<PanasonicCameraAwDevice>(this, 2));
 		}
 
 		#region Camera Control Methods
@@ -389,6 +385,21 @@ namespace ICD.Connect.Cameras.Panasonic
 
 			m_PanTiltSpeed = settings.PanTiltSpeed;
 			m_ZoomSpeed = settings.ZoomSpeed;
+		}
+
+		/// <summary>
+		/// Override to add controls to the device.
+		/// </summary>
+		/// <param name="settings"></param>
+		/// <param name="factory"></param>
+		/// <param name="addControl"></param>
+		protected override void AddControls(PanasonicCameraAwDeviceSettings settings, IDeviceFactory factory, Action<IDeviceControl> addControl)
+		{
+			base.AddControls(settings, factory, addControl);
+
+			addControl(new GenericCameraRouteSourceControl<PanasonicCameraAwDevice>(this, 0));
+			addControl(new CameraDeviceControl(this, 1));
+			addControl(new PowerDeviceControl<PanasonicCameraAwDevice>(this, 2));
 		}
 
 		#endregion

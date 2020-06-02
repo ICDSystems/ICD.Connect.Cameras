@@ -90,10 +90,6 @@ namespace ICD.Connect.Cameras.Vaddio
 			m_ConnectionStateManager.OnSerialDataReceived += PortOnSerialDataReceived;
 			m_ConnectionStateManager.OnIsOnlineStateChanged += PortOnIsOnlineStateChanged;
 			m_ConnectionStateManager.OnConnectedStateChanged += PortOnConnectedStateChanged;
-
-			Controls.Add(new GenericCameraRouteSourceControl<VaddioRoboshotCameraDevice>(this, 0));
-			Controls.Add(new CameraDeviceControl(this, 1));
-			Controls.Add(new PowerDeviceControl<VaddioRoboshotCameraDevice>(this, 2));
 		}
 
 		/// <summary>
@@ -456,6 +452,21 @@ namespace ICD.Connect.Cameras.Vaddio
 			SetPort(port);
 
 			SupportedCameraFeatures = eCameraFeatures.PanTiltZoom | eCameraFeatures.Presets | eCameraFeatures.Home;
+		}
+
+		/// <summary>
+		/// Override to add controls to the device.
+		/// </summary>
+		/// <param name="settings"></param>
+		/// <param name="factory"></param>
+		/// <param name="addControl"></param>
+		protected override void AddControls(VaddioRoboshotCameraDeviceSettings settings, IDeviceFactory factory, Action<IDeviceControl> addControl)
+		{
+			base.AddControls(settings, factory, addControl);
+
+			addControl(new GenericCameraRouteSourceControl<VaddioRoboshotCameraDevice>(this, 0));
+			addControl(new CameraDeviceControl(this, 1));
+			addControl(new PowerDeviceControl<VaddioRoboshotCameraDevice>(this, 2));
 		}
 
 		#endregion
