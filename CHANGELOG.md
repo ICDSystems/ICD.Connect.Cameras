@@ -6,9 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [5.0.0] - 2020-06-18
 ### Changed
  - MockCameraDevice now implements IMockDevice
  - Using new logging context
+ - Refactoring for logging, telemetry, device controls, etc
 
 ## [4.5.0] - 2020-03-20
 ### Added
