@@ -64,7 +64,7 @@
     <Compile Include="KrangPlugin.cs" />
     <Compile Include="MockCameraDevice.cs" />
     <Compile Include="MockCameraDeviceSettings.cs" />
-    <None Include="ObfuscationSettings.cs" />
+    <Compile Include="ObfuscationSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="Properties\ControlSystem.cfg" />
   </ItemGroup>

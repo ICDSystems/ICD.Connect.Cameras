@@ -63,7 +63,7 @@
   <ItemGroup>
     <Compile Include="KrangPlugin.cs" />
     <None Include="411-0003-30-rev-c-roboshot-hdbt-integrators-complete-guide.pdf" />
-    <None Include="ObfuscationSettings.cs" />
+    <Compile Include="ObfuscationSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VaddioRoboshotCameraDeviceSettings.cs" />
     <Compile Include="VaddioRoboshotCameraDevice.cs" />

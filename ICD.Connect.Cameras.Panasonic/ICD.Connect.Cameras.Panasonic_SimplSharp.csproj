@@ -62,7 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="KrangPlugin.cs" />
-    <None Include="ObfuscationSettings.cs" />
+    <Compile Include="ObfuscationSettings.cs" />
     <Compile Include="PanasonicCameraAwDevice.cs" />
     <Compile Include="PanasonicCameraAwDeviceSettings.cs" />
     <Compile Include="PanasonicCommandBuilder.cs" />
