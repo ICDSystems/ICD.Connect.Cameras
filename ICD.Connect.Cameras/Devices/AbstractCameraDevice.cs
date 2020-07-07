@@ -65,7 +65,7 @@ namespace ICD.Connect.Cameras.Devices
 				Activities.LogActivity(m_IsCameraMuted
 					                   ? new Activity(Activity.ePriority.Medium, "Camera Muted", "Camera Muted",
 					                                  eSeverity.Informational)
-					                   : new Activity(Activity.ePriority.Low, "Camera Unmuted", "Camera Unmuted",
+					                   : new Activity(Activity.ePriority.Low, "Camera Muted", "Camera Unmuted",
 					                                  eSeverity.Informational));
 
 				OnCameraMuteStateChanged.Raise(this, new BoolEventArgs(m_IsCameraMuted));
