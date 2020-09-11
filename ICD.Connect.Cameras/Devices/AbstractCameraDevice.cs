@@ -56,23 +56,38 @@ namespace ICD.Connect.Cameras.Devices
 			get { return m_IsCameraMuted; }
 			protected set
 			{
-				if (value == m_IsCameraMuted)
-					return;
+				try
+				{
+					if (value == m_IsCameraMuted)
+						return;
 
-				m_IsCameraMuted = value;
+					m_IsCameraMuted = value;
 
-				Logger.LogSetTo(eSeverity.Informational, "IsCameraMuted", m_IsCameraMuted);
-				Activities.LogActivity(m_IsCameraMuted
-					                   ? new Activity(Activity.ePriority.Medium, "Camera Muted", "Camera Muted",
-					                                  eSeverity.Informational)
-					                   : new Activity(Activity.ePriority.Low, "Camera Muted", "Camera Unmuted",
-					                                  eSeverity.Informational));
+					Logger.LogSetTo(eSeverity.Informational, "IsCameraMuted", m_IsCameraMuted);
 
-				OnCameraMuteStateChanged.Raise(this, new BoolEventArgs(m_IsCameraMuted));
+					OnCameraMuteStateChanged.Raise(this, new BoolEventArgs(m_IsCameraMuted));
+				}
+				finally
+				{
+					Activities.LogActivity(m_IsCameraMuted
+						                       ? new Activity(Activity.ePriority.Medium, "Camera Muted", "Camera Muted",
+						                                      eSeverity.Informational)
+						                       : new Activity(Activity.ePriority.Low, "Camera Muted", "Camera Unmuted",
+						                                      eSeverity.Informational));
+				}
 			}
 		}
 
 		#endregion
+
+		/// <summary>
+		/// Constructor.
+		/// </summary>
+		protected AbstractCameraDevice()
+		{
+			// Initialize activities
+			IsCameraMuted = false;
+		}
 
 		#region Methods
 
