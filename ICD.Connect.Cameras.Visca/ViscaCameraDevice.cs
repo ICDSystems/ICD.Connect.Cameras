@@ -178,7 +178,7 @@ namespace ICD.Connect.Cameras.Visca
 		/// <param name="port"></param>
 		public void SetPort(ISerialPort port)
 		{
-			m_ConnectionStateManager.SetPort(port);
+			m_ConnectionStateManager.SetPort(port, false);
 		}
 
 		/// <summary>
@@ -394,8 +394,6 @@ namespace ICD.Connect.Cameras.Visca
 			SetPort(null);
 
 			SupportedCameraFeatures = eCameraFeatures.None;
-
-			m_ConnectionStateManager.SetPort(null);
 		}
 
 		/// <summary>
@@ -430,6 +428,7 @@ namespace ICD.Connect.Cameras.Visca
 
 			SupportedCameraFeatures = eCameraFeatures.PanTiltZoom;
 
+			//todo: Initialize when port comes online?
 			if (port != null && port.IsOnline)
 			{
 				SendCommand(ViscaCommandBuilder.GetSetAddressCommand());
@@ -443,13 +442,25 @@ namespace ICD.Connect.Cameras.Visca
 		/// <param name="settings"></param>
 		/// <param name="factory"></param>
 		/// <param name="addControl"></param>
-		protected override void AddControls(ViscaCameraDeviceSettings settings, IDeviceFactory factory, Action<IDeviceControl> addControl)
+		protected override void AddControls(ViscaCameraDeviceSettings settings, IDeviceFactory factory,
+		                                    Action<IDeviceControl> addControl)
 		{
 			base.AddControls(settings, factory, addControl);
 
 			addControl(new GenericCameraRouteSourceControl<ViscaCameraDevice>(this, 0));
 			addControl(new CameraDeviceControl(this, 1));
 			addControl(new PowerDeviceControl<ViscaCameraDevice>(this, 2));
+		}
+
+		/// <summary>
+		/// Override to add actions on StartSettings
+		/// This should be used to start communications with devices and perform initial actions
+		/// </summary>
+		protected override void StartSettingsFinal()
+		{
+			base.StartSettingsFinal();
+
+			m_ConnectionStateManager.Start();
 		}
 
 		#endregion

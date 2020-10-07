@@ -20,6 +20,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
  - Using new logging context
  - Refactoring for logging, telemetry, device controls, etc
 
+## [4.6.0] - 2020-06-10
+### Changed
+ - Implemented StartSettings for Vaddio and Visca cameras to start communications
+
 ## [4.5.0] - 2020-03-20
 ### Added
  - Initial commit of ICD.Connect.Cameras.Windows project

@@ -144,7 +144,7 @@ namespace ICD.Connect.Cameras.Vaddio
 		/// <param name="port"></param>
 		public void SetPort(ISerialPort port)
 		{
-			m_ConnectionStateManager.SetPort(port);
+			m_ConnectionStateManager.SetPort(port, false);
 		}
 
 		/// <summary>
@@ -461,13 +461,25 @@ namespace ICD.Connect.Cameras.Vaddio
 		/// <param name="settings"></param>
 		/// <param name="factory"></param>
 		/// <param name="addControl"></param>
-		protected override void AddControls(VaddioRoboshotCameraDeviceSettings settings, IDeviceFactory factory, Action<IDeviceControl> addControl)
+		protected override void AddControls(VaddioRoboshotCameraDeviceSettings settings, IDeviceFactory factory,
+		                                    Action<IDeviceControl> addControl)
 		{
 			base.AddControls(settings, factory, addControl);
 
 			addControl(new GenericCameraRouteSourceControl<VaddioRoboshotCameraDevice>(this, 0));
 			addControl(new CameraDeviceControl(this, 1));
 			addControl(new PowerDeviceControl<VaddioRoboshotCameraDevice>(this, 2));
+		}
+
+		/// <summary>
+		/// Override to add actions on StartSettings
+		/// This should be used to start communications with devices and perform initial actions
+		/// </summary>
+		protected override void StartSettingsFinal()
+		{
+			base.StartSettingsFinal();
+
+			m_ConnectionStateManager.Start();
 		}
 
 		#endregion
