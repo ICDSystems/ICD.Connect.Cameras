@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using ICD.Common.Utils;
+using ICD.Common.Utils.Extensions;
 using ICD.Common.Utils.Services.Logging;
 using ICD.Connect.API.Commands;
 using ICD.Connect.API.Nodes;
@@ -9,6 +10,7 @@ using ICD.Connect.Cameras.Devices;
 using ICD.Connect.Devices;
 using ICD.Connect.Devices.Controls;
 using ICD.Connect.Devices.Controls.Power;
+using ICD.Connect.Devices.EventArguments;
 using ICD.Connect.Devices.Mock;
 using ICD.Connect.Settings;
 
@@ -16,11 +18,16 @@ namespace ICD.Connect.Cameras.Mock
 {
 	public sealed class MockCameraDevice : AbstractCameraDevice<MockCameraDeviceSettings>, IDeviceWithPower, IMockDevice
 	{
+		/// <summary>
+		/// Raised when the powered state changes.
+		/// </summary>
+		public event EventHandler<PowerDeviceControlPowerStateApiEventArgs> OnPowerStateChanged;
+
 		private readonly Dictionary<int, CameraPosition> m_PresetPositions;
 		private readonly Dictionary<int, CameraPreset> m_Presets;
 
 		private bool m_IsOnline;
-		private bool m_Powered;
+		private ePowerState m_PowerState;
 
 		private int m_VPosition;
 		private int m_HPosition;
@@ -42,6 +49,23 @@ namespace ICD.Connect.Cameras.Mock
 
 		public bool DefaultOffline { get; set; }
 
+		/// <summary>
+		/// Gets the powered state of the device.
+		/// </summary>
+		public ePowerState PowerState
+		{
+			get { return m_PowerState; }
+			private set
+			{
+				if (value == m_PowerState)
+					return;
+
+				m_PowerState = value;
+
+				OnPowerStateChanged.Raise(this, new PowerDeviceControlPowerStateApiEventArgs(m_PowerState));
+			}
+		}
+
 		#endregion
 
 		/// <summary>
@@ -57,6 +81,16 @@ namespace ICD.Connect.Cameras.Mock
 				eCameraFeatures.Presets |
 				eCameraFeatures.Mute |
 				eCameraFeatures.Home;
+		}
+
+		/// <summary>
+		/// Release resources.
+		/// </summary>
+		protected override void DisposeFinal(bool disposing)
+		{
+			OnPowerStateChanged = null;
+
+			base.DisposeFinal(disposing);
 		}
 
 		public void SetIsOnlineState(bool isOnline)
@@ -202,14 +236,20 @@ namespace ICD.Connect.Cameras.Mock
 
 		#region IDeviceWithPower
 
+		/// <summary>
+		/// Powers on the device.
+		/// </summary>
 		public void PowerOn()
 		{
-			m_Powered = true;
+			PowerState = ePowerState.PowerOn;
 		}
 
+		/// <summary>
+		/// Powers off the device.
+		/// </summary>
 		public void PowerOff()
 		{
-			m_Powered = false;
+			PowerState = ePowerState.PowerOff;
 		}
 
 		#endregion
@@ -221,20 +261,6 @@ namespace ICD.Connect.Cameras.Mock
 			Logger.Log(eSeverity.Informational,
 			    "MockCamera {0}: Instruction {1}: New Position - h{2},v{3},z{4}",
 			    Name, action, m_HPosition, m_VPosition, m_ZPosition);
-		}
-
-		#endregion
-
-		#region QueryCommands
-
-		private void QueryPowerState()
-		{
-			Logger.Log(eSeverity.Informational, "Power State: {0}", m_Powered);
-		}
-
-		private void QueryCoordinates()
-		{
-			Logger.Log(eSeverity.Informational, "Coordinates: h{0},v{1},z{2}", m_HPosition, m_VPosition, m_ZPosition);
 		}
 
 		#endregion
@@ -307,6 +333,31 @@ namespace ICD.Connect.Cameras.Mock
 		#region Console
 
 		/// <summary>
+		/// Gets the child console nodes.
+		/// </summary>
+		/// <returns></returns>
+		public override IEnumerable<IConsoleNodeBase> GetConsoleNodes()
+		{
+			foreach (IConsoleNodeBase node in GetBaseConsoleNodes())
+				yield return node;
+
+			foreach (IConsoleNodeBase node in MockDeviceHelper.GetConsoleNodes(this))
+				yield return node;
+
+			foreach (IConsoleNodeBase node in DeviceWithPowerConsole.GetConsoleNodes(this))
+				yield return node;
+		}
+
+		/// <summary>
+		/// Wrokaround for "unverifiable code" warning.
+		/// </summary>
+		/// <returns></returns>
+		private IEnumerable<IConsoleNodeBase> GetBaseConsoleNodes()
+		{
+			return base.GetConsoleNodes();
+		}
+
+		/// <summary>
 		/// Gets the child console commands.
 		/// </summary>
 		/// <returns></returns>
@@ -318,10 +369,8 @@ namespace ICD.Connect.Cameras.Mock
 			foreach (IConsoleCommand command in MockDeviceHelper.GetConsoleCommands(this))
 				yield return command;
 
-			yield return new ConsoleCommand("PowerOn", "Powers the camera device", () => PowerOn());
-			yield return new ConsoleCommand("PowerOff", "Places the camera device on standby", () => PowerOff());
-			yield return new ConsoleCommand("PowerQuery", "Returns the Powered State of the device", () => QueryPowerState());
-			yield return new ConsoleCommand("PositionQuery", "Queries the current position of the camera", () => QueryCoordinates());
+			foreach (IConsoleCommand command in DeviceWithPowerConsole.GetConsoleCommands(this))
+				yield return command;
 		}
 
 		/// <summary>
@@ -342,9 +391,11 @@ namespace ICD.Connect.Cameras.Mock
 			base.BuildConsoleStatus(addRow);
 
 			MockDeviceHelper.BuildConsoleStatus(this, addRow);
+			DeviceWithPowerConsole.BuildConsoleStatus(this, addRow);
 
 			addRow("Pan/Tilt Speed", m_PanTiltSpeed);
 			addRow("Zoom Speed", m_ZoomSpeed);
+			addRow("Coordinates", string.Format("h{0},v{1},z{2}", m_HPosition, m_VPosition, m_ZPosition));
 		}
 
 		#endregion

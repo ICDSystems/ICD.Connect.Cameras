@@ -16,4 +16,17 @@
 		NULL = 108,
 		IMPROPER_FORMAT = 109,
 	}
+
+	public static class ViscaResponseExtensions
+	{
+		/// <summary>
+		/// Returns true if the response code is an error.
+		/// </summary>
+		/// <param name="extends"></param>
+		/// <returns></returns>
+		public static bool IsError(this eViscaResponse extends)
+		{
+			return (int)extends > 100;
+		}
+	}
 }

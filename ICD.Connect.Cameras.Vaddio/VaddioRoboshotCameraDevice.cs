@@ -13,11 +13,16 @@ using ICD.Connect.Cameras.Devices;
 using ICD.Connect.Devices;
 using ICD.Connect.Devices.Controls;
 using ICD.Connect.Devices.Controls.Power;
+using ICD.Connect.Devices.EventArguments;
 using ICD.Connect.Protocol;
+using ICD.Connect.Protocol.Data;
+using ICD.Connect.Protocol.EventArguments;
 using ICD.Connect.Protocol.Extensions;
 using ICD.Connect.Protocol.Network.Ports;
+using ICD.Connect.Protocol.Network.Ports.Tcp;
 using ICD.Connect.Protocol.Network.Settings;
 using ICD.Connect.Protocol.Ports;
+using ICD.Connect.Protocol.SerialQueues;
 using ICD.Connect.Settings;
 
 namespace ICD.Connect.Cameras.Vaddio
@@ -37,16 +42,22 @@ namespace ICD.Connect.Cameras.Vaddio
 
 		#endregion
 
+		/// <summary>
+		/// Raised when the powered state changes.
+		/// </summary>
+		public event EventHandler<PowerDeviceControlPowerStateApiEventArgs> OnPowerStateChanged;
+
 		#region Private Members
 
 		private readonly ConnectionStateManager m_ConnectionStateManager;
 		private readonly VaddioRoboshotSerialBuffer m_SerialBuffer;
-
 		private readonly NetworkProperties m_NetworkProperties;
 
 		private int m_PanSpeed;
 		private int m_TiltSpeed;
 		private int m_ZoomSpeed;
+		private ePowerState m_PowerState;
+		private ISerialQueue m_SerialQueue;
 
 		#endregion
 
@@ -75,6 +86,23 @@ namespace ICD.Connect.Cameras.Vaddio
 			}
 		}
 
+		/// <summary>
+		/// Gets the powered state of the device.
+		/// </summary>
+		public ePowerState PowerState
+		{
+			get { return m_PowerState; }
+			private set
+			{
+				if (value == m_PowerState)
+					return;
+
+				m_PowerState = value;
+
+				OnPowerStateChanged.Raise(this, new PowerDeviceControlPowerStateApiEventArgs(m_PowerState));
+			}
+		}
+
 		#endregion
 
 		/// <summary>
@@ -88,7 +116,6 @@ namespace ICD.Connect.Cameras.Vaddio
 			Subscribe(m_SerialBuffer);
 
 			m_ConnectionStateManager = new ConnectionStateManager(this) {ConfigurePort = ConfigurePort};
-			m_ConnectionStateManager.OnSerialDataReceived += PortOnSerialDataReceived;
 			m_ConnectionStateManager.OnIsOnlineStateChanged += PortOnIsOnlineStateChanged;
 			m_ConnectionStateManager.OnConnectedStateChanged += PortOnConnectedStateChanged;
 		}
@@ -98,42 +125,14 @@ namespace ICD.Connect.Cameras.Vaddio
 		/// </summary>
 		protected override void DisposeFinal(bool disposing)
 		{
+			OnPowerStateChanged = null;
+
 			m_ConnectionStateManager.OnIsOnlineStateChanged -= PortOnIsOnlineStateChanged;
 			m_ConnectionStateManager.Dispose();
 
 			base.DisposeFinal(disposing);
 
 			Unsubscribe(m_SerialBuffer);
-		}
-
-		/// <summary>
-		/// Called when we receive data from the device.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="stringEventArgs"></param>
-		private void PortOnSerialDataReceived(object sender, StringEventArgs stringEventArgs)
-		{
-			m_SerialBuffer.Enqueue(stringEventArgs.Data);
-		}
-
-		/// <summary>
-		/// Called when the port online status changes.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void PortOnIsOnlineStateChanged(object sender, BoolEventArgs e)
-		{
-			UpdateCachedOnlineStatus();
-		}
-
-		/// <summary>
-		/// Called when we gain/lose connection to the device.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="boolEventArgs"></param>
-		private void PortOnConnectedStateChanged(object sender, BoolEventArgs boolEventArgs)
-		{
-			m_SerialBuffer.Clear();
 		}
 
 		#region Methods
@@ -144,6 +143,12 @@ namespace ICD.Connect.Cameras.Vaddio
 		/// <param name="port"></param>
 		public void SetPort(ISerialPort port)
 		{
+			if (port != null)
+			{
+				port.DebugRx = eDebugMode.Ascii;
+				port.DebugTx = eDebugMode.Ascii;
+			}
+
 			m_ConnectionStateManager.SetPort(port, false);
 		}
 
@@ -156,6 +161,15 @@ namespace ICD.Connect.Cameras.Vaddio
 			// TCP
 			if (port is INetworkPort)
 				(port as INetworkPort).ApplyDeviceConfiguration(m_NetworkProperties);
+
+			SerialQueue queue = new SerialQueue();
+			queue.SetPort(port as ISerialPort);
+			queue.SetBuffer(m_SerialBuffer);
+			queue.Timeout = 3 * 1000;
+
+			SetSerialQueue(queue);
+
+			UpdateCachedOnlineStatus();
 		}
 
 		/// <summary>
@@ -316,7 +330,7 @@ namespace ICD.Connect.Cameras.Vaddio
 			if (!command.EndsWith(DELIMITER))
 				command += DELIMITER;
 
-			m_ConnectionStateManager.Send(command);
+			m_SerialQueue.Enqueue(new SerialData(command));
 		}
 
 		#endregion
@@ -334,43 +348,176 @@ namespace ICD.Connect.Cameras.Vaddio
 
 		#endregion
 
-		#region SerialBuffer Callbacks
+		#region SerialQueue Callbacks
 
-		private void Subscribe(VaddioRoboshotSerialBuffer buffer)
+		/// <summary>
+		/// Subscribe to the serial queue events.
+		/// </summary>
+		/// <param name="serialQueue"></param>
+		private void SetSerialQueue(ISerialQueue serialQueue)
 		{
-			buffer.OnCompletedSerial += BufferOnCompletedSerial;
-			buffer.OnPasswordPrompt += BufferOnPasswordPrompt;
-			buffer.OnUsernamePrompt += BufferOnUsernamePrompt;
+			Unsubscribe(m_SerialQueue);
+
+			if (m_SerialQueue != null)
+				m_SerialQueue.Dispose();
+
+			m_SerialQueue = serialQueue;
+
+			Subscribe(m_SerialQueue);
+
+			UpdateCachedOnlineStatus();
 		}
 
-		private void Unsubscribe(VaddioRoboshotSerialBuffer buffer)
+		/// <summary>
+		/// Subscribe to the serial queue events.
+		/// </summary>
+		/// <param name="queue"></param>
+		private void Subscribe(ISerialQueue queue)
 		{
-			buffer.OnCompletedSerial -= BufferOnCompletedSerial;
-			buffer.OnPasswordPrompt -= BufferOnPasswordPrompt;
-			buffer.OnUsernamePrompt -= BufferOnUsernamePrompt;
+			if (queue == null)
+				return;
+
+			queue.OnSerialResponse += SerialQueueOnSerialResponse;
 		}
 
-		private void BufferOnUsernamePrompt(object sender, EventArgs eventArgs)
+		/// <summary>
+		/// Unsubscribe from the serial queue events.
+		/// </summary>
+		/// <param name="queue"></param>
+		private void Unsubscribe(ISerialQueue queue)
 		{
-			SendCommand(Username ?? string.Empty);
+			if (queue == null)
+				return;
+
+			queue.OnSerialResponse -= SerialQueueOnSerialResponse;
 		}
 
-		private void BufferOnPasswordPrompt(object sender, EventArgs eventArgs)
+		/// <summary>
+		/// Called when we receive a response from the device.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="args"></param>
+		private void SerialQueueOnSerialResponse(object sender, SerialResponseEventArgs args)
 		{
-			SendCommand(Password ?? string.Empty);
-		}
+			// Initialize
+			if (args.Response.Contains("Welcome admin"))
+				SendCommand("camera standby get");
 
-		private void BufferOnCompletedSerial(object sender, StringEventArgs stringEventArgs)
-		{
-			const string responseRegex = @"(?'command'[^\r\n]+)\r\n((?'message'[^\r\n]+)\r\n)?(?'status'[^\r\n]+)\r\n";
+			const string responseRegex = @"\s*(?'command'[^\r\n]+)\r\n((?'message'[^\r\n]+)\r\n)?(?'status'[^\r\n]+)\r\n";
 
-			Match match = Regex.Match(stringEventArgs.Data, responseRegex);
-
+			Match match = Regex.Match(args.Response, responseRegex);
 			if (!match.Success)
 				return;
 
-			if(match.Groups["status"].Value.Equals("ERROR"))
-				Logger.Log(eSeverity.Error, "Error executing \"{0}\" - {1}", match.Groups["command"].Value, match.Groups["message"].Value);
+			string command = match.Groups["command"].Value;
+			string status = match.Groups["status"].Value;
+			string message = match.Groups["message"].Value;
+
+			switch (status)
+			{
+				case "ERROR":
+					Logger.Log(eSeverity.Error, "Error executing \"{0}\" - {1}", command, message);
+					break;
+
+				case "OK":
+					switch (command)
+					{
+						case "camera standby on":
+							PowerState = ePowerState.PowerOff;
+							break;
+
+						case "camera standby off":
+							PowerState = ePowerState.PowerOn;
+							break;
+
+						case "camera standby get":
+							PowerState = message.Contains("on") ? ePowerState.PowerOff : ePowerState.PowerOn;
+							break;
+					}
+
+					break;
+			}
+		}
+
+		#endregion
+
+		#region Port Callbacks
+
+		/// <summary>
+		/// Called when the port online status changes.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void PortOnIsOnlineStateChanged(object sender, BoolEventArgs e)
+		{
+			UpdateCachedOnlineStatus();
+		}
+
+		/// <summary>
+		/// Called when we gain/lose connection to the device.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="eventArgs"></param>
+		private void PortOnConnectedStateChanged(object sender, BoolEventArgs eventArgs)
+		{
+			m_SerialBuffer.Clear();
+		}
+
+		#endregion
+
+		#region SerialBuffer Callbacks
+
+		/// <summary>
+		/// Subscribe to the buffer events.
+		/// </summary>
+		/// <param name="buffer"></param>
+		private void Subscribe(VaddioRoboshotSerialBuffer buffer)
+		{
+			buffer.OnPasswordPrompt += BufferOnPasswordPrompt;
+			buffer.OnUsernamePrompt += BufferOnUsernamePrompt;
+			buffer.OnSerialTelnetHeader += BufferOnSerialTelnetHeader;
+		}
+
+		/// <summary>
+		/// Unsubscribe from the buffer events.
+		/// </summary>
+		/// <param name="buffer"></param>
+		private void Unsubscribe(VaddioRoboshotSerialBuffer buffer)
+		{
+			buffer.OnPasswordPrompt -= BufferOnPasswordPrompt;
+			buffer.OnUsernamePrompt -= BufferOnUsernamePrompt;
+			buffer.OnSerialTelnetHeader -= BufferOnSerialTelnetHeader;
+		}
+
+		/// <summary>
+		/// Called when the device prompts for a username.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="eventArgs"></param>
+		private void BufferOnUsernamePrompt(object sender, EventArgs eventArgs)
+		{
+			m_ConnectionStateManager.Send((Username ?? string.Empty) + DELIMITER);
+		}
+
+		/// <summary>
+		/// Called when the device prompts for a password.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="eventArgs"></param>
+		private void BufferOnPasswordPrompt(object sender, EventArgs eventArgs)
+		{
+			m_ConnectionStateManager.Send((Password ?? string.Empty) + DELIMITER);
+		}
+
+		/// <summary>
+		/// Called when we receive a telnet handshake message from the device.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="args"></param>
+		private void BufferOnSerialTelnetHeader(object sender, StringEventArgs args)
+		{
+			TelnetCommand command = TelnetCommand.Parse(args.Data);
+			m_ConnectionStateManager.Send(command.Reject().Serialize());
 		}
 
 		#endregion
@@ -487,6 +634,31 @@ namespace ICD.Connect.Cameras.Vaddio
 		#region Console
 
 		/// <summary>
+		/// Gets the child console nodes.
+		/// </summary>
+		/// <returns></returns>
+		public override IEnumerable<IConsoleNodeBase> GetConsoleNodes()
+		{
+			foreach (IConsoleNodeBase node in GetBaseConsoleNodes())
+				yield return node;
+
+			foreach (IConsoleNodeBase node in DeviceWithPowerConsole.GetConsoleNodes(this))
+				yield return node;
+
+			if (m_ConnectionStateManager.Port != null)
+				yield return m_ConnectionStateManager.Port;
+		}
+
+		/// <summary>
+		/// Wrokaround for "unverifiable code" warning.
+		/// </summary>
+		/// <returns></returns>
+		private IEnumerable<IConsoleNodeBase> GetBaseConsoleNodes()
+		{
+			return base.GetConsoleNodes();
+		}
+
+		/// <summary>
 		/// Gets the child console commands.
 		/// </summary>
 		/// <returns></returns>
@@ -495,8 +667,8 @@ namespace ICD.Connect.Cameras.Vaddio
 			foreach (IConsoleCommand command in GetBaseConsoleCommands())
 				yield return command;
 
-			yield return new ConsoleCommand("PowerOn", "Powers the camera device", () => PowerOn());
-			yield return new ConsoleCommand("PowerOff", "Places the camera device on standby", () => PowerOff());
+			foreach (IConsoleCommand command in DeviceWithPowerConsole.GetConsoleCommands(this))
+				yield return command;
 		}
 
 		/// <summary>
@@ -509,25 +681,18 @@ namespace ICD.Connect.Cameras.Vaddio
 		}
 
 		/// <summary>
-		/// Gets the child console nodes.
+		/// Calls the delegate for each console status item.
 		/// </summary>
-		/// <returns></returns>
-		public override IEnumerable<IConsoleNodeBase> GetConsoleNodes()
+		/// <param name="addRow"></param>
+		public override void BuildConsoleStatus(AddStatusRowDelegate addRow)
 		{
-			foreach (IConsoleNodeBase node in GetBaseConsoleNodes())
-				yield return node;
+			base.BuildConsoleStatus(addRow);
 
-			if (m_ConnectionStateManager != null)
-				yield return m_ConnectionStateManager.Port;
-		}
+			DeviceWithPowerConsole.BuildConsoleStatus(this, addRow);
 
-		/// <summary>
-		/// Workaround for "unverifiable code" warning.
-		/// </summary>
-		/// <returns></returns>
-		private IEnumerable<IConsoleNodeBase> GetBaseConsoleNodes()
-		{
-			return base.GetConsoleNodes();
+			addRow("Pan Speed", m_PanSpeed);
+			addRow("Tilt Speed", m_TiltSpeed);
+			addRow("Zoom Speed", m_ZoomSpeed);
 		}
 
 		#endregion

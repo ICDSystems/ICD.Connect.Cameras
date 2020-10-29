@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ICD.Common.Utils;
 using ICD.Common.Utils.EventArguments;
+using ICD.Common.Utils.Extensions;
 using ICD.Common.Utils.Services.Logging;
 using ICD.Connect.API.Commands;
 using ICD.Connect.API.Nodes;
@@ -11,8 +12,8 @@ using ICD.Connect.Cameras.Devices;
 using ICD.Connect.Devices;
 using ICD.Connect.Devices.Controls;
 using ICD.Connect.Devices.Controls.Power;
+using ICD.Connect.Devices.EventArguments;
 using ICD.Connect.Protocol;
-using ICD.Connect.Protocol.Data;
 using ICD.Connect.Protocol.EventArguments;
 using ICD.Connect.Protocol.Extensions;
 using ICD.Connect.Protocol.Ports;
@@ -30,18 +31,22 @@ namespace ICD.Connect.Cameras.Visca
 		private const int DEFAULT_ID = 1;
 		private const char DELIMITER = '\xFF';
 
+		/// <summary>
+		/// Raised when the powered state changes.
+		/// </summary>
+		public event EventHandler<PowerDeviceControlPowerStateApiEventArgs> OnPowerStateChanged;
+
 		#region Private Members
 
 		private readonly Dictionary<string, int> m_RetryCounts = new Dictionary<string, int>();
 		private readonly SafeCriticalSection m_RetryLock = new SafeCriticalSection();
-
 		private readonly ComSpecProperties m_ComSpecProperties;
-
 		private readonly ConnectionStateManager m_ConnectionStateManager;
 
 		private int? m_PanTiltSpeed;
 		private int? m_ZoomSpeed;
-		private ISerialQueue SerialQueue { get; set; }
+		private ePowerState m_PowerState;
+		private ISerialQueue m_SerialQueue;
 
 		#endregion
 
@@ -50,7 +55,24 @@ namespace ICD.Connect.Cameras.Visca
 		/// <summary>
 		/// Gets the maximum number of presets this camera can support
 		/// </summary>
-		public override int MaxPresets { get { throw new NotSupportedException(); } }
+		public override int MaxPresets { get { return 0; } }
+
+		/// <summary>
+		/// Gets the powered state of the device.
+		/// </summary>
+		public ePowerState PowerState
+		{
+			get { return m_PowerState; }
+			private set
+			{
+				if (value == m_PowerState)
+					return;
+
+				m_PowerState = value;
+
+				OnPowerStateChanged.Raise(this, new PowerDeviceControlPowerStateApiEventArgs(m_PowerState));
+			}
+		}
 
 		#endregion
 
@@ -63,8 +85,28 @@ namespace ICD.Connect.Cameras.Visca
 
 			m_ConnectionStateManager = new ConnectionStateManager(this) { ConfigurePort = ConfigurePort };
 			m_ConnectionStateManager.OnIsOnlineStateChanged += PortOnIsOnlineStateChanged;
+
+			SupportedCameraFeatures = eCameraFeatures.PanTiltZoom;
 		}
 
+		/// <summary>
+		/// Release resources.
+		/// </summary>
+		protected override void DisposeFinal(bool disposing)
+		{
+			OnPowerStateChanged = null;
+
+			m_ConnectionStateManager.OnIsOnlineStateChanged -= PortOnIsOnlineStateChanged;
+			m_ConnectionStateManager.Dispose();
+
+			base.DisposeFinal(disposing);
+		}
+
+		/// <summary>
+		/// Called when the port online state changes.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void PortOnIsOnlineStateChanged(object sender, BoolEventArgs e)
 		{
 			UpdateCachedOnlineStatus();
@@ -79,8 +121,8 @@ namespace ICD.Connect.Cameras.Visca
 		public override void Pan(eCameraPanAction action)
 		{
 			SendCommand(m_PanTiltSpeed == null
-							? ViscaCommandBuilder.GetPanCommand(DEFAULT_ID, action)
-							: ViscaCommandBuilder.GetPanCommand(DEFAULT_ID, action, m_PanTiltSpeed.Value));
+							? ViscaCommand.GetPanCommand(DEFAULT_ID, action)
+							: ViscaCommand.GetPanCommand(DEFAULT_ID, action, m_PanTiltSpeed.Value));
 		}
 
 		/// <summary>
@@ -89,8 +131,8 @@ namespace ICD.Connect.Cameras.Visca
 		public override void Tilt(eCameraTiltAction action)
 		{
 			SendCommand(m_PanTiltSpeed == null
-							? ViscaCommandBuilder.GetTiltCommand(DEFAULT_ID, action)
-							: ViscaCommandBuilder.GetTiltCommand(DEFAULT_ID, action, m_PanTiltSpeed.Value));
+							? ViscaCommand.GetTiltCommand(DEFAULT_ID, action)
+							: ViscaCommand.GetTiltCommand(DEFAULT_ID, action, m_PanTiltSpeed.Value));
 		}
 
 		/// <summary>
@@ -100,8 +142,8 @@ namespace ICD.Connect.Cameras.Visca
 		public override void Zoom(eCameraZoomAction action)
 		{
 			SendCommand(m_ZoomSpeed == null
-							? ViscaCommandBuilder.GetZoomCommand(DEFAULT_ID, action)
-							: ViscaCommandBuilder.GetZoomCommand(DEFAULT_ID, action, m_ZoomSpeed.Value));
+							? ViscaCommand.GetZoomCommand(DEFAULT_ID, action)
+							: ViscaCommand.GetZoomCommand(DEFAULT_ID, action, m_ZoomSpeed.Value));
 		}
 
 		/// <summary>
@@ -160,25 +202,20 @@ namespace ICD.Connect.Cameras.Visca
 		#region Methods
 
 		/// <summary>
-		/// Release resources.
-		/// </summary>
-		protected override void DisposeFinal(bool disposing)
-		{
-			SetPort(null);
-
-			m_ConnectionStateManager.OnIsOnlineStateChanged -= PortOnIsOnlineStateChanged;
-			m_ConnectionStateManager.Dispose();
-
-			base.DisposeFinal(disposing);
-		}
-
-		/// <summary>
 		/// Sets the wrapped port for communication with the hardware.
 		/// </summary>
 		/// <param name="port"></param>
 		public void SetPort(ISerialPort port)
 		{
 			m_ConnectionStateManager.SetPort(port, false);
+
+			// todo: Initialize when port comes online?
+			if (port != null && port.IsOnline)
+			{
+				SendCommand(ViscaCommand.GetSetAddressCommand());
+				SendCommand(ViscaCommand.GetClearCommand());
+				SendCommand(ViscaCommand.GetPowerInquiryCommand(DEFAULT_ID));
+			}
 		}
 
 		/// <summary>
@@ -216,7 +253,7 @@ namespace ICD.Connect.Cameras.Visca
 		/// </summary>
 		public void PowerOn()
 		{
-			SendCommand(ViscaCommandBuilder.GetPowerOnCommand(DEFAULT_ID));
+			SendCommand(ViscaCommand.GetPowerOnCommand(DEFAULT_ID));
 		}
 
 		/// <summary>
@@ -224,16 +261,16 @@ namespace ICD.Connect.Cameras.Visca
 		/// </summary>
 		public void PowerOff()
 		{
-			SendCommand(ViscaCommandBuilder.GetPowerOffCommand(DEFAULT_ID));
+			SendCommand(ViscaCommand.GetPowerOffCommand(DEFAULT_ID));
 		}
 
 		/// <summary>
 		/// Queues the command to be sent to the device.
 		/// </summary>
 		/// <param name="command"></param>
-		public void SendCommand(string command)
+		private void SendCommand(ViscaCommand command)
 		{
-			SerialQueue.Enqueue(new SerialData(command));
+			m_SerialQueue.Enqueue(command);
 		}
 
 		#endregion
@@ -246,18 +283,22 @@ namespace ICD.Connect.Cameras.Visca
 		/// <param name="serialQueue"></param>
 		private void SetSerialQueue(ISerialQueue serialQueue)
 		{
-			Unsubscribe(SerialQueue);
+			Unsubscribe(m_SerialQueue);
 
-			if (SerialQueue != null)
-				SerialQueue.Dispose();
+			if (m_SerialQueue != null)
+				m_SerialQueue.Dispose();
 
-			SerialQueue = serialQueue;
+			m_SerialQueue = serialQueue;
 
-			Subscribe(SerialQueue);
+			Subscribe(m_SerialQueue);
 
 			UpdateCachedOnlineStatus();
 		}
 
+		/// <summary>
+		/// Subscribe to the serial queue events.
+		/// </summary>
+		/// <param name="queue"></param>
 		private void Subscribe(ISerialQueue queue)
 		{
 			if (queue == null)
@@ -278,88 +319,97 @@ namespace ICD.Connect.Cameras.Visca
 			queue.OnSerialResponse -= SerialQueueOnSerialResponse;
 		}
 
+		/// <summary>
+		/// Called when a complete response is received from the device.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="args"></param>
 		private void SerialQueueOnSerialResponse(object sender, SerialResponseEventArgs args)
 		{
 			if (args.Data == null)
 				return;
 
-			eViscaResponse response = ViscaResponseHandler.HandleResponse(args.Response);
-			if (!ViscaResponseHandler.ResponseIsError(response))
-				ParseQuery(args.Response);
+			eViscaResponse response = ViscaResponseUtils.ToResponse(args.Response);
+
+			if (response.IsError())
+				HandleError((ViscaCommand)args.Data, response);
 			else
-			{
-				Logger.Log(eSeverity.Error, ViscaResponseHandler.HandleResponse(args.Response).ToString(), args);
-				ParseError(args.Data);
-			}
+				HandleQuery((ViscaCommand)args.Data, response);
 		}
 
-		private void ParseQuery(string data)
+		/// <summary>
+		/// Handles good responses from the device.
+		/// </summary>
+		/// <param name="request"></param>
+		/// <param name="response"></param>
+		private void HandleQuery(ViscaCommand request, eViscaResponse response)
 		{
-			string response = data;
-			Logger.Log(eSeverity.Debug, response);
+			// Update power state feedback
+			if (request.CommandEquals(ViscaCommand.GetPowerOnCommand(DEFAULT_ID)))
+				PowerState = ePowerState.PowerOn;
+			if (request.CommandEquals(ViscaCommand.GetPowerOffCommand(DEFAULT_ID)))
+				PowerState = ePowerState.PowerOff;
 		}
 
-		private void ParseError(ISerialData data)
+		/// <summary>
+		/// Handles error responses from the device.
+		/// </summary>
+		/// <param name="data"></param>
+		/// <param name="response"></param>
+		private void HandleError(ViscaCommand data, eViscaResponse response)
 		{
-			RetryCommand(data.Serialize());
+			Logger.Log(eSeverity.Error, "Got error response for command {0} - {1}",
+			           StringUtils.ToHexLiteral(data.Serialize()), response.ToString());
+
+			RetryCommand(data);
 		}
 
-		private void RetryCommand(string command)
+		/// <summary>
+		/// Increments the retry count for the command and sends again if the retry attempt limit hasn't been reached.
+		/// </summary>
+		/// <param name="command"></param>
+		private void RetryCommand(ViscaCommand command)
 		{
 			IncrementRetryCount(command);
+
 			if (GetRetryCount(command) <= MAX_RETRY_ATTEMPTS)
-				SerialQueue.EnqueuePriority(new SerialData(command));
-			else
 			{
-				Logger.Log(eSeverity.Error, "Command {0} failed too many times and hit the retry limit.",
-					StringUtils.ToMixedReadableHexLiteral(command));
-				ResetRetryCount(command);
+				m_SerialQueue.EnqueuePriority(command);
+				return;
 			}
+
+			Logger.Log(eSeverity.Error, "Command {0} failed too many times and hit the retry limit.",
+			           StringUtils.ToMixedReadableHexLiteral(command.Serialize()));
+			ResetRetryCount(command);
 		}
 
-		private void IncrementRetryCount(string command)
+		/// <summary>
+		/// Increments the retry count for the given command.
+		/// </summary>
+		/// <param name="command"></param>
+		private void IncrementRetryCount(ViscaCommand command)
 		{
-			m_RetryLock.Enter();
-
-			try
-			{
-				if (m_RetryCounts.ContainsKey(command))
-					m_RetryCounts[command]++;
-				else
-					m_RetryCounts.Add(command, 1);
-			}
-			finally
-			{
-				m_RetryLock.Leave();
-			}
+			string serial = command.Serialize();
+			m_RetryLock.Execute(() => m_RetryCounts[serial] = m_RetryCounts.GetDefault(serial) + 1);
 		}
 
-		private int GetRetryCount(string command)
+		/// <summary>
+		/// Gets the retry count for the given command.
+		/// </summary>
+		/// <param name="command"></param>
+		/// <returns></returns>
+		private int GetRetryCount(ViscaCommand command)
 		{
-			m_RetryLock.Enter();
-
-			try
-			{
-				return m_RetryCounts.ContainsKey(command) ? m_RetryCounts[command] : 0;
-			}
-			finally
-			{
-				m_RetryLock.Leave();
-			}
+			return m_RetryLock.Execute(() => m_RetryCounts.GetDefault(command.Serialize()));
 		}
 
-		private void ResetRetryCount(string command)
+		/// <summary>
+		/// Resets the retry count for the given command.
+		/// </summary>
+		/// <param name="command"></param>
+		private void ResetRetryCount(ViscaCommand command)
 		{
-			m_RetryLock.Enter();
-
-			try
-			{
-				m_RetryCounts.Remove(command);
-			}
-			finally
-			{
-				m_RetryLock.Leave();
-			}
+			m_RetryLock.Execute(() => m_RetryCounts.Remove(command.Serialize()));
 		}
 
 		#endregion
@@ -375,7 +425,6 @@ namespace ICD.Connect.Cameras.Visca
 			base.CopySettingsFinal(settings);
 
 			settings.Port = m_ConnectionStateManager.PortNumber;
-
 			settings.PanTiltSpeed = m_PanTiltSpeed;
 			settings.ZoomSpeed = m_ZoomSpeed;
 
@@ -392,8 +441,6 @@ namespace ICD.Connect.Cameras.Visca
 			m_ComSpecProperties.ClearComSpecProperties();
 
 			SetPort(null);
-
-			SupportedCameraFeatures = eCameraFeatures.None;
 		}
 
 		/// <summary>
@@ -425,15 +472,6 @@ namespace ICD.Connect.Cameras.Visca
 			}
 
 			SetPort(port);
-
-			SupportedCameraFeatures = eCameraFeatures.PanTiltZoom;
-
-			//todo: Initialize when port comes online?
-			if (port != null && port.IsOnline)
-			{
-				SendCommand(ViscaCommandBuilder.GetSetAddressCommand());
-				SendCommand(ViscaCommandBuilder.GetClearCommand());
-			}
 		}
 
 		/// <summary>
@@ -468,6 +506,31 @@ namespace ICD.Connect.Cameras.Visca
 		#region Console
 
 		/// <summary>
+		/// Gets the child console nodes.
+		/// </summary>
+		/// <returns></returns>
+		public override IEnumerable<IConsoleNodeBase> GetConsoleNodes()
+		{
+			foreach (IConsoleNodeBase node in GetBaseConsoleNodes())
+				yield return node;
+
+			foreach (IConsoleNodeBase node in DeviceWithPowerConsole.GetConsoleNodes(this))
+				yield return node;
+
+			if (m_ConnectionStateManager.Port != null)
+				yield return m_ConnectionStateManager.Port;
+		}
+
+		/// <summary>
+		/// Workaround for "unverifiable code" warning.
+		/// </summary>
+		/// <returns></returns>
+		private IEnumerable<IConsoleNodeBase> GetBaseConsoleNodes()
+		{
+			return base.GetConsoleNodes();
+		}
+
+		/// <summary>
 		/// Gets the child console commands.
 		/// </summary>
 		/// <returns></returns>
@@ -476,8 +539,8 @@ namespace ICD.Connect.Cameras.Visca
 			foreach (IConsoleCommand command in GetBaseConsoleCommands())
 				yield return command;
 
-			yield return new ConsoleCommand("PowerOn", "Powers the camera device", () => PowerOn());
-			yield return new ConsoleCommand("PowerOff", "Places the camera device on standby", () => PowerOff());
+			foreach (IConsoleCommand command in DeviceWithPowerConsole.GetConsoleCommands(this))
+				yield return command;
 		}
 
 		/// <summary>
@@ -490,25 +553,17 @@ namespace ICD.Connect.Cameras.Visca
 		}
 
 		/// <summary>
-		/// Gets the child console nodes.
+		/// Calls the delegate for each console status item.
 		/// </summary>
-		/// <returns></returns>
-		public override IEnumerable<IConsoleNodeBase> GetConsoleNodes()
+		/// <param name="addRow"></param>
+		public override void BuildConsoleStatus(AddStatusRowDelegate addRow)
 		{
-			foreach (IConsoleNodeBase node in GetBaseConsoleNodes())
-				yield return node;
+			base.BuildConsoleStatus(addRow);
 
-			if (m_ConnectionStateManager != null)
-				yield return m_ConnectionStateManager.Port;
-		}
+			DeviceWithPowerConsole.BuildConsoleStatus(this, addRow);
 
-		/// <summary>
-		/// Workaround for "unverifiable code" warning.
-		/// </summary>
-		/// <returns></returns>
-		private IEnumerable<IConsoleNodeBase> GetBaseConsoleNodes()
-		{
-			return base.GetConsoleNodes();
+			addRow("Pan/Tilt Speed", m_PanTiltSpeed);
+			addRow("Zoom Speed", m_ZoomSpeed);
 		}
 
 		#endregion

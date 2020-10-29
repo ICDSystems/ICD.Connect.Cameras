@@ -21,9 +21,9 @@ namespace ICD.Connect.Cameras.Panasonic.Tests
 		
 		[TestCase(eCameraZoomAction.ZoomIn, 24, "/cgi-bin/aw_ptz?cmd=%23Z74&res=1")]
 		[TestCase(eCameraZoomAction.ZoomOut, 24, "/cgi-bin/aw_ptz?cmd=%23Z26&res=1")]
-		public void TestZoom(eCameraZoomAction action, int zoomspeed, string expected)
+		public void TestZoom(eCameraZoomAction action, int zoomSpeed, string expected)
 		{
-			string result = PanasonicCommandBuilder.GetZoomCommand(action, zoomspeed);
+			string result = PanasonicCommandBuilder.GetZoomCommand(action, zoomSpeed);
 			Assert.AreEqual(expected, result);
 		}
 

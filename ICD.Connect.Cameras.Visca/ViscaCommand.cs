@@ -1,15 +1,19 @@
 ﻿using System;
+using System.Linq;
 using ICD.Common.Properties;
 using ICD.Common.Utils;
+using ICD.Connect.Protocol.Data;
 
 namespace ICD.Connect.Cameras.Visca
 {
-	public static class ViscaCommandBuilder
+	public sealed class ViscaCommand : ISerialData
 	{
 		#region Byte Constants
 
 		private const byte MESSAGE_START_BYTE = 0x01;
 		private const byte MESSAGE_END_BYTE = 0xFF;
+
+		private const byte INQUIRY_START_BYTE = 0x09;
 
 		#endregion
 
@@ -21,7 +25,22 @@ namespace ICD.Connect.Cameras.Visca
 
 		#endregion
 
-		#region Public Commands
+		[NotNull]
+		private readonly byte[] m_Bytes;
+
+		#region Constructors
+
+		/// <summary>
+		/// Constructor.
+		/// </summary>
+		/// <param name="bytes"></param>
+		public ViscaCommand([NotNull] params byte[] bytes)
+		{
+			if (bytes == null)
+				throw new ArgumentNullException("bytes");
+
+			m_Bytes = bytes.ToArray();
+		}
 
 		/// <summary>
 		/// Gets the Pan Command, using the default speed
@@ -29,7 +48,7 @@ namespace ICD.Connect.Cameras.Visca
 		/// <param name="id">The sequential Id of the camera to perform the operation on.</param>
 		/// <param name="action">The Pan action desired.</param>
 		[PublicAPI]
-		public static string GetPanCommand(int id, eCameraPanAction action)
+		public static ViscaCommand GetPanCommand(int id, eCameraPanAction action)
 		{
 			return GetPanCommand(id, action, DEFAULT_PAN_SPEED);
 		}
@@ -40,7 +59,7 @@ namespace ICD.Connect.Cameras.Visca
 		/// <param name="id">The sequential Id of the camera to perform the operation on.</param>
 		/// <param name="action">The Tilt action desired.</param>
 		[PublicAPI]
-		public static string GetTiltCommand(int id, eCameraTiltAction action)
+		public static ViscaCommand GetTiltCommand(int id, eCameraTiltAction action)
 		{
 			return GetTiltCommand(id, action, DEFAULT_TILT_SPEED);
 		}
@@ -51,7 +70,7 @@ namespace ICD.Connect.Cameras.Visca
 		/// <param name="id">The sequential Id of the camera to perform the operation on.</param>
 		/// <param name="action">The Zoom action desired.</param>
 		[PublicAPI]
-		public static string GetZoomCommand(int id, eCameraZoomAction action)
+		public static ViscaCommand GetZoomCommand(int id, eCameraZoomAction action)
 		{
 			return GetZoomCommand(id, action, DEFAULT_ZOOM_SPEED);
 		}
@@ -63,7 +82,7 @@ namespace ICD.Connect.Cameras.Visca
 		/// <param name="action">The Pan action desired.</param>
 		/// <param name="panSpeed">The desired speed for panning.</param>
 		[PublicAPI]
-		public static string GetPanCommand(int id, eCameraPanAction action, int panSpeed)
+		public static ViscaCommand GetPanCommand(int id, eCameraPanAction action, int panSpeed)
 		{
 			switch (action)
 			{
@@ -85,7 +104,7 @@ namespace ICD.Connect.Cameras.Visca
 		/// <param name="action">The Tilt action desired.</param>
 		/// <param name="tiltSpeed">The desired speed for tilting.</param>
 		[PublicAPI]
-		public static string GetTiltCommand(int id, eCameraTiltAction action, int tiltSpeed)
+		public static ViscaCommand GetTiltCommand(int id, eCameraTiltAction action, int tiltSpeed)
 		{
 			switch (action)
 			{
@@ -107,7 +126,7 @@ namespace ICD.Connect.Cameras.Visca
 		/// <param name="action">The Zoom action desired.</param>
 		/// <param name="zoomSpeed">The desired speed, where 0 is still and 50 is fastest possible</param>
 		[PublicAPI]
-		public static string GetZoomCommand(int id, eCameraZoomAction action, int zoomSpeed)
+		public static ViscaCommand GetZoomCommand(int id, eCameraZoomAction action, int zoomSpeed)
 		{
 			switch (action)
 			{
@@ -126,18 +145,29 @@ namespace ICD.Connect.Cameras.Visca
 		/// Gets the command which tells all VISCA cameras in a chain of VISCA cameras to discover their own ids.
 		/// </summary>
 		[PublicAPI]
-		public static string GetSetAddressCommand()
+		public static ViscaCommand GetSetAddressCommand()
 		{
-			return BuildSetAddressCommand();
+			return new ViscaCommand(
+				0x88,
+				0x30,
+				0x01,
+				MESSAGE_END_BYTE
+				);
 		}
 
 		/// <summary>
 		/// Gets the command to clear all pending commands for the given camera.
 		/// </summary>
 		[PublicAPI]
-		public static string GetClearCommand()
+		public static ViscaCommand GetClearCommand()
 		{
-			return BuildClearCommand();
+			return new ViscaCommand(
+				0x88,
+				MESSAGE_START_BYTE,
+				0x00,
+				0x01,
+				MESSAGE_END_BYTE
+				);
 		}
 
 		/// <summary>
@@ -146,9 +176,16 @@ namespace ICD.Connect.Cameras.Visca
 		/// <param name="id">The sequential id of the camera to power on</param>
 		/// <returns></returns>
 		[PublicAPI]
-		public static string GetPowerOnCommand(int id)
+		public static ViscaCommand GetPowerOnCommand(int id)
 		{
-			return BuildPowerOnCommand(id);
+			return new ViscaCommand(
+				GetIdByte(id),
+				MESSAGE_START_BYTE,
+				0x04,
+				0x00,
+				0x02,
+				MESSAGE_END_BYTE
+				);
 		}
 
 		/// <summary>
@@ -157,9 +194,58 @@ namespace ICD.Connect.Cameras.Visca
 		/// <param name="id">The sequential id of the camera to power off.</param>
 		/// <returns></returns>
 		[PublicAPI]
-		public static string GetPowerOffCommand(int id)
+		public static ViscaCommand GetPowerOffCommand(int id)
 		{
-			return BuildPowerOffCommand(id);
+			return new ViscaCommand(
+				GetIdByte(id),
+				MESSAGE_START_BYTE,
+				0x04,
+				0x00,
+				0x03,
+				MESSAGE_END_BYTE
+				);
+		}
+
+		/// <summary>
+		/// Gets the command to request the current power state of the camera.
+		/// </summary>
+		/// <param name="id">The sequential id of the camera to power off.</param>
+		/// <returns></returns>
+		public static ViscaCommand GetPowerInquiryCommand(int id)
+		{
+			return new ViscaCommand(
+				GetIdByte(id),
+				INQUIRY_START_BYTE,
+				0x04,
+				0x00,
+				MESSAGE_END_BYTE
+				);
+		}
+
+		#endregion
+
+		#region Methods
+
+		/// <summary>
+		/// Serialize this instance to a string.
+		/// </summary>
+		/// <returns></returns>
+		public string Serialize()
+		{
+			return StringUtils.ToString(m_Bytes);
+		}
+
+		/// <summary>
+		/// Returns true if the bytes for this command match the bytes for the given command.
+		/// </summary>
+		/// <param name="other"></param>
+		/// <returns></returns>
+		public bool CommandEquals([NotNull] ViscaCommand other)
+		{
+			if (other == null)
+				throw new ArgumentNullException("other");
+
+			return m_Bytes.SequenceEqual(other.m_Bytes);
 		}
 
 		#endregion
@@ -200,10 +286,9 @@ namespace ICD.Connect.Cameras.Visca
 
 		#region Command Builders
 
-		private static string BuildStopPanTiltCommand(int id)
+		private static ViscaCommand BuildStopPanTiltCommand(int id)
 		{
-			return StringUtils.ToString(new byte[]
-			{
+			return new ViscaCommand(
 				GetIdByte(id),
 				MESSAGE_START_BYTE,
 				0x06,
@@ -213,13 +298,12 @@ namespace ICD.Connect.Cameras.Visca
 				0x03,
 				0x03,
 				MESSAGE_END_BYTE
-			});
+			);
 		}
 
-		private static string BuildUpCommand(int id, int tiltSpeed)
+		private static ViscaCommand BuildUpCommand(int id, int tiltSpeed)
 		{
-			return StringUtils.ToString(new byte[]
-			{
+			return new ViscaCommand(
 				GetIdByte(id),
 				MESSAGE_START_BYTE,
 				0x06,
@@ -229,13 +313,12 @@ namespace ICD.Connect.Cameras.Visca
 				0x03,
 				0x01,
 				MESSAGE_END_BYTE
-			});
+			);
 		}
 
-		private static string BuildDownCommand(int id, int tiltSpeed)
+		private static ViscaCommand BuildDownCommand(int id, int tiltSpeed)
 		{
-			return StringUtils.ToString(new byte[]
-			{
+			return new ViscaCommand(
 				GetIdByte(id),
 				MESSAGE_START_BYTE,
 				0x06,
@@ -245,13 +328,12 @@ namespace ICD.Connect.Cameras.Visca
 				0x03,
 				0x02,
 				MESSAGE_END_BYTE
-			});
+			);
 		}
 
-		private static string BuildLeftCommand(int id, int panSpeed)
+		private static ViscaCommand BuildLeftCommand(int id, int panSpeed)
 		{
-			return StringUtils.ToString(new byte[]
-			{
+			return new ViscaCommand(
 				GetIdByte(id),
 				MESSAGE_START_BYTE,
 				0x06,
@@ -261,13 +343,12 @@ namespace ICD.Connect.Cameras.Visca
 				0x01,
 				0x03,
 				MESSAGE_END_BYTE
-			});
+			);
 		}
 
-		private static string BuildRightCommand(int id, int panSpeed)
+		private static ViscaCommand BuildRightCommand(int id, int panSpeed)
 		{
-			return StringUtils.ToString(new byte[]
-			{
+			return new ViscaCommand(
 				GetIdByte(id),
 				MESSAGE_START_BYTE,
 				0x06,
@@ -277,95 +358,43 @@ namespace ICD.Connect.Cameras.Visca
 				0x02,
 				0x03,
 				MESSAGE_END_BYTE
-			});
+			);
 		}
 
-		private static string BuildStopZoomCommand(int id)
+		private static ViscaCommand BuildStopZoomCommand(int id)
 		{
-			return StringUtils.ToString(new byte[]
-			{
+			return new ViscaCommand(
 				GetIdByte(id),
 				MESSAGE_START_BYTE,
 				0x04,
 				0x07,
 				0x00,
 				MESSAGE_END_BYTE
-			});
+			);
 		}
 
-		private static string BuildZoomInCommand(int id, int zoomSpeed)
+		private static ViscaCommand BuildZoomInCommand(int id, int zoomSpeed)
 		{
-			return StringUtils.ToString(new byte[]
-			{
+			return new ViscaCommand(
 				GetIdByte(id),
 				MESSAGE_START_BYTE,
 				0x04,
 				0x07,
 				GetZoomInSpeedByte(zoomSpeed),
 				MESSAGE_END_BYTE
-			});
+			);
 		}
 
-		private static string BuildZoomOutCommand(int id, int zoomSpeed)
+		private static ViscaCommand BuildZoomOutCommand(int id, int zoomSpeed)
 		{
-			return StringUtils.ToString(new byte[]
-			{
+			return new ViscaCommand(
 				GetIdByte(id),
 				MESSAGE_START_BYTE,
 				0x04,
 				0x07,
 				GetZoomOutSpeedByte(zoomSpeed),
 				MESSAGE_END_BYTE
-			});
-		}
-
-		private static string BuildSetAddressCommand()
-		{
-			return StringUtils.ToString(new byte[]
-			{
-				0x88,
-				0x30,
-				0x01,
-				MESSAGE_END_BYTE
-			});
-		}
-
-		private static string BuildClearCommand()
-		{
-			return StringUtils.ToString(new byte[]
-			{
-				0x88,
-				MESSAGE_START_BYTE,
-				0x00,
-				0x01,
-				MESSAGE_END_BYTE
-			});
-		}
-
-		private static string BuildPowerOnCommand(int id)
-		{
-			return StringUtils.ToString(new byte[]
-			{
-				GetIdByte(id),
-				MESSAGE_START_BYTE,
-				0x04,
-				0x00,
-				0x02,
-				MESSAGE_END_BYTE
-			});
-		}
-
-		private static string BuildPowerOffCommand(int id)
-		{
-			return StringUtils.ToString(new byte[]
-			{
-				GetIdByte(id),
-				MESSAGE_START_BYTE,
-				0x04,
-				0x00,
-				0x03,
-				MESSAGE_END_BYTE
-			});
+			);
 		}
 
 		#endregion

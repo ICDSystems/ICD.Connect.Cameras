@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using ICD.Common.Properties;
 using ICD.Common.Utils;
+using ICD.Common.Utils.Extensions;
 using ICD.Common.Utils.Services.Logging;
 using ICD.Common.Utils.Timers;
 using ICD.Connect.API.Commands;
+using ICD.Connect.API.Nodes;
 using ICD.Connect.Cameras.Controls;
 using ICD.Connect.Cameras.Devices;
 using ICD.Connect.Devices;
@@ -22,6 +24,11 @@ namespace ICD.Connect.Cameras.Panasonic
 	public sealed class PanasonicCameraAwDevice : AbstractCameraDevice<PanasonicCameraAwDeviceSettings>, IDeviceWithPower
 	{
 		private const long RATE_LIMIT = 130;
+
+		/// <summary>
+		/// Raised when the powered state changes.
+		/// </summary>
+		public event EventHandler<PowerDeviceControlPowerStateApiEventArgs> OnPowerStateChanged;
 
 		private static readonly Dictionary<string, string> s_ErrorMap =
 			new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -42,11 +49,33 @@ namespace ICD.Connect.Cameras.Panasonic
 		private IWebPort m_Port;
 		private int? m_PanTiltSpeed;
 		private int? m_ZoomSpeed;
+		private ePowerState m_PowerState;
+
+		#region Properties
 
 		/// <summary>
 		/// Gets the maximum number of presets this camera can support
 		/// </summary>
-		public override int MaxPresets { get { throw new NotSupportedException(); } }
+		public override int MaxPresets { get { return 0; } }
+
+		/// <summary>
+		/// Gets the powered state of the device.
+		/// </summary>
+		public ePowerState PowerState
+		{
+			get { return m_PowerState; }
+			private set
+			{
+				if (value == m_PowerState)
+					return;
+
+				m_PowerState = value;
+
+				OnPowerStateChanged.Raise(this, new PowerDeviceControlPowerStateApiEventArgs(m_PowerState));
+			}
+		}
+
+		#endregion
 
 		/// <summary>
 		/// Constructor.
@@ -61,6 +90,16 @@ namespace ICD.Connect.Cameras.Panasonic
 
 			m_DelayTimer = new IcdTimer();
 			m_DelayTimer.OnElapsed += TimerElapsed;
+		}
+
+		/// <summary>
+		/// Release resources.
+		/// </summary>
+		protected override void DisposeFinal(bool disposing)
+		{
+			OnPowerStateChanged = null;
+
+			base.DisposeFinal(disposing);
 		}
 
 		#region Camera Control Methods
@@ -141,11 +180,17 @@ namespace ICD.Connect.Cameras.Panasonic
 
 		#region IDeviceWithPower
 
+		/// <summary>
+		/// Powers on the device.
+		/// </summary>
 		public void PowerOn()
 		{
 			SendCommand(PanasonicCommandBuilder.GetPowerOnCommand());
 		}
 
+		/// <summary>
+		/// Powers off the device.
+		/// </summary>
 		public void PowerOff()
 		{
 			SendCommand(PanasonicCommandBuilder.GetPowerOffCommand());
@@ -267,18 +312,28 @@ namespace ICD.Connect.Cameras.Panasonic
 			if (string.IsNullOrEmpty(response))
 				return;
 
-			response = response.Trim();
-
-			if (command.ToLower().Contains(response.ToLower()))
-				return;
-
-			string code = response.Substring(0, 3);
-
+			response = response.Trim().ToLower();
+			
+			// Handle error
 			string message;
-			if (!s_ErrorMap.TryGetValue(code, out message))
-				message = "Unexpected error code";
+			string code = response.Substring(0, Math.Min(3, response.Length));
+			if (s_ErrorMap.TryGetValue(code, out message))
+			{
+				Logger.Log(eSeverity.Error, "{0} - {1}", response, message);
+				return;
+			}
 
-			Logger.Log(eSeverity.Error, "{0} - {1}", response, message);
+			// Handle feedback
+			switch (response)
+			{
+				case "p0":
+					PowerState = ePowerState.PowerOff;
+					break;
+
+				case "p1":
+					PowerState = ePowerState.PowerOn;
+					break;
+			}
 		}
 
 		#endregion
@@ -408,6 +463,28 @@ namespace ICD.Connect.Cameras.Panasonic
 		#region Console
 
 		/// <summary>
+		/// Gets the child console nodes.
+		/// </summary>
+		/// <returns></returns>
+		public override IEnumerable<IConsoleNodeBase> GetConsoleNodes()
+		{
+			foreach (IConsoleNodeBase node in GetBaseConsoleNodes())
+				yield return node;
+
+			foreach (IConsoleNodeBase node in DeviceWithPowerConsole.GetConsoleNodes(this))
+				yield return node;
+		}
+
+		/// <summary>
+		/// Wrokaround for "unverifiable code" warning.
+		/// </summary>
+		/// <returns></returns>
+		private IEnumerable<IConsoleNodeBase> GetBaseConsoleNodes()
+		{
+			return base.GetConsoleNodes();
+		}
+
+		/// <summary>
 		/// Gets the child console commands.
 		/// </summary>
 		/// <returns></returns>
@@ -416,8 +493,8 @@ namespace ICD.Connect.Cameras.Panasonic
 			foreach (IConsoleCommand command in GetBaseConsoleCommands())
 				yield return command;
 
-			yield return new ConsoleCommand("PowerOn", "Powers the camera device", () => PowerOn());
-			yield return new ConsoleCommand("PowerOff", "Places the camera device on standby", () => PowerOff());
+			foreach (IConsoleCommand command in DeviceWithPowerConsole.GetConsoleCommands(this))
+				yield return command;
 		}
 
 		/// <summary>
@@ -427,6 +504,20 @@ namespace ICD.Connect.Cameras.Panasonic
 		private IEnumerable<IConsoleCommand> GetBaseConsoleCommands()
 		{
 			return base.GetConsoleCommands();
+		}
+
+		/// <summary>
+		/// Calls the delegate for each console status item.
+		/// </summary>
+		/// <param name="addRow"></param>
+		public override void BuildConsoleStatus(AddStatusRowDelegate addRow)
+		{
+			base.BuildConsoleStatus(addRow);
+
+			DeviceWithPowerConsole.BuildConsoleStatus(this, addRow);
+
+			addRow("Pan/Tilt Speed", m_PanTiltSpeed);
+			addRow("Zoom Speed", m_ZoomSpeed);
 		}
 
 		#endregion
