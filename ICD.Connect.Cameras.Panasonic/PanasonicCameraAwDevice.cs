@@ -455,7 +455,7 @@ namespace ICD.Connect.Cameras.Panasonic
 
 			addControl(new GenericCameraRouteSourceControl<PanasonicCameraAwDevice>(this, 0));
 			addControl(new CameraDeviceControl(this, 1));
-			addControl(new PowerDeviceControl<PanasonicCameraAwDevice>(this, 2));
+			addControl(new PowerDeviceControl(this, 2));
 		}
 
 		#endregion

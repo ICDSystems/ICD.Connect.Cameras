@@ -487,7 +487,7 @@ namespace ICD.Connect.Cameras.Visca
 
 			addControl(new GenericCameraRouteSourceControl<ViscaCameraDevice>(this, 0));
 			addControl(new CameraDeviceControl(this, 1));
-			addControl(new PowerDeviceControl<ViscaCameraDevice>(this, 2));
+			addControl(new PowerDeviceControl(this, 2));
 		}
 
 		/// <summary>

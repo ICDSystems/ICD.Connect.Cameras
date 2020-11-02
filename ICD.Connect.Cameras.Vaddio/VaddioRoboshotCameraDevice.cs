@@ -615,7 +615,7 @@ namespace ICD.Connect.Cameras.Vaddio
 
 			addControl(new GenericCameraRouteSourceControl<VaddioRoboshotCameraDevice>(this, 0));
 			addControl(new CameraDeviceControl(this, 1));
-			addControl(new PowerDeviceControl<VaddioRoboshotCameraDevice>(this, 2));
+			addControl(new PowerDeviceControl(this, 2));
 		}
 
 		/// <summary>

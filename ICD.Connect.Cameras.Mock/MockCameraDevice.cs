@@ -325,7 +325,7 @@ namespace ICD.Connect.Cameras.Mock
 
 			addControl(new GenericCameraRouteSourceControl<MockCameraDevice>(this, 0));
 			addControl(new CameraDeviceControl(this, 1));
-			addControl(new PowerDeviceControl<MockCameraDevice>(this, 3));
+			addControl(new PowerDeviceControl(this, 3));
 		}
 
 		#endregion
