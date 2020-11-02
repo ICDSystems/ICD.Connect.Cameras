@@ -1,4 +1,6 @@
-﻿using ICD.Common.Utils;
+﻿using System;
+using ICD.Common.Properties;
+using ICD.Common.Utils;
 
 namespace ICD.Connect.Cameras.Visca
 {
@@ -65,6 +67,22 @@ namespace ICD.Connect.Cameras.Visca
 				default:
 					return eViscaResponse.UNSPECIFIED;
 			}
+		}
+
+		/// <summary>
+		/// Gets the single value from a visca inquiry response.
+		/// </summary>
+		/// <param name="response"></param>
+		/// <returns></returns>
+		public static byte GetSingleValue([NotNull] string response)
+		{
+			if (response == null)
+				throw new ArgumentNullException("response");
+
+			if (response.Length < 3)
+				throw new FormatException("Response must be at least 3 bytes");
+
+			return StringUtils.ToBytes(response)[2];
 		}
 	}
 }

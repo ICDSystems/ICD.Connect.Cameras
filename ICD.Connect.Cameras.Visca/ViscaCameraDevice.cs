@@ -329,12 +329,12 @@ namespace ICD.Connect.Cameras.Visca
 			if (args.Data == null)
 				return;
 
-			eViscaResponse response = ViscaResponseUtils.ToResponse(args.Response);
+			eViscaResponse code = ViscaResponseUtils.ToResponse(args.Response);
 
-			if (response.IsError())
-				HandleError((ViscaCommand)args.Data, response);
+			if (code.IsError())
+				HandleError((ViscaCommand)args.Data, code);
 			else
-				HandleQuery((ViscaCommand)args.Data, response);
+				HandleSuccess((ViscaCommand)args.Data, args.Response, code);
 		}
 
 		/// <summary>
@@ -342,13 +342,16 @@ namespace ICD.Connect.Cameras.Visca
 		/// </summary>
 		/// <param name="request"></param>
 		/// <param name="response"></param>
-		private void HandleQuery(ViscaCommand request, eViscaResponse response)
+		/// <param name="code"></param>
+		private void HandleSuccess(ViscaCommand request, string response, eViscaResponse code)
 		{
 			// Update power state feedback
 			if (request.CommandEquals(ViscaCommand.GetPowerOnCommand(DEFAULT_ID)))
 				PowerState = ePowerState.PowerOn;
-			if (request.CommandEquals(ViscaCommand.GetPowerOffCommand(DEFAULT_ID)))
+			else if (request.CommandEquals(ViscaCommand.GetPowerOffCommand(DEFAULT_ID)))
 				PowerState = ePowerState.PowerOff;
+			else if (request.CommandEquals(ViscaCommand.GetPowerInquiryCommand(DEFAULT_ID)))
+				PowerState = ViscaResponseUtils.GetSingleValue(response) == 2 ? ePowerState.PowerOn : ePowerState.PowerOff;
 		}
 
 		/// <summary>
