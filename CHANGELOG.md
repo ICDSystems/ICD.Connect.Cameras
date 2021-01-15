@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [5.1.0] - 2021-01-15
+### Added
+ - Camera drivers report power state feedback
+
 ## [5.0.2] - 2020-09-24
 ### Changed
  - Fixed a bug where default camera activities were not being initialized
