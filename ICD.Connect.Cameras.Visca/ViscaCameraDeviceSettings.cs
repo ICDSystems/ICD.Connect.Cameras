@@ -1,4 +1,5 @@
-﻿using ICD.Common.Utils;
+﻿using System;
+using ICD.Common.Utils;
 using ICD.Common.Utils.Xml;
 using ICD.Connect.Cameras.Devices;
 using ICD.Connect.Protocol.Ports;
@@ -149,17 +150,7 @@ namespace ICD.Connect.Cameras.Visca
 		/// </summary>
 		public ViscaCameraDeviceSettings()
 		{
-			m_ComSpecProperties = new ComSpecProperties
-			{
-				ComSpecBaudRate = eComBaudRates.BaudRate9600,
-				ComSpecNumberOfDataBits = eComDataBits.DataBits8,
-				ComSpecParityType = eComParityType.None,
-				ComSpecNumberOfStopBits = eComStopBits.StopBits1,
-				ComSpecProtocolType = eComProtocolType.Rs232,
-				ComSpecHardwareHandshake = eComHardwareHandshakeType.None,
-				ComSpecSoftwareHandshake = eComSoftwareHandshakeType.None,
-				ComSpecReportCtsChanges = false
-			};
+			m_ComSpecProperties = new ComSpecProperties();
 		}
 
 		/// <summary>
@@ -190,6 +181,23 @@ namespace ICD.Connect.Cameras.Visca
 			ZoomSpeed = XmlUtils.TryReadChildElementContentAsInt(xml, ZOOM_SPEED_ELEMENT);
 
 			m_ComSpecProperties.ParseXml(xml);
+
+			UpdateComSpecDefaults(m_ComSpecProperties);
+		}
+
+		private void UpdateComSpecDefaults(ComSpecProperties comSpecProperties)
+		{
+			if(comSpecProperties == null)
+				throw new ArgumentNullException("comSpecProperties");
+
+			comSpecProperties.ApplyDefaultValues(eComBaudRates.BaudRate9600,
+			                                     eComDataBits.DataBits8,
+			                                     eComParityType.None,
+			                                     eComStopBits.StopBits1,
+			                                     eComProtocolType.Rs232,
+			                                     eComHardwareHandshakeType.None,
+			                                     eComSoftwareHandshakeType.None,
+			                                     false);
 		}
 	}
 }
