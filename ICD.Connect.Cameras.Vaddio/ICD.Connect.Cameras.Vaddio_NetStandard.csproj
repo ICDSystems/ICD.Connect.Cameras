@@ -46,7 +46,7 @@
   <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
-  <Target Name="ArchivePlugin" AfterTargets="AfterBuild">
+  <Target Name="ArchivePlugin" AfterTargets="AfterBuild" Condition="'$(OS)' == 'Windows_NT'">
     <Delete Files="$(TargetDir)$(AssemblyName).kpz" />
     <ZipDirectory DestinationFile="$(TargetDir)..\$(AssemblyName).kpz"
                   SourceDirectory="$(TargetDir)"
