@@ -222,6 +222,43 @@ namespace ICD.Connect.Cameras.Visca
 				);
 		}
 
+		public static ViscaCommand GetRecallPresetCommand(int id, byte presetId)
+		{
+			return new ViscaCommand(
+				GetIdByte(id),
+				MESSAGE_START_BYTE,
+				0x04,
+				0x3F,
+				0x02,
+				presetId,
+				MESSAGE_END_BYTE
+				);
+		}
+
+		public static ViscaCommand GetStorePresetCommand(int id, byte presetId)
+		{
+			return new ViscaCommand(
+				GetIdByte(id),
+				MESSAGE_START_BYTE,
+				0x04,
+				0x3F,
+				0x01,
+				presetId,
+				MESSAGE_END_BYTE
+				);
+		}
+
+		public static ViscaCommand GetRecallHomeCommand(int id)
+		{
+			return new ViscaCommand(
+				GetIdByte(id),
+				MESSAGE_START_BYTE,
+				0x06,
+				0x04,
+				MESSAGE_END_BYTE
+				);
+		}
+
 		#endregion
 
 		#region Methods

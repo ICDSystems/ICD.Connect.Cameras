@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Added
  - Added AVer PTZ3 camera driver for visca over UDP control
+ - Added preset support to visca cameras
 
 ## [5.1.1] - 2021-01-25
 ### Changed

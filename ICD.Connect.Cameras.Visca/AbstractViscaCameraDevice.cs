@@ -28,6 +28,8 @@ namespace ICD.Connect.Cameras.Visca
 	public abstract class AbstractViscaCameraDevice<TSettings> : AbstractCameraDevice<TSettings>, IViscaCameraDevice
 		where TSettings : IViscaCameraDeviceSettings, new()
 	{
+		// Since we (probably) can't get presets from the camera, this is the number we return
+		private const int NUMBER_OF_PRESETS = 7;
 		private const int MAX_RETRY_ATTEMPTS = 20;
 		private const int DEFAULT_ID = 1;
 		private const char DELIMITER = '\xFF';
@@ -56,7 +58,7 @@ namespace ICD.Connect.Cameras.Visca
 		/// <summary>
 		/// Gets the maximum number of presets this camera can support
 		/// </summary>
-		public override int MaxPresets { get { return 0; } }
+		public override int MaxPresets { get { return 127; } }
 
 		/// <summary>
 		/// Gets the powered state of the device.
@@ -89,7 +91,9 @@ namespace ICD.Connect.Cameras.Visca
 			m_ConnectionStateManager = new ConnectionStateManager(this) { ConfigurePort = ConfigurePort };
 			m_ConnectionStateManager.OnIsOnlineStateChanged += PortOnIsOnlineStateChanged;
 
-			SupportedCameraFeatures = eCameraFeatures.PanTiltZoom;
+			SupportedCameraFeatures = eCameraFeatures.PanTiltZoom |
+			                          eCameraFeatures.Home |
+			                          eCameraFeatures.Presets;
 		}
 
 		/// <summary>
@@ -153,8 +157,10 @@ namespace ICD.Connect.Cameras.Visca
 		/// Gets the stored camera presets.
 		/// </summary>
 		public override IEnumerable<CameraPreset> GetPresets()
-		{
-			return Enumerable.Empty<CameraPreset>();
+		{	
+			// Presets start at 1
+			for(int i = 1; i <= NUMBER_OF_PRESETS; i++)
+				yield return new CameraPreset(i, string.Format("Preset {0}", i));
 		}
 
 		/// <summary>
@@ -163,7 +169,7 @@ namespace ICD.Connect.Cameras.Visca
 		/// <param name="presetId">The id of the preset to position to.</param>
 		public override void ActivatePreset(int presetId)
 		{
-			throw new NotSupportedException();
+			SendCommand(ViscaCommand.GetRecallPresetCommand(DEFAULT_ID, (byte)presetId));
 		}
 
 		/// <summary>
@@ -172,7 +178,7 @@ namespace ICD.Connect.Cameras.Visca
 		/// <param name="presetId">The index to store the preset at.</param>
 		public override void StorePreset(int presetId)
 		{
-			throw new NotSupportedException();
+			SendCommand(ViscaCommand.GetStorePresetCommand(DEFAULT_ID, (byte)presetId));
 		}
 
 		/// <summary>
@@ -189,7 +195,7 @@ namespace ICD.Connect.Cameras.Visca
 		/// </summary>
 		public override void ActivateHome()
 		{
-			throw new NotSupportedException();
+			SendCommand(ViscaCommand.GetRecallHomeCommand(DEFAULT_ID));
 		}
 
 		/// <summary>
@@ -197,7 +203,6 @@ namespace ICD.Connect.Cameras.Visca
 		/// </summary>
 		public override void StoreHome()
 		{
-			throw new NotSupportedException();
 		}
 
 		#endregion
