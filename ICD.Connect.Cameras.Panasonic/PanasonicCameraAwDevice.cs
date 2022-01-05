@@ -286,7 +286,7 @@ namespace ICD.Connect.Cameras.Panasonic
 					}
 					try
 					{
-						WebPortResponse response = m_Port.Get(command);
+						WebPortResponse response = m_Port.Get(command, null);
 						ParsePortData(command, response.DataAsString);
 					}
 					catch (Exception ex)
