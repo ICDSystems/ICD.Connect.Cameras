@@ -5,7 +5,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [5.2.1] - 2022-07-01
 ### Changed
+ - Updated usages of web port to use null body for get requests
  - Updated Dependencies, Updated Crestron SDK to 2.18.96
 
 ## [5.2.0] - 2021-08-18
