@@ -62,7 +62,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="KrangPlugin.cs" />
-    <Compile Include="ObfuscationSettings.cs" />
     <None Include="Properties\ControlSystem.cfg" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WindowsUsbCameraDevice.cs" />

@@ -68,7 +68,6 @@
     <Compile Include="eViscaResponse.cs" />
     <Compile Include="IViscaCameraDevice.cs" />
     <Compile Include="IViscaCameraDeviceSettings.cs" />
-    <Compile Include="ObfuscationSettings.cs" />
     <Compile Include="ViscaCommand.cs" />
     <Compile Include="KrangPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
